@@ -1,8 +1,9 @@
 import { ApplicationConfig } from '@angular/core';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 
-import { routes } from './app.routes';
+import { APP_ROUTES } from './config/routes/app.routes';
 
-export const appConfig: ApplicationConfig = {
-  providers: [provideRouter(routes)]
+export const APP_CONFIG: ApplicationConfig = {
+  providers: [provideRouter(APP_ROUTES), provideAnimations()],
 };

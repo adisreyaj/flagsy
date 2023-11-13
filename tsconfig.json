@@ -2,6 +2,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -19,6 +20,20 @@
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
+    "paths": {
+      "@ui/*": [
+        "./projects/ui/src/public-api.ts"
+      ],
+      "@ui/components/*": [
+        "./projects/ui/src/components/index.ts"
+      ],
+      "@app/services/*": [
+        "./src/app/services/*"
+      ],
+      "@app/types/*": [
+        "./src/app/types/*"
+      ]
+    },
     "lib": [
       "ES2022",
       "dom"
