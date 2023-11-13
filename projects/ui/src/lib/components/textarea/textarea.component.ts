@@ -3,6 +3,7 @@ import {
   Component,
   inject,
   Input,
+  numberAttribute,
   signal,
 } from '@angular/core';
 import {
@@ -13,53 +14,32 @@ import {
 import { FormFieldComponent } from '../form-field/form-field.component';
 
 @Component({
-  selector: 'ui-input',
-  template: ` <input
-    class="py-2 px-3 block w-full border border-gray-200 rounded-lg focus:ring-1 focus:border-primary-500 focus:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none"
-    [class.form-field-input]="this.isWithinFormField"
-    [class.error]="this.hasError"
-    [type]="this.type"
+  selector: 'ui-textarea',
+  template: ` <textarea
+    class="p-2 block w-full border border-gray-200 rounded-lg resize-none focus:ring-1 focus:border-primary-500 focus:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none"
+    [rows]="this.rows"
     [disabled]="this.isDisabled()"
     [placeholder]="this.placeholder"
     [ngModel]="this.value()"
     (ngModelChange)="this.updateValue($event)"
-  />`,
-  styles: [
-    // language=SCSS
-    `
-      @mixin errorBorder() {
-        @apply border-red-500 ring-red-500;
-      }
-
-      :host {
-        &.ng-dirty.ng-invalid {
-          input:not(.form-field-input) {
-            @include errorBorder;
-          }
-        }
-      }
-
-      .error {
-        @include errorBorder;
-      }
-    `,
-  ],
+  >
+  </textarea>`,
   standalone: true,
   imports: [FormsModule],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: InputComponent,
+      useExisting: TextareaComponent,
       multi: true,
     },
   ],
 })
-export class InputComponent implements ControlValueAccessor {
-  @Input()
-  public type: string = 'text';
-
+export class TextareaComponent implements ControlValueAccessor {
   @Input()
   public placeholder: string = '';
+
+  @Input({ transform: numberAttribute })
+  public rows: number = 3;
 
   @Input({ transform: booleanAttribute })
   public set disabled(isDisabled: boolean) {

@@ -1,5 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import {
+  AbstractControl,
   FormBuilder,
   FormControl,
   FormGroup,
@@ -17,6 +18,7 @@ import {
   SelectComponent,
   SelectOptionComponent,
   SheetRef,
+  TextareaComponent,
   ToggleComponent,
 } from '@ui/components';
 
@@ -26,33 +28,25 @@ import {
     <div class="flex flex-col h-full">
       <form
         [formGroup]="form"
-        class="flex flex-col gap-4 p-6 min-h-0 overflow-y-auto flex-auto"
+        class="flex flex-col gap-4 p-6 min-h-0 overflow-y-auto flex-auto max-w-lg"
       >
-        <ui-form-field label="Key" errorMessage="Key is required." showError>
-          <ui-input formControlName="key"></ui-input>
-        </ui-form-field>
-        <ui-form-field label="Description">
-          <ui-input formControlName="description"></ui-input>
-        </ui-form-field>
-        <ui-form-field label="Key" errorMessage="Key is required." showError>
-          <ui-input formControlName="key"></ui-input>
-        </ui-form-field>
-        <ui-form-field label="Description">
-          <ui-input formControlName="description"></ui-input>
-        </ui-form-field>
-
-        <ui-form-field label="Key" errorMessage="Key is required." showError>
-          <ui-input formControlName="key"></ui-input>
-        </ui-form-field>
-        <ui-form-field label="Description">
-          <ui-input formControlName="description"></ui-input>
+        <ui-form-field
+          label="Key"
+          hint="Allowed characters: Alphanumeric, dashes & underscores)"
+          errorMessage="Key is required."
+          [showError]="this.hasErrors(this.form.controls.key)"
+        >
+          <ui-input
+            formControlName="key"
+            placeholder="my-cool-feature"
+          ></ui-input>
         </ui-form-field>
 
-        <ui-form-field label="Key" errorMessage="Key is required." showError>
-          <ui-input formControlName="key"></ui-input>
-        </ui-form-field>
         <ui-form-field label="Description">
-          <ui-input formControlName="description"></ui-input>
+          <ui-textarea
+            formControlName="description"
+            placeholder="Meaningful description for the flag"
+          ></ui-textarea>
         </ui-form-field>
 
         <ui-form-field label="Type">
@@ -69,11 +63,17 @@ import {
             }
           </ui-select>
         </ui-form-field>
+
         <div>
           @switch (this.form.controls.valueType.value) {
             @case (FeatureValueType.Boolean) {
               <ui-form-field label="Enabled">
                 <ui-toggle></ui-toggle>
+              </ui-form-field>
+            }
+            @case (FeatureValueType.Number) {
+              <ui-form-field label="Value">
+                <ui-input type="number"></ui-input>
               </ui-form-field>
             }
             @default {
@@ -84,6 +84,7 @@ import {
           }
         </div>
       </form>
+
       <footer
         class="flex items-center gap-3 flex-none px-6 py-4 justify-end border-t border-gray-200"
       >
@@ -92,7 +93,7 @@ import {
           label="Close"
           (click)="this.closeSheet()"
         ></ui-button>
-        <ui-button label="Continue"></ui-button>
+        <ui-button label="Continue" (click)="this.saveFlag()"></ui-button>
       </footer>
     </div>
   `,
@@ -106,12 +107,14 @@ import {
     FormFieldComponent,
     SelectComponent,
     SelectOptionComponent,
+    TextareaComponent,
   ],
 })
 export class FeatureConfigSheetComponent {
   protected readonly form: FormGroup<FeatureFormType>;
   protected readonly featureTypeSelectOptions;
   protected readonly FeatureValueType = FeatureValueType;
+  protected readonly submitted = signal(false);
 
   private readonly sheetRef = inject(SheetRef);
   private readonly fb: NonNullableFormBuilder = inject(FormBuilder).nonNullable;
@@ -128,8 +131,18 @@ export class FeatureConfigSheetComponent {
     });
   }
 
+  hasErrors(control: AbstractControl): boolean {
+    return (
+      this.submitted() && (control.touched || control.dirty) && control.invalid
+    );
+  }
+
   closeSheet() {
     this.sheetRef.close();
+  }
+
+  public saveFlag(): void {
+    this.submitted.set(true);
   }
 }
 

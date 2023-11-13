@@ -31,9 +31,10 @@ import { SelectOptionComponent } from './select-option.component';
       <div>{{ this.selectedItemLabel() }}</div>
       <div>
         <svg
-          class="w-5 h-5"
+          class="w-5 h-5 transform-gpu duration-300"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
+          [class.rotate-180]="this.isOpen()"
         >
           <path
             d="M11.9997 13.1714L16.9495 8.22168L18.3637 9.63589L11.9997 15.9999L5.63574 9.63589L7.04996 8.22168L11.9997 13.1714Z"

@@ -13,6 +13,14 @@
   font-family: 'Raleway', sans-serif;
   letter-spacing: 0.5px;
   outline: none;
+
+  ::-moz-selection { /* Code for Firefox */
+    @apply bg-primary-100;
+  }
+
+  ::selection {
+    @apply bg-primary-100;
+  }
 }
 
 
