@@ -22,24 +22,24 @@ import { NAVIGATION_DATA } from '../../../config/navigation-definition.data';
             Home
           </a>
         </li>
-        @for (item of NAVIGATION_ITEMS;track item.id) {
-        <li class="cursor-pointer">
-          <a
-            [routerLink]="item.route"
-            routerLinkActive="active"
-            [routerLinkActiveOptions]="routerLinkActiveOptions"
-            ariaCurrentWhenActive="page"
-          >
-            {{ item.title }}
-          </a>
-        </li>
+        @for (item of NAVIGATION_ITEMS; track item.id) {
+          <li class="cursor-pointer">
+            <a
+              [routerLink]="item.route"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="routerLinkActiveOptions"
+              ariaCurrentWhenActive="page"
+            >
+              {{ item.title }}
+            </a>
+          </li>
         }
       </ul>
     </div>
   `,
   styles: `
     .active {
-      @apply text-blue-500;
+      @apply text-primary-500;
     }
   `,
   standalone: true,

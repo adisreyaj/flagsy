@@ -1,5 +1,9 @@
 import { booleanAttribute, Component, Input, signal } from '@angular/core';
-import { ControlValueAccessor, FormsModule } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  FormsModule,
+  NG_VALUE_ACCESSOR,
+} from '@angular/forms';
 
 @Component({
   selector: 'ui-input',
@@ -13,6 +17,13 @@ import { ControlValueAccessor, FormsModule } from '@angular/forms';
   />`,
   standalone: true,
   imports: [FormsModule],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: InputComponent,
+      multi: true,
+    },
+  ],
 })
 export class InputComponent implements ControlValueAccessor {
   @Input()

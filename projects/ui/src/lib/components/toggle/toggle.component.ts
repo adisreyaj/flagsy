@@ -11,7 +11,7 @@ import {
     <label
       for="AcceptConditions"
       [class.disabled]="this.isDisabled()"
-      class="relative block h-5 w-10 cursor-pointer [-webkit-tap-highlight-color:_transparent]"
+      class="toggle rounded-full relative block h-6 w-12 cursor-pointer [-webkit-tap-highlight-color:_transparent]"
     >
       <input
         type="checkbox"
@@ -23,12 +23,12 @@ import {
       />
 
       <span
-        class="absolute inset-0 rounded-full bg-gray-300 transition peer-checked:bg-primary-600 peer-disabled:bg-gray-200"
+        class="absolute inset-0 rounded-full bg-gray-300 transition peer-checked:bg-primary-600 peer-disabled:bg-gray-200 ring-offset-2 peer-focus:ring-2 peer-focus:ring-primary-500"
       >
       </span>
 
       <span
-        class="absolute inset-y-0 start-0 m-1 h-3 w-3 rounded-full bg-white transition-all peer-checked:start-5"
+        class="absolute inset-y-0 start-0 m-1 h-4 w-4 rounded-full bg-white transition-all peer-checked:start-6"
       >
       </span>
     </label>
