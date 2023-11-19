@@ -16,6 +16,7 @@ import {
   signal,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { AngularRemixIconComponent } from 'angular-remix-icon';
 import { SelectOptionComponent } from './select-option.component';
 
 @Component({
@@ -30,16 +31,11 @@ import { SelectOptionComponent } from './select-option.component';
     >
       <div>{{ this.selectedItemLabel() }}</div>
       <div>
-        <svg
-          class="w-5 h-5 transform-gpu duration-300"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
+        <rmx-icon
+          class="!w-5 !h-5 transform-gpu duration-300"
           [class.rotate-180]="this.isOpen()"
-        >
-          <path
-            d="M11.9997 13.1714L16.9495 8.22168L18.3637 9.63589L11.9997 15.9999L5.63574 9.63589L7.04996 8.22168L11.9997 13.1714Z"
-          ></path>
-        </svg>
+          name="arrow-down-s-line"
+        ></rmx-icon>
       </div>
     </button>
     <ng-template #menu>
@@ -66,16 +62,10 @@ import { SelectOptionComponent } from './select-option.component';
             </div>
             @if (this.selectedItemValue() === item.value) {
               <div>
-                <svg
-                  class="w-5 h-5 text-primary-500"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M10.0007 15.1709L19.1931 5.97852L20.6073 7.39273L10.0007 17.9993L3.63672 11.6354L5.05093 10.2212L10.0007 15.1709Z"
-                  ></path>
-                </svg>
+                <rmx-icon
+                  class="!w-5 !h-5 text-primary-500"
+                  name="check-line"
+                ></rmx-icon>
               </div>
             }
           </button>
@@ -84,7 +74,14 @@ import { SelectOptionComponent } from './select-option.component';
     </ng-template>
   `,
   standalone: true,
-  imports: [CdkMenu, CdkMenuItem, CdkMenuTrigger, A11yModule, CdkMenuItemRadio],
+  imports: [
+    CdkMenu,
+    CdkMenuItem,
+    CdkMenuTrigger,
+    A11yModule,
+    CdkMenuItemRadio,
+    AngularRemixIconComponent,
+  ],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

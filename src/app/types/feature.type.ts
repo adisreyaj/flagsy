@@ -12,6 +12,17 @@ export interface Feature {
   lastUpdatedBy?: FeatureUser;
 }
 
+export interface FeatureCreateData {
+  key: string;
+  projectId: string;
+  valueType: FeatureValueType;
+  value: SupportedFeatureValueTypes;
+  environmentOverrides: {
+    environmentId: string;
+    value: SupportedFeatureValueTypes;
+  }[];
+}
+
 export interface FeatureUser {
   id: string;
   firstName: string;
@@ -47,8 +58,10 @@ export type FeatureValue =
     };
 
 export enum FeatureValueType {
-  Boolean = 'boolean',
-  String = 'string',
-  Number = 'number',
-  Json = 'json',
+  Boolean = 'BOOLEAN',
+  String = 'STRING',
+  Number = 'NUMBER',
+  Json = 'JSON',
 }
+
+export type SupportedFeatureValueTypes = boolean | string | number | object;

@@ -10,7 +10,7 @@
 }
 
 * {
-  font-family: 'Raleway', sans-serif;
+  font-family: 'Manrope', sans-serif;
   letter-spacing: 0.5px;
   outline: none;
 
@@ -31,4 +31,21 @@
 .sheet {
   @apply bg-white rounded-tl-lg rounded-br-lg border-l border-gray-200;
   box-shadow: -9px 0px 32px -6px rgba(0, 0, 0, 0.1);
+}
+
+.page-content {
+  @apply p-4 overflow-y-auto bg-white min-h-0 flex-auto;
+}
+
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
 }

@@ -5,16 +5,26 @@ import {
   Input,
   signal,
 } from '@angular/core';
+import { AngularRemixIconComponent } from 'angular-remix-icon';
+import { IconName } from 'angular-remix-icon/lib/icon-names';
 
 @Component({
   selector: 'ui-button',
   template: `
     <button [class]="this.buttonClasses()" [disabled]="this.isDisabled()">
-      {{ this.label }}
+      <div>
+        {{ this.label }}
+      </div>
+      @if (this.trailingIcon; as icon) {
+        <div>
+          <rmx-icon class="trailing-icon" [name]="icon"></rmx-icon>
+        </div>
+      }
     </button>
   `,
   styleUrl: './button.component.scss',
   standalone: true,
+  imports: [AngularRemixIconComponent],
 })
 export class ButtonComponent {
   @Input()
@@ -35,12 +45,20 @@ export class ButtonComponent {
     this.isDisabled.set(isDisabled);
   }
 
+  @Input()
+  public trailingIcon?: IconName;
+
   protected readonly isDisabled = signal(false);
   private readonly sizeSelection = signal('md');
   private readonly variantSelection = signal('primary');
 
   protected readonly buttonClasses = computed(() => {
-    return ['btn', this.sizeSelection(), this.variantSelection()];
+    return [
+      'btn',
+      this.sizeSelection(),
+      this.variantSelection(),
+      this.trailingIcon ? 'has-trailing-icon' : '',
+    ];
   });
 }
 

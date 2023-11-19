@@ -7,7 +7,7 @@ export const PROJECT_ROUTES: Route[] = [
     path: '',
     pathMatch: 'full',
     loadComponent: () =>
-      import('../../pages/projects/projects.component').then(
+        import('../../pages/projects/projects.component').then(
         (m) => m.ProjectsComponent,
       ),
   },

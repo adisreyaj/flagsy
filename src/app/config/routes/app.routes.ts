@@ -17,6 +17,11 @@ export const APP_ROUTES: Routes = [
           import('../../shell.component').then((m) => m.ShellComponent),
         children: [
           {
+            path: AppRoutes.Orgs,
+            loadChildren: () =>
+              import('./org.routes').then((m) => m.ORG_ROUTES),
+          },
+          {
             path: AppRoutes.Projects,
             loadChildren: () =>
               import('./project.routes').then((m) => m.PROJECT_ROUTES),
@@ -40,6 +45,7 @@ export const APP_ROUTES: Routes = [
 export const enum AppRoutes {
   Login = 'login',
   Register = 'register',
+  Orgs = 'orgs',
   Projects = 'projects',
   Environments = 'environments',
   Features = 'features',

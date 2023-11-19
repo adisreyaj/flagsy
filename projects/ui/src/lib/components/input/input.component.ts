@@ -10,6 +10,7 @@ import {
   FormsModule,
   NG_VALUE_ACCESSOR,
 } from '@angular/forms';
+import { debounce } from 'lodash-es';
 import { FormFieldComponent } from '../form-field/form-field.component';
 
 @Component({
@@ -61,6 +62,9 @@ export class InputComponent implements ControlValueAccessor {
   @Input()
   public placeholder: string = '';
 
+  @Input()
+  public debounceTime: number = 0;
+
   @Input({ transform: booleanAttribute })
   public set disabled(isDisabled: boolean) {
     this.isDisabled.set(isDisabled);
@@ -69,7 +73,9 @@ export class InputComponent implements ControlValueAccessor {
   protected readonly value = signal('');
   protected readonly isDisabled = signal(false);
 
-  protected readonly formField? = inject(FormFieldComponent);
+  protected readonly formField? = inject(FormFieldComponent, {
+    optional: true,
+  });
 
   private propagateValueChange?: (value: string) => void;
   private propagateTouch?: () => void;
@@ -100,7 +106,13 @@ export class InputComponent implements ControlValueAccessor {
 
   public updateValue(value: string): void {
     this.value.set(value);
-    this.propagateValueChange?.(value);
-    this.propagateTouch?.();
+    this.debouncedNotifyChange(value)();
+  }
+
+  private debouncedNotifyChange(value: string) {
+    return debounce(() => {
+      this.propagateValueChange?.(value);
+      this.propagateTouch?.();
+    }, this.debounceTime);
   }
 }

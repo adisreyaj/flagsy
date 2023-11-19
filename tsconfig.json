@@ -21,11 +21,8 @@
     "module": "ES2022",
     "useDefineForClassFields": false,
     "paths": {
-      "@ui/*": [
-        "./projects/ui/src/public-api.ts"
-      ],
-      "@ui/components/*": [
-        "./projects/ui/src/components/index.ts"
+      "@ui/components": [
+        "./projects/ui/src/lib/components/index.ts"
       ],
       "@app/services/*": [
         "./src/app/services/*"

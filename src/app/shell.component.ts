@@ -6,11 +6,14 @@ import { SidebarComponent } from './shared/components/sidebar/sidebar.component'
 @Component({
   selector: 'app-shell',
   template: `
-    <div class="shell" [class.sidebar-open]="this.isSidebarOpen()">
-      <aside class="sidebar">
+    <div
+      class="shell flex bg-slate-100 h-screen"
+      [class.sidebar-open]="this.isSidebarOpen()"
+    >
+      <aside class="sidebar p-2 pr-0">
         <app-sidebar></app-sidebar>
       </aside>
-      <main class="content">
+      <main class="content flex-auto p-2">
         <router-outlet></router-outlet>
       </main>
     </div>
@@ -18,12 +21,6 @@ import { SidebarComponent } from './shared/components/sidebar/sidebar.component'
   styles: [
     `
       .shell {
-        display: flex;
-
-        .content {
-          flex: 1 1 auto;
-        }
-
         &.sidebar-open {
           .sidebar {
             width: 16rem;

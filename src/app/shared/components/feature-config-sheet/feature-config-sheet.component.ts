@@ -10,7 +10,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { FeatureService } from '@app/services/features/feature.service';
-import { FeatureValueType } from '@app/types/feature';
+import { ProjectsService } from '@app/services/projects/projects.service';
+import { FeatureCreateData, FeatureValueType } from '@app/types/feature.type';
 import {
   ButtonComponent,
   FormFieldComponent,
@@ -93,7 +94,7 @@ import {
           label="Close"
           (click)="this.closeSheet()"
         ></ui-button>
-        <ui-button label="Continue" (click)="this.saveFlag()"></ui-button>
+        <ui-button label="Save Flag" (click)="this.saveFlag()"></ui-button>
       </footer>
     </div>
   `,
@@ -118,11 +119,12 @@ export class FeatureConfigSheetComponent {
 
   private readonly sheetRef = inject(SheetRef);
   private readonly fb: NonNullableFormBuilder = inject(FormBuilder).nonNullable;
-  private readonly featureService = inject(FeatureService);
+  private readonly featuresService = inject(FeatureService);
+  private readonly projectsService = inject(ProjectsService);
 
   constructor() {
     this.featureTypeSelectOptions =
-      this.featureService.getFeatureTypeSelectOptions();
+      this.featuresService.getFeatureTypeSelectOptions();
     this.form = this.fb.group<FeatureFormType>({
       key: this.fb.control('', Validators.required),
       description: this.fb.control(''),
@@ -143,6 +145,19 @@ export class FeatureConfigSheetComponent {
 
   public saveFlag(): void {
     this.submitted.set(true);
+    const activeProject = this.projectsService.activeProject();
+    if (this.form.valid && activeProject) {
+      const { key, value, valueType, description } = this.form.getRawValue();
+      const createFeatureData: FeatureCreateData = {
+        key,
+        environmentOverrides: [],
+        value,
+        valueType,
+        projectId: activeProject.id,
+      };
+
+      this.featuresService.createFeature(createFeatureData).subscribe();
+    }
   }
 }
 

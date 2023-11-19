@@ -1,13 +1,25 @@
-@mixin sm() {
-  @apply py-1 px-2;
+@mixin sm($withTrailingIcon: false) {
+  @if $withTrailingIcon {
+    @apply py-1 px-2 pr-1;
+  } @else {
+    @apply py-1 px-2;
+  }
 }
 
-@mixin md() {
-  @apply py-2 px-4;
+@mixin md($withTrailingIcon: false) {
+  @if $withTrailingIcon {
+    @apply py-2 px-3 pr-2;
+  } @else {
+    @apply py-2 px-3;
+  }
 }
 
-@mixin lg() {
-  @apply py-4 px-5;
+@mixin lg($withTrailingIcon: false) {
+  @if $withTrailingIcon {
+    @apply py-3 px-4 pr-3;
+  } @else {
+    @apply py-3 px-4;
+  }
 }
 
 @mixin primary() {
@@ -20,17 +32,47 @@
 
 
 .btn {
-  @apply inline-flex items-center gap-x-2 text-base rounded-lg border border-transparent text-white focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50;
+  @apply inline-flex items-center gap-x-1 text-base rounded-lg border border-transparent text-white focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50;
   &.sm {
-    @include sm;
+    &:not(.has-trailing-icon) {
+      @include sm;
+    }
+
+    &.has-trailing-icon {
+      @include sm(true);
+    }
+
+    .trailing-icon {
+      @apply w-4 h-4;
+    }
   }
 
   &.md {
-    @include md;
+    &:not(.has-trailing-icon) {
+      @include md;
+    }
+
+    &.has-trailing-icon {
+      @include md(true);
+    }
+
+    .trailing-icon {
+      @apply w-5 h-5;
+    }
   }
 
   &.lg {
-    @include lg;
+    &:not(.has-trailing-icon) {
+      @include lg;
+    }
+
+    &.has-trailing-icon {
+      @include lg(true);
+    }
+
+    .trailing-icon {
+      @apply w-6 h-6;
+    }
   }
 
   &.primary {
