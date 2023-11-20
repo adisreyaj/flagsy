@@ -15,13 +15,16 @@ import { ProjectConfigSheetComponent } from '../../shared/components/project-con
       <app-page-header title="Projects">
         <div class="flex gap-2 items-center">
           <ui-input
+            class="w-64"
             type="text"
+            prefixIcon="search-line"
             placeholder="Search"
             [debounceTime]="400"
             [ngModel]="this.searchText()"
           ></ui-input>
           <ui-button
             label="Create"
+            trailingIcon="add-line"
             (click)="this.openProjectConfigSheet()"
           ></ui-button>
         </div>

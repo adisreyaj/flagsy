@@ -17,6 +17,7 @@ import {
   RiFlagLine,
   RiHome2Fill,
   RiHome2Line,
+  RiSearchLine,
 } from 'angular-remix-icon';
 
 import { APP_ROUTES } from './config/routes/app.routes';
@@ -40,6 +41,7 @@ export const APP_CONFIG: ApplicationConfig = {
       RiHome2Fill,
       RiBuilding2Line,
       RiBuilding2Fill,
+      RiSearchLine,
     }),
   ],
 };

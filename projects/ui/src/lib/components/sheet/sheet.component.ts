@@ -8,9 +8,7 @@ import { SheetRef } from './sheet-ref';
 @Component({
   selector: 'ui-sheet',
   template: ` <div [cdkTrapFocus]="true" class="flex flex-col h-full">
-    <header
-      class="flex flex-none items-center justify-between px-6 py-4 border-b border-gray-200"
-    >
+    <header class="flex flex-none items-center justify-between px-6 py-4">
       <div class="font-bold text-xl text-gray-800">
         {{ this.title }}
       </div>

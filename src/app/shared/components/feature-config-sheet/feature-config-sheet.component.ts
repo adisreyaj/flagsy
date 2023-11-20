@@ -1,3 +1,4 @@
+import { TitleCasePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import {
   AbstractControl,
@@ -58,7 +59,7 @@ import {
           >
             @for (option of this.featureTypeSelectOptions; track option.value) {
               <ui-select-option
-                [label]="option.label"
+                [label]="option.label | titlecase"
                 [value]="option.value"
               ></ui-select-option>
             }
@@ -86,9 +87,7 @@ import {
         </div>
       </form>
 
-      <footer
-        class="flex items-center gap-3 flex-none px-6 py-4 justify-end border-t border-gray-200"
-      >
+      <footer class="flex items-center gap-3 flex-none px-6 py-4 justify-end ">
         <ui-button
           variant="neutral"
           label="Close"
@@ -109,6 +108,7 @@ import {
     SelectComponent,
     SelectOptionComponent,
     TextareaComponent,
+    TitleCasePipe,
   ],
 })
 export class FeatureConfigSheetComponent {

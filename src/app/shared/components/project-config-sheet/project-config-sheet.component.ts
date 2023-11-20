@@ -26,7 +26,7 @@ import {
     >
       <ui-form-field
         label="Name"
-        errorMessage="Name is required."
+        errorMessage="Enter a valid name."
         [showError]="this.hasErrors(this.form.controls.name)"
       >
         <ui-input formControlName="name"></ui-input>
@@ -34,16 +34,14 @@ import {
 
       <ui-form-field
         label="Key"
-        errorMessage="Key is required."
+        errorMessage="Enter a valid key."
         hint="Unique identifier for the project."
         [showError]="this.hasErrors(this.form.controls.key)"
       >
         <ui-input formControlName="key"></ui-input>
       </ui-form-field>
     </form>
-    <footer
-      class="flex items-center gap-3 flex-none px-6 py-4 justify-end border-t border-gray-200"
-    >
+    <footer class="flex items-center gap-3 flex-none px-6 py-4 justify-end">
       <ui-button
         variant="neutral"
         label="Close"
@@ -65,28 +63,28 @@ export class ProjectConfigSheetComponent {
   protected readonly form: FormGroup<ProjectFormType>;
   protected readonly submitted = signal(false);
 
+  private readonly KEY_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/i;
   private readonly sheetRef = inject(SheetRef);
   private readonly projectsService = inject(ProjectsService);
   private readonly fb: NonNullableFormBuilder = inject(FormBuilder).nonNullable;
 
   constructor() {
-    this.form = this.fb.group<ProjectFormType>({
-      name: this.fb.control('', Validators.required),
-      key: this.fb.control('', Validators.required),
-    });
+    this.form = this.buildForm();
   }
 
   hasErrors(control: AbstractControl): boolean {
-    return (
-      this.submitted() && (control.touched || control.dirty) && control.invalid
-    );
+    if (this.submitted()) {
+      return control.invalid;
+    }
+
+    return (control.touched || control.dirty) && control.invalid;
   }
 
   closeSheet() {
     this.sheetRef.close();
   }
 
-  public saveProject(): void {
+  saveProject(): void {
     this.submitted.set(true);
     if (this.form.valid) {
       this.projectsService
@@ -100,6 +98,23 @@ export class ProjectConfigSheetComponent {
           },
         });
     }
+  }
+
+  private buildForm(): FormGroup<ProjectFormType> {
+    const form = this.fb.group<ProjectFormType>({
+      name: this.fb.control('', Validators.required),
+      key: this.fb.control('', [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.pattern(this.KEY_REGEX),
+      ]),
+    });
+
+    form.controls.name.valueChanges.subscribe((value) => {
+      form.controls.key.setValue(value.toLowerCase().replaceAll(/\s/g, '-'));
+    });
+
+    return form;
   }
 }
 

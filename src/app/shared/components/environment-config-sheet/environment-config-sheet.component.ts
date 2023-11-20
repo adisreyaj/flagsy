@@ -35,9 +35,7 @@ import {
         <ui-input formControlName="name" placeholder="Eg: staging"></ui-input>
       </ui-form-field>
     </form>
-    <footer
-      class="flex items-center gap-3 flex-none px-6 py-4 justify-end border-t border-gray-200"
-    >
+    <footer class="flex items-center gap-3 flex-none px-6 py-4 justify-end ">
       <ui-button
         variant="neutral"
         label="Close"

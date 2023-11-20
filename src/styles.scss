@@ -33,6 +33,10 @@
   box-shadow: -9px 0px 32px -6px rgba(0, 0, 0, 0.1);
 }
 
+.sheet-backdrop {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
 .page-content {
   @apply p-4 overflow-y-auto bg-white min-h-0 flex-auto;
 }

@@ -12,6 +12,8 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
         <div class="flex gap-2 items-center">
           <ui-input
             type="text"
+            class="w-64"
+            prefixIcon="search-line"
             placeholder="Search"
             [debounceTime]="400"
           ></ui-input>

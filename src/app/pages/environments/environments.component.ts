@@ -20,6 +20,8 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
         <div class="flex gap-2 items-center">
           <ui-input
             type="text"
+            class="w-64"
+            prefixIcon="search-line"
             placeholder="Search"
             [debounceTime]="400"
             [ngModel]="this.searchText()"
@@ -27,6 +29,7 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
           ></ui-input>
           <ui-button
             label="Create"
+            trailingIcon="add-line"
             (click)="this.openEnvironmentSheet()"
           ></ui-button>
         </div>

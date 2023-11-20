@@ -48,6 +48,7 @@ export class SheetService {
       hasBackdrop: true,
       backdropClass: 'sheet-backdrop',
       panelClass: 'sheet',
+      disposeOnNavigation: true,
       positionStrategy: positionStrategy,
     };
     const ref = this.overlay.create(overlayConfig);

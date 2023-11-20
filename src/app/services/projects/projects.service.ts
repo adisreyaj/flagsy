@@ -42,15 +42,23 @@ export class ProjectsService {
   };
 
   createProject = (data: ProjectCreateInput): Observable<string> => {
-    return this.http.post<string>(
-      `${environment.api}/projects`,
-      {
-        ...data,
-      },
-      {
-        withCredentials: true,
-      },
-    );
+    return this.http
+      .post<string>(
+        `${environment.api}/projects`,
+        {
+          ...data,
+        },
+        {
+          withCredentials: true,
+        },
+      )
+      .pipe(
+        tap({
+          next: () => {
+            this.refreshSubject.next();
+          },
+        }),
+      );
   };
 
   getProjectSelectOptions = (): Signal<SelectOption<string>[]> => {

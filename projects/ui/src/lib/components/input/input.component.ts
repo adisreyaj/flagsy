@@ -10,24 +10,37 @@ import {
   FormsModule,
   NG_VALUE_ACCESSOR,
 } from '@angular/forms';
+import { AngularRemixIconComponent } from 'angular-remix-icon';
+import { IconName } from 'angular-remix-icon/lib/icon-names';
 import { debounce } from 'lodash-es';
 import { FormFieldComponent } from '../form-field/form-field.component';
 
 @Component({
   selector: 'ui-input',
-  template: ` <input
-    class="py-2 px-3 block w-full border border-gray-200 rounded-lg focus:ring-1 focus:border-primary-500 focus:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none"
-    [class.form-field-input]="this.isWithinFormField"
-    [class.error]="this.hasError"
-    [type]="this.type"
-    [disabled]="this.isDisabled()"
-    [placeholder]="this.placeholder"
-    [ngModel]="this.value()"
-    (ngModelChange)="this.updateValue($event)"
-  />`,
-  styles: [
-    // language=SCSS
-    `
+  template: `
+    <div class="flex gap-2 items-center relative group h-[42px]">
+      @if (this.prefixIcon; as prefixIcon) {
+        <div class="absolute h-full top-0 left-2 flex items-center z-10">
+          <rmx-icon
+            class="icon text-gray-500 group-focus-within:text-primary-600"
+            [name]="prefixIcon"
+          ></rmx-icon>
+        </div>
+      }
+      <input
+        class="absolute w-full py-2 px-3 block border border-gray-200 rounded-lg focus:ring-1 focus:border-primary-500 focus:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none"
+        [class.pl-8]="this.prefixIcon"
+        [class.form-field-input]="this.isWithinFormField"
+        [class.error]="this.hasError"
+        [type]="this.type"
+        [disabled]="this.isDisabled()"
+        [placeholder]="this.placeholder"
+        [ngModel]="this.value()"
+        (ngModelChange)="this.updateValue($event)"
+      />
+    </div>
+  `,
+  styles: `
       @mixin errorBorder() {
         @apply border-red-500 ring-red-500;
       }
@@ -39,14 +52,17 @@ import { FormFieldComponent } from '../form-field/form-field.component';
           }
         }
       }
+      
+      .icon {
+        @apply w-5 h-5;
+      }
 
       .error {
         @include errorBorder;
       }
     `,
-  ],
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, AngularRemixIconComponent],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -61,6 +77,9 @@ export class InputComponent implements ControlValueAccessor {
 
   @Input()
   public placeholder: string = '';
+
+  @Input()
+  public prefixIcon?: IconName;
 
   @Input()
   public debounceTime: number = 0;
