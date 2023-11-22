@@ -1,8 +1,10 @@
 import { Routes } from '@angular/router';
+import { alreadyLoggedInGuard, loggedInGuard } from '../../guards/auth.guard';
 
 export const APP_ROUTES: Routes = [
   {
     path: AppRoutes.Login,
+    canMatch: [alreadyLoggedInGuard],
     loadComponent: () =>
       import('../../pages/auth/login/login.component').then(
         (m) => m.LoginComponent,
@@ -13,6 +15,7 @@ export const APP_ROUTES: Routes = [
     loadChildren: () => [
       {
         path: '',
+        canMatch: [loggedInGuard],
         loadComponent: () =>
           import('../../shell.component').then((m) => m.ShellComponent),
         children: [

@@ -28,7 +28,7 @@ module.exports = plugin.withOptions(function (options = {}) {
           width: spacing[4],
           color: theme('colors.primary.600', colors.blue[600]),
           'background-color': '#fff',
-          'border-color': theme('colors.gray.200', colors.gray[200]),
+          'border-color': theme('colors.gray.300', colors.gray[300]),
           'border-width': borderWidth['DEFAULT'],
           '--tw-shadow': '0 0 #0000',
         },

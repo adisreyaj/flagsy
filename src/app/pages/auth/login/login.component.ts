@@ -1,5 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
+import {
+  AbstractControl,
   FormBuilder,
   FormControl,
   FormGroup,
@@ -14,6 +20,8 @@ import {
   FormFieldComponent,
   InputComponent,
 } from '@ui/components';
+import { finalize } from 'rxjs';
+import { FormUtil } from '../../../utils/form.util';
 
 @Component({
   selector: 'app-login',
@@ -32,7 +40,11 @@ import {
           [formGroup]="this.form"
           class="flex flex-col gap-4 w-96 p-6 min-h-0 overflow-y-auto flex-auto max-w-lg"
         >
-          <ui-form-field label="Email" errorMessage="Email is required.">
+          <ui-form-field
+            label="Email"
+            [showError]="this.hasErrors(this.form.controls.email)"
+            errorMessage="Email is required."
+          >
             <ui-input
               prefixIcon="mail-line"
               formControlName="email"
@@ -40,7 +52,11 @@ import {
             ></ui-input>
           </ui-form-field>
 
-          <ui-form-field label="Password" errorMessage="Password is required.">
+          <ui-form-field
+            label="Password"
+            [showError]="this.hasErrors(this.form.controls.password)"
+            errorMessage="Password is required."
+          >
             <ui-input
               prefixIcon="lock-password-line"
               formControlName="password"
@@ -59,6 +75,7 @@ import {
           <ui-button
             class="block h-full"
             label="Login"
+            [disabled]="this.inProgress()"
             (click)="this.login()"
           ></ui-button>
         </form>
@@ -84,6 +101,8 @@ import {
   ],
 })
 export class LoginComponent {
+  protected readonly inProgress = signal(false);
+  protected readonly submitted = signal(false);
   protected readonly form: FormGroup<LoginFormType>;
 
   private readonly fb = inject(FormBuilder).nonNullable;
@@ -92,18 +111,36 @@ export class LoginComponent {
 
   constructor() {
     this.form = this.fb.group<LoginFormType>({
-      email: this.fb.control('hi@adi.so', [Validators.required]),
+      email: this.fb.control('hi@adi.so', [
+        Validators.required,
+        Validators.email,
+      ]),
       password: this.fb.control('password', [Validators.required]),
     });
   }
 
-  public login(): void {
-    const { email, password } = this.form.getRawValue();
-    this.authService.login(email, password).subscribe({
-      next: () => {
-        this.router.navigate(['/']);
-      },
-    });
+  hasErrors(control: AbstractControl): boolean {
+    return FormUtil.hasErrors(control, this.submitted());
+  }
+
+  login(): void {
+    this.submitted.set(true);
+    if (this.form.valid) {
+      const { email, password } = this.form.getRawValue();
+      this.inProgress.set(true);
+      this.authService
+        .login(email, password)
+        .pipe(
+          finalize(() => {
+            this.inProgress.set(false);
+          }),
+        )
+        .subscribe({
+          next: () => {
+            this.router.navigate(['/']);
+          },
+        });
+    }
   }
 }
 
