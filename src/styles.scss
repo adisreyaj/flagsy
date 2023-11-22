@@ -23,6 +23,15 @@
   }
 }
 
+@layer components {
+  .link {
+    @apply decoration-1 decoration-wavy underline-offset-2;
+
+    &:focus,&:hover {
+      @apply underline text-primary-500 bg-primary-100;
+    }
+  }
+}
 
 .cdk-menu {
   @apply flex flex-col gap-2 shadow-md rounded-md mt-2 p-2 z-50 bg-white;

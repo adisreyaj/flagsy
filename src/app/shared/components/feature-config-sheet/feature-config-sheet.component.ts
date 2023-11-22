@@ -23,6 +23,7 @@ import {
   TextareaComponent,
   ToggleComponent,
 } from '@ui/components';
+import { FormUtil } from '../../../utils/form.util';
 
 @Component({
   selector: 'app-feature-config-sheet',
@@ -134,16 +135,14 @@ export class FeatureConfigSheetComponent {
   }
 
   hasErrors(control: AbstractControl): boolean {
-    return (
-      this.submitted() && (control.touched || control.dirty) && control.invalid
-    );
+    return FormUtil.hasErrors(control, this.submitted());
   }
 
   closeSheet() {
     this.sheetRef.close();
   }
 
-  public saveFlag(): void {
+  saveFlag(): void {
     this.submitted.set(true);
     const activeProject = this.projectsService.activeProject();
     if (this.form.valid && activeProject) {

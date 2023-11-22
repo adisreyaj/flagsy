@@ -22,7 +22,8 @@ import { FormFieldComponent } from '../form-field/form-field.component';
       @if (this.prefixIcon; as prefixIcon) {
         <div class="absolute h-full top-0 left-2 flex items-center z-10">
           <rmx-icon
-            class="icon text-gray-500 group-focus-within:text-primary-600"
+            class="icon text-gray-500"
+            [class.error]="this.hasError"
             [name]="prefixIcon"
           ></rmx-icon>
         </div>
@@ -55,6 +56,13 @@ import { FormFieldComponent } from '../form-field/form-field.component';
       
       .icon {
         @apply w-5 h-5;
+        &:not(.error) {
+            @apply group-focus-within:text-primary-600;
+        }
+        
+        &.error {
+            @apply text-red-500;
+        }
       }
 
       .error {
