@@ -8,6 +8,7 @@ import {
   RiArchiveDrawerFill,
   RiArchiveDrawerLine,
   RiArrowDownSLine,
+  RiArrowRightSLine,
   RiBriefcaseFill,
   RiBriefcaseLine,
   RiBuilding2Fill,
@@ -42,6 +43,7 @@ export const APP_CONFIG: ApplicationConfig = {
       RiBuilding2Line,
       RiBuilding2Fill,
       RiSearchLine,
+      RiArrowRightSLine,
     }),
   ],
 };

@@ -1,10 +1,12 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import { SlicePipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject, Signal } from '@angular/core';
 import {
   IsActiveMatchOptions,
   RouterLink,
   RouterLinkActive,
 } from '@angular/router';
+import { SidebarService } from '@app/services/sidebar/sidebar.service';
 import { AngularRemixIconComponent } from 'angular-remix-icon';
 import { NAVIGATION_DATA } from '../../../config/navigation-definition.data';
 import { ProjectSelectorComponent } from '../project-selector/project-selector.component';
@@ -12,55 +14,90 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
 @Component({
   selector: 'app-sidebar',
   template: `
-    <div class="flex flex-col bg-white rounded-md h-full">
-      <header class="p-4 flex justify-start items-center h-[75px]">
-        <img src="/assets/images/logo-full.svg" class="h-10" alt="Logo" />
+    <div
+      class="group flex flex-col bg-white rounded-md h-full relative transition-all duration-500"
+      [style.width.px]="this.isSidebarOpen() ? 240 : 84"
+    >
+      <button
+        class="transform-gpu transition-all duration-300 group-hover:opacity-100 flex top-6 bg-primary-500 opacity-0 absolute -right-3 cursor-pointer rounded-full w-6 h-6 shadow-md hover:bg-primary-600 items-center justify-center text-white"
+        (click)="this.toggleSidebar()"
+        [class.rotate-180]="this.isSidebarOpen()"
+      >
+        <rmx-icon class="!w-4 !h-4" name="arrow-right-s-line"></rmx-icon>
+      </button>
+      <header class="p-4 flex items-center h-[75px]">
+        @if (this.isSidebarOpen()) {
+          <img
+            @logoEnter
+            src="/assets/images/logo-full.svg"
+            class="h-10"
+            alt="Logo"
+          />
+        } @else {
+          <img
+            @logoEnter
+            src="/assets/images/logo.svg"
+            class="h-10"
+            alt="Logo"
+          />
+        }
       </header>
-      <ul class="flex flex-col gap-4 p-4">
-        <app-project-selector></app-project-selector>
-        <li>
-          <a
-            class="item"
-            [routerLink]="['/']"
-            routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: true }"
-            ariaCurrentWhenActive="page"
-            #router="routerLinkActive"
-          >
-            <rmx-icon
-              class="icon"
-              [name]="router.isActive ? 'home-2-fill' : 'home-2-line'"
-            ></rmx-icon>
-            <div>Home</div>
-          </a>
-        </li>
-        @for (item of NAVIGATION_ITEMS; track item.id) {
+      <section class="p-4">
+        <div style="height: 64px">
+          @if (this.isSidebarOpen()) {
+            <app-project-selector @logoEnter></app-project-selector>
+          }
+        </div>
+        <ul class="flex flex-col gap-4">
           <li>
             <a
               class="item"
-              [routerLink]="item.route"
+              [routerLink]="['/']"
               routerLinkActive="active"
-              [routerLinkActiveOptions]="routerLinkActiveOptions"
+              [routerLinkActiveOptions]="{ exact: true }"
               ariaCurrentWhenActive="page"
               #router="routerLinkActive"
             >
               <rmx-icon
                 class="icon"
-                [name]="router.isActive ? item.activeIcon : item.icon"
+                [name]="router.isActive ? 'home-2-fill' : 'home-2-line'"
               ></rmx-icon>
-              <div>{{ item.title }}</div>
+              @if (this.isSidebarOpen()) {
+                <div @fadeSlideInOut>Home</div>
+              }
             </a>
           </li>
-        }
-      </ul>
+          @for (item of NAVIGATION_ITEMS; track item.id) {
+            <li>
+              <a
+                class="item"
+                [routerLink]="item.route"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="routerLinkActiveOptions"
+                ariaCurrentWhenActive="page"
+                #router="routerLinkActive"
+              >
+                <rmx-icon
+                  class="icon"
+                  [name]="router.isActive ? item.activeIcon : item.icon"
+                ></rmx-icon>
+                @if (this.isSidebarOpen()) {
+                  <div @fadeSlideInOut>{{ item.title }}</div>
+                }
+              </a>
+            </li>
+          }
+        </ul>
+      </section>
     </div>
   `,
   styles: `
     .item {
       @apply cursor-pointer flex gap-2 items-center px-4 py-2 rounded-md w-full relative;
+      min-height:40px;
       
       .icon {
-        @apply h-5 w-5;
+        @apply h-5 w-5 flex-shrink-0;
       }
       
       &.active {
@@ -80,6 +117,32 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
     ProjectSelectorComponent,
     AngularRemixIconComponent,
   ],
+  animations: [
+    trigger('fadeSlideInOut', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateX(-10px)' }),
+        animate(
+          '200ms 200ms ease-in',
+          style({ opacity: 1, transform: 'translateX(0)' }),
+        ),
+      ]),
+      transition(':leave', [
+        animate(
+          '100ms ease-out',
+          style({ opacity: 0, transform: 'translateX(-10px)' }),
+        ),
+      ]),
+    ]),
+    trigger('logoEnter', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateX(-10px)' }),
+        animate(
+          '700ms 100ms ease-in-out',
+          style({ opacity: 1, transform: 'translateX(0px)' }),
+        ),
+      ]),
+    ]),
+  ],
 })
 export class SidebarComponent {
   protected readonly NAVIGATION_ITEMS = NAVIGATION_DATA;
@@ -89,4 +152,12 @@ export class SidebarComponent {
     queryParams: 'ignored',
     matrixParams: 'subset',
   };
+
+  private readonly sidebarService = inject(SidebarService);
+
+  protected isSidebarOpen: Signal<boolean> = this.sidebarService.isOpen;
+
+  toggleSidebar(): void {
+    this.sidebarService.toggleSidebar();
+  }
 }

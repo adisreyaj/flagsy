@@ -1,3 +1,4 @@
+import { A11yModule } from '@angular/cdk/a11y';
 import { AsyncPipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import {
@@ -22,9 +23,10 @@ import {
 
 @Component({
   selector: 'app-environment-config-sheet',
-  template: ` <div class="flex flex-col h-full">
+  template: ` <div class="flex flex-col h-full" [cdkTrapFocus]="true">
     <form
       [formGroup]="form"
+      cdkFocusRegionStart
       class="flex flex-col gap-4 p-6 min-h-0 overflow-y-auto flex-auto max-w-lg"
     >
       <ui-form-field
@@ -35,7 +37,7 @@ import {
         <ui-input formControlName="name" placeholder="Eg: staging"></ui-input>
       </ui-form-field>
     </form>
-    <footer class="flex items-center gap-3 flex-none px-6 py-4 justify-end ">
+    <footer class="flex items-center gap-3 flex-none px-6 py-4 justify-end">
       <ui-button
         variant="neutral"
         label="Close"
@@ -54,6 +56,7 @@ import {
     SelectComponent,
     AsyncPipe,
     SelectOptionComponent,
+    A11yModule,
   ],
 })
 export class EnvironmentConfigSheetComponent {
