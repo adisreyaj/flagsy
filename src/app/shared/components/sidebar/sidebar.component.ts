@@ -14,10 +14,7 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
 @Component({
   selector: 'app-sidebar',
   template: `
-    <div
-      class="group flex flex-col bg-white rounded-md h-full relative transition-all duration-500"
-      [style.width.px]="this.isSidebarOpen() ? 240 : 84"
-    >
+    <div class="group flex flex-col bg-white rounded-md h-full relative">
       <button
         class="transform-gpu transition-all duration-300 group-hover:opacity-100 flex top-6 bg-primary-500 opacity-0 absolute -right-3 cursor-pointer rounded-full w-6 h-6 shadow-md hover:bg-primary-600 items-center justify-center text-white"
         (click)="this.toggleSidebar()"
