@@ -12,7 +12,7 @@ import { IconName } from 'angular-remix-icon/lib/icon-names';
   selector: 'ui-button',
   template: `
     <button [class]="this.buttonClasses()" [disabled]="this.isDisabled()">
-      <div>
+      <div class="flex-auto">
         {{ this.label }}
       </div>
       @if (this.trailingIcon; as icon) {

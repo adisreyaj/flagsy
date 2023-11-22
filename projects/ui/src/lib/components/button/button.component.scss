@@ -32,7 +32,7 @@
 
 
 .btn {
-  @apply inline-flex items-center gap-x-1 text-base rounded-lg border border-transparent text-white focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50;
+  @apply w-full inline-flex items-center gap-x-1 text-base rounded-lg border border-transparent text-white focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50;
   &.sm {
     &:not(.has-trailing-icon) {
       @include sm;

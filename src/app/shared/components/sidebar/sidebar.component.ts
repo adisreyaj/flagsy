@@ -34,7 +34,7 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
           <img
             @logoEnter
             src="/assets/images/logo.svg"
-            class="h-10"
+            class="h-10 w-full"
             alt="Logo"
           />
         }

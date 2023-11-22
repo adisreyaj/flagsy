@@ -18,6 +18,8 @@ import {
   RiFlagLine,
   RiHome2Fill,
   RiHome2Line,
+  RiLockPasswordLine,
+  RiMailLine,
   RiSearchLine,
 } from 'angular-remix-icon';
 
@@ -44,6 +46,8 @@ export const APP_CONFIG: ApplicationConfig = {
       RiBuilding2Fill,
       RiSearchLine,
       RiArrowRightSLine,
+      RiMailLine,
+      RiLockPasswordLine,
     }),
   ],
 };
