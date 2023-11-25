@@ -1,3 +1,4 @@
+import { A11yModule } from '@angular/cdk/a11y';
 import { Component, inject, signal } from '@angular/core';
 import {
   AbstractControl,
@@ -19,7 +20,7 @@ import {
 
 @Component({
   selector: 'app-project-config-sheet',
-  template: ` <div class="flex flex-col h-full">
+  template: ` <div class="flex flex-col h-full" cdkTrapFocusAutoCapture>
     <form
       [formGroup]="form"
       class="flex flex-col gap-4 p-6 min-h-0 overflow-y-auto flex-auto max-w-lg"
@@ -29,7 +30,7 @@ import {
         errorMessage="Enter a valid name."
         [showError]="this.hasErrors(this.form.controls.name)"
       >
-        <ui-input formControlName="name"></ui-input>
+        <ui-input cdkFocusInitial formControlName="name"></ui-input>
       </ui-form-field>
 
       <ui-form-field
@@ -57,6 +58,7 @@ import {
     FormFieldComponent,
     InputComponent,
     ButtonComponent,
+    A11yModule,
   ],
 })
 export class ProjectConfigSheetComponent {

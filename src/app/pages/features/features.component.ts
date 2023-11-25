@@ -1,5 +1,9 @@
+import { AsyncPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { FeatureService } from '@app/services/features/feature.service';
+import { Feature } from '@app/types/feature.type';
 import { ButtonComponent, InputComponent, SheetService } from '@ui/components';
+import { Observable } from 'rxjs';
 import { SheetSize } from '../../../../projects/ui/src/lib/components/sheet/sheet.type';
 import { FeatureConfigSheetComponent } from '../../shared/components/feature-config-sheet/feature-config-sheet.component';
 import { PageHeaderComponent } from '../../shared/components/header/page-header.component';
@@ -24,17 +28,33 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
           ></ui-button>
         </div>
       </app-page-header>
-      <section class="page-content"></section>
+      <section class="page-content">
+        <ul class="flex gap-4">
+          @for (feature of this.features$ | async; track feature.id) {
+            <li
+              class="flex p-4 rounded-md border border-gray-300 cursor-pointer"
+            >
+              {{ feature.key }}
+            </li>
+          }
+        </ul>
+      </section>
     </div>
   `,
   standalone: true,
-  imports: [ButtonComponent, InputComponent, PageHeaderComponent],
+  imports: [ButtonComponent, InputComponent, PageHeaderComponent, AsyncPipe],
 })
 export class FeaturesComponent {
-  protected readonly sheetService = inject(SheetService);
+  public readonly features$: Observable<Feature[]>;
+  readonly #sheetService = inject(SheetService);
+  readonly #featuresService = inject(FeatureService);
+
+  constructor() {
+    this.features$ = this.#featuresService.getFeatures();
+  }
 
   public open(): void {
-    this.sheetService.open(FeatureConfigSheetComponent, {
+    this.#sheetService.open(FeatureConfigSheetComponent, {
       title: 'Create Feature Flag',
       size: SheetSize.Large,
     });

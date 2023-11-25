@@ -1,3 +1,4 @@
+import { A11yModule } from '@angular/cdk/a11y';
 import { TitleCasePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import {
@@ -40,6 +41,7 @@ import { FormUtil } from '../../../utils/form.util';
           [showError]="this.hasErrors(this.form.controls.key)"
         >
           <ui-input
+            cdkFocusInitial
             formControlName="key"
             placeholder="my-cool-feature"
           ></ui-input>
@@ -110,6 +112,7 @@ import { FormUtil } from '../../../utils/form.util';
     SelectOptionComponent,
     TextareaComponent,
     TitleCasePipe,
+    A11yModule,
   ],
 })
 export class FeatureConfigSheetComponent {

@@ -7,7 +7,11 @@ import { SheetRef } from './sheet-ref';
 
 @Component({
   selector: 'ui-sheet',
-  template: ` <div [cdkTrapFocus]="true" class="flex flex-col h-full">
+  template: ` <div
+    [cdkTrapFocusAutoCapture]="true"
+    class="flex flex-col h-full"
+    [cdkTrapFocus]="true"
+  >
     <header class="flex flex-none items-center justify-between px-6 py-4">
       <div class="font-bold text-xl text-gray-800">
         {{ this.title }}
@@ -26,7 +30,10 @@ import { SheetRef } from './sheet-ref';
         </button>
       }
     </header>
-    <section class="w-full flex-auto min-h-0 overflow-y-auto h-full">
+    <section
+      class="w-full flex-auto min-h-0 overflow-y-auto h-full"
+      cdkFocusRegionEnd
+    >
       <ng-container *ngComponentOutlet="this.content"></ng-container>
     </section>
   </div>`,
