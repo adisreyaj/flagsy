@@ -1,6 +1,9 @@
-export interface SheetConfig {
+import { InjectionToken } from '@angular/core';
+
+export interface SheetConfig<SheetDataType = unknown> {
   title?: string;
   size?: SheetSize;
+  data?: SheetDataType;
 }
 
 export const enum SheetSize {
@@ -9,3 +12,5 @@ export const enum SheetSize {
   Large = 'large',
   ExtraLarge = 'extra-large',
 }
+
+export const SHEET_DATA = new InjectionToken<unknown>('Sheet Data');

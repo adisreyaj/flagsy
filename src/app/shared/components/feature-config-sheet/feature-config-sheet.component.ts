@@ -13,7 +13,11 @@ import {
 } from '@angular/forms';
 import { FeatureService } from '@app/services/features/feature.service';
 import { ProjectsService } from '@app/services/projects/projects.service';
-import { FeatureCreateData, FeatureValueType } from '@app/types/feature.type';
+import {
+  Feature,
+  FeatureCreateData,
+  FeatureValueType,
+} from '@app/types/feature.type';
 import {
   ButtonComponent,
   FormFieldComponent,
@@ -24,6 +28,7 @@ import {
   TextareaComponent,
   ToggleComponent,
 } from '@ui/components';
+import { SHEET_DATA } from '../../../../../projects/ui/src/lib/components/sheet/sheet.type';
 import { FormUtil } from '../../../utils/form.util';
 
 @Component({
@@ -72,7 +77,7 @@ import { FormUtil } from '../../../utils/form.util';
         <div>
           @switch (this.form.controls.valueType.value) {
             @case (FeatureValueType.Boolean) {
-              <ui-form-field label="Enabled">
+              <ui-form-field label="">
                 <ui-toggle></ui-toggle>
               </ui-form-field>
             }
@@ -121,20 +126,30 @@ export class FeatureConfigSheetComponent {
   protected readonly FeatureValueType = FeatureValueType;
   protected readonly submitted = signal(false);
 
-  private readonly sheetRef = inject(SheetRef);
-  private readonly fb: NonNullableFormBuilder = inject(FormBuilder).nonNullable;
-  private readonly featuresService = inject(FeatureService);
-  private readonly projectsService = inject(ProjectsService);
+  readonly #sheetRef = inject(SheetRef);
+  readonly #fb: NonNullableFormBuilder = inject(FormBuilder).nonNullable;
+  readonly #featuresService = inject(FeatureService);
+  readonly #projectsService = inject(ProjectsService);
+  readonly #sheetData = inject<FeatureConfigSheetData>(SHEET_DATA);
 
   constructor() {
     this.featureTypeSelectOptions =
-      this.featuresService.getFeatureTypeSelectOptions();
-    this.form = this.fb.group<FeatureFormType>({
-      key: this.fb.control('', Validators.required),
-      description: this.fb.control(''),
-      valueType: this.fb.control(FeatureValueType.Boolean),
-      value: this.fb.control(false),
+      this.#featuresService.getFeatureTypeSelectOptions();
+    this.form = this.#fb.group<FeatureFormType>({
+      key: this.#fb.control('', Validators.required),
+      description: this.#fb.control(''),
+      valueType: this.#fb.control(FeatureValueType.Boolean),
+      value: this.#fb.control(false),
     });
+
+    if (this.#sheetData.type === FeatureConfigSheetMode.Edit) {
+      this.form.patchValue({
+        key: this.#sheetData.feature.key,
+        description: this.#sheetData.feature.description,
+        valueType: this.#sheetData.feature.type,
+        value: this.#sheetData.feature.value,
+      });
+    }
   }
 
   hasErrors(control: AbstractControl): boolean {
@@ -142,12 +157,12 @@ export class FeatureConfigSheetComponent {
   }
 
   closeSheet() {
-    this.sheetRef.close();
+    this.#sheetRef.close();
   }
 
   saveFlag(): void {
     this.submitted.set(true);
-    const activeProject = this.projectsService.activeProject();
+    const activeProject = this.#projectsService.activeProject();
     if (this.form.valid && activeProject) {
       const { key, value, valueType, description } = this.form.getRawValue();
       const createFeatureData: FeatureCreateData = {
@@ -158,7 +173,7 @@ export class FeatureConfigSheetComponent {
         projectId: activeProject.id,
       };
 
-      this.featuresService.createFeature(createFeatureData).subscribe();
+      this.#featuresService.createFeature(createFeatureData).subscribe();
     }
   }
 }
@@ -168,4 +183,18 @@ interface FeatureFormType {
   description: FormControl<string>;
   valueType: FormControl<FeatureValueType>;
   value: FormControl<string | number | boolean>;
+}
+
+export type FeatureConfigSheetData =
+  | {
+      type: FeatureConfigSheetMode.Create;
+    }
+  | {
+      type: FeatureConfigSheetMode.Edit;
+      feature: Feature;
+    };
+
+export enum FeatureConfigSheetMode {
+  Create = 'CREATE',
+  Edit = 'EDIT',
 }

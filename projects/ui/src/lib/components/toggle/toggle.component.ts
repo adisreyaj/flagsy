@@ -9,13 +9,11 @@ import {
   selector: 'ui-toggle',
   template: `
     <label
-      for="AcceptConditions"
       [class.disabled]="this.isDisabled()"
       class="toggle rounded-full relative block h-6 w-12 cursor-pointer [-webkit-tap-highlight-color:_transparent]"
     >
       <input
         type="checkbox"
-        id="AcceptConditions"
         class="peer sr-only"
         [disabled]="this.isDisabled()"
         [ngModel]="this.isChecked()"
@@ -51,6 +49,11 @@ import {
   ],
 })
 export class ToggleComponent implements ControlValueAccessor {
+  @Input({ transform: booleanAttribute })
+  public set enabled(isEnabled: boolean) {
+    this.isChecked.set(isEnabled);
+  }
+
   @Input({ transform: booleanAttribute })
   public set disabled(isDisabled: boolean) {
     this.isDisabled.set(isDisabled);

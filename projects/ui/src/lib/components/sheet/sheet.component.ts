@@ -45,30 +45,33 @@ import { SheetRef } from './sheet-ref';
   imports: [NgComponentOutlet, ButtonComponent, A11yModule],
 })
 export class SheetComponent<T> {
-  private readonly sheetData = inject(SHEET_DATA);
-  private readonly sheetRef: SheetRef = inject(SheetRef);
+  readonly #sheetConfig = inject(SHEET_COMPONENT_ARGS);
+  readonly #sheetRef: SheetRef = inject(SheetRef);
 
   get content(): Type<T> {
-    return this.sheetData.content as Type<T>;
+    return this.#sheetConfig.content as Type<T>;
   }
 
   get title(): string | undefined {
-    return trim(this.sheetData.title) ?? undefined;
+    return trim(this.#sheetConfig.title) ?? undefined;
   }
 
   get showCloseButton(): boolean {
-    return this.sheetData.showCloseButton ?? true;
+    return this.#sheetConfig.showCloseButton ?? true;
   }
 
   close() {
-    this.sheetRef.close();
+    this.#sheetRef.close();
   }
 }
 
-export const SHEET_DATA = new InjectionToken<SheetData<unknown>>('Sheet Data');
+export const SHEET_COMPONENT_ARGS = new InjectionToken<
+  SheetComponentArgs<unknown, unknown>
+>('Sheet Component Args');
 
-export interface SheetData<C> {
+export interface SheetComponentArgs<C, D> {
   content: Type<C>;
   title?: string;
   showCloseButton?: boolean;
+  data?: D;
 }

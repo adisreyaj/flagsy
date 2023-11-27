@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal, Signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Project, ProjectCreateInput } from '@app/types/project.type';
 import { Observable, startWith, Subject, switchMap, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -11,6 +11,7 @@ import { SelectOption } from '../../shared/components/select.type';
 })
 export class ProjectsService {
   public readonly activeProject = signal<Project | undefined>(undefined);
+  public readonly activeProject$ = toObservable(this.activeProject);
 
   private readonly projects: Signal<Project[]>;
   private readonly refreshSubject = new Subject<void>();

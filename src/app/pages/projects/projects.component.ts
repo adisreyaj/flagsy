@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { ProjectsService } from '@app/services/projects/projects.service';
 import { ButtonComponent, InputComponent, SheetService } from '@ui/components';
 import { SheetSize } from '../../../../projects/ui/src/lib/components/sheet/sheet.type';
+import { EnvironmentSelectorComponent } from '../../shared/components/environment-selector/environment-selector.component';
 import { PageHeaderComponent } from '../../shared/components/header/page-header.component';
 import { ProjectConfigSheetComponent } from '../../shared/components/project-config-sheet/project-config-sheet.component';
 
@@ -14,14 +15,6 @@ import { ProjectConfigSheetComponent } from '../../shared/components/project-con
     <div class="flex flex-col h-full">
       <app-page-header title="Projects">
         <div class="flex gap-2 items-center">
-          <ui-input
-            class="w-64"
-            type="text"
-            prefixIcon="search-line"
-            placeholder="Search"
-            [debounceTime]="400"
-            [ngModel]="this.searchText()"
-          ></ui-input>
           <ui-button
             label="Create"
             trailingIcon="add-line"
@@ -52,6 +45,7 @@ import { ProjectConfigSheetComponent } from '../../shared/components/project-con
     RouterLink,
     InputComponent,
     AsyncPipe,
+    EnvironmentSelectorComponent,
   ],
 })
 export class ProjectsComponent {
