@@ -1,16 +1,14 @@
-export interface Feature {
+export type Feature = {
   id: string;
   key: string;
   description: string;
-  value: FeatureValue;
-  environmentOverrides: EnvironmentOverride[];
   segmentOverrides: SegmentOverride[];
   createdBy: FeatureUser;
   createdAt: Date;
   archived: boolean;
   lastUpdated?: Date;
   lastUpdatedBy?: FeatureUser;
-}
+} & FeatureValue;
 
 export interface FeatureCreateData {
   key: string;

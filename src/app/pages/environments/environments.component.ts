@@ -1,12 +1,11 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, Signal, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { EnvironmentsService } from '@app/services/environments/environments.service';
 import { Environment } from '@app/types/environment.type';
 import { ButtonComponent, InputComponent, SheetService } from '@ui/components';
 import { lowerCase } from 'lodash-es';
-import { map, Observable } from 'rxjs';
 import { SheetSize } from '../../../../projects/ui/src/lib/components/sheet/sheet.type';
 import { AppRoutes } from '../../config/routes/app.routes';
 import { EnvironmentConfigSheetComponent } from '../../shared/components/environment-config-sheet/environment-config-sheet.component';
@@ -36,7 +35,7 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
       </app-page-header>
       <section class="page-content">
         <ul class="flex gap-4">
-          @for (environment of environments | async; track environment.id) {
+          @for (environment of this.environments(); track environment.id) {
             <li
               class="flex p-4 rounded-md border border-gray-300 cursor-pointer"
             >
@@ -60,26 +59,24 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
   ],
 })
 export class EnvironmentsComponent {
-  protected readonly environments: Observable<EnvironmentWithRoute[]>;
+  protected readonly environments: Signal<EnvironmentWithRoute[]>;
   protected readonly searchText = signal('');
 
   private readonly sheetService = inject(SheetService);
   private readonly environmentsService = inject(EnvironmentsService);
 
   constructor() {
-    this.environments = this.environmentsService.getAllEnvironments().pipe(
-      map((environments) => {
-        return environments.filter((environment) =>
+    this.environments = computed(() => {
+      return this.environmentsService
+        .environments()
+        .filter((environment) =>
           lowerCase(environment.name).includes(lowerCase(this.searchText())),
-        );
-      }),
-      map((environments) => {
-        return environments.map((environment) => ({
+        )
+        .map((environment) => ({
           ...environment,
           route: ['/', AppRoutes.Environments, environment.id],
         }));
-      }),
-    );
+    });
   }
 
   public search(searchText: string): void {

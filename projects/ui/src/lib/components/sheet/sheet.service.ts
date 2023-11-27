@@ -2,8 +2,12 @@ import { Overlay, OverlayConfig } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { inject, Injectable, Injector, Type } from '@angular/core';
 import { SheetRef } from './sheet-ref';
-import { SHEET_DATA, SheetComponent, SheetData } from './sheet.component';
-import { SheetConfig, SheetSize } from './sheet.type';
+import {
+  SHEET_COMPONENT_ARGS,
+  SheetComponent,
+  SheetComponentArgs,
+} from './sheet.component';
+import { SHEET_DATA, SheetConfig, SheetSize } from './sheet.type';
 
 @Injectable({
   providedIn: 'root',
@@ -12,8 +16,11 @@ export class SheetService {
   private readonly overlay = inject(Overlay);
   private readonly parentInjector = inject(Injector);
 
-  open<C = unknown>(component: Type<C>, config?: SheetConfig) {
-    const sheetData: SheetData<C> = {
+  open<ComponentType = unknown, DataType = unknown>(
+    component: Type<ComponentType>,
+    config?: SheetConfig<DataType>,
+  ) {
+    const sheetConfig: SheetComponentArgs<ComponentType, DataType> = {
       content: component,
       title: config?.title,
     };
@@ -22,8 +29,12 @@ export class SheetService {
     const injector = Injector.create({
       providers: [
         {
+          provide: SHEET_COMPONENT_ARGS,
+          useValue: sheetConfig,
+        },
+        {
           provide: SHEET_DATA,
-          useValue: sheetData,
+          useValue: config?.data,
         },
         {
           provide: SheetRef,

@@ -7,7 +7,11 @@ import { SheetRef } from './sheet-ref';
 
 @Component({
   selector: 'ui-sheet',
-  template: ` <div [cdkTrapFocus]="true" class="flex flex-col h-full">
+  template: ` <div
+    [cdkTrapFocusAutoCapture]="true"
+    class="flex flex-col h-full"
+    [cdkTrapFocus]="true"
+  >
     <header class="flex flex-none items-center justify-between px-6 py-4">
       <div class="font-bold text-xl text-gray-800">
         {{ this.title }}
@@ -26,7 +30,10 @@ import { SheetRef } from './sheet-ref';
         </button>
       }
     </header>
-    <section class="w-full flex-auto min-h-0 overflow-y-auto h-full">
+    <section
+      class="w-full flex-auto min-h-0 overflow-y-auto h-full"
+      cdkFocusRegionEnd
+    >
       <ng-container *ngComponentOutlet="this.content"></ng-container>
     </section>
   </div>`,
@@ -38,30 +45,33 @@ import { SheetRef } from './sheet-ref';
   imports: [NgComponentOutlet, ButtonComponent, A11yModule],
 })
 export class SheetComponent<T> {
-  private readonly sheetData = inject(SHEET_DATA);
-  private readonly sheetRef: SheetRef = inject(SheetRef);
+  readonly #sheetConfig = inject(SHEET_COMPONENT_ARGS);
+  readonly #sheetRef: SheetRef = inject(SheetRef);
 
   get content(): Type<T> {
-    return this.sheetData.content as Type<T>;
+    return this.#sheetConfig.content as Type<T>;
   }
 
   get title(): string | undefined {
-    return trim(this.sheetData.title) ?? undefined;
+    return trim(this.#sheetConfig.title) ?? undefined;
   }
 
   get showCloseButton(): boolean {
-    return this.sheetData.showCloseButton ?? true;
+    return this.#sheetConfig.showCloseButton ?? true;
   }
 
   close() {
-    this.sheetRef.close();
+    this.#sheetRef.close();
   }
 }
 
-export const SHEET_DATA = new InjectionToken<SheetData<unknown>>('Sheet Data');
+export const SHEET_COMPONENT_ARGS = new InjectionToken<
+  SheetComponentArgs<unknown, unknown>
+>('Sheet Component Args');
 
-export interface SheetData<C> {
+export interface SheetComponentArgs<C, D> {
   content: Type<C>;
   title?: string;
   showCloseButton?: boolean;
+  data?: D;
 }

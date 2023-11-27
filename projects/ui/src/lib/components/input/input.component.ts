@@ -29,7 +29,7 @@ import { FormFieldComponent } from '../form-field/form-field.component';
         </div>
       }
       <input
-        class="absolute w-full py-2 px-3 block border border-gray-200 rounded-lg focus:ring-1 focus:border-primary-500 focus:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none"
+        class="absolute w-full py-2 px-3 block border border-gray-200 rounded-lg focus:ring-1 focus:border-primary-500 focus:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none transition-all duration-300"
         [class.pl-8]="this.prefixIcon"
         [class.form-field-input]="this.isWithinFormField"
         [class.error]="this.hasError"
