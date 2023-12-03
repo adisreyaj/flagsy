@@ -24,6 +24,8 @@
     "@floating-ui/dom": "^1.5.3",
     "@ngneat/hot-toast": "^6.0.1",
     "@ngneat/overview": "^5.1.0",
+    "@ngx-loading-bar/core": "^6.0.2",
+    "@ngx-loading-bar/router": "^6.0.2",
     "angular-remix-icon": "^5.0.0",
     "D": "^1.0.0",
     "lodash-es": "^4.17.21",
