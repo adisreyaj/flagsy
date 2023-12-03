@@ -16,11 +16,11 @@ export class SheetService {
   private readonly overlay = inject(Overlay);
   private readonly parentInjector = inject(Injector);
 
-  open<ComponentType = unknown, DataType = unknown>(
-    component: Type<ComponentType>,
+  open<DataType = unknown>(
+    component: Type<unknown>,
     config?: SheetConfig<DataType>,
   ) {
-    const sheetConfig: SheetComponentArgs<ComponentType, DataType> = {
+    const sheetConfig: SheetComponentArgs<DataType> = {
       content: component,
       title: config?.title,
     };
@@ -57,7 +57,7 @@ export class SheetService {
     const overlayConfig: OverlayConfig = {
       ...this.getSheetDimensions(config?.size),
       hasBackdrop: true,
-      backdropClass: 'sheet-backdrop',
+      backdropClass: 'overlay-backdrop',
       panelClass: 'sheet',
       disposeOnNavigation: true,
       positionStrategy: positionStrategy,

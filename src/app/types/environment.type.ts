@@ -10,5 +10,6 @@ export interface Environment {
 
 export interface EnvironmentCreateInput {
   name: string;
+  key: string;
   projectId: string;
 }

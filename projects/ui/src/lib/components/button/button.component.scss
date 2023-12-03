@@ -27,22 +27,50 @@
 }
 
 @mixin neutral() {
-  @apply bg-gray-200 text-gray-800 hover:bg-gray-300;
+  @apply bg-white border border-gray-300 text-gray-800 hover:bg-gray-100;
 }
 
+@mixin plain() {
+  @apply bg-transparent hover:bg-gray-100 text-gray-800;
+}
 
 .btn {
-  @apply w-full inline-flex items-center gap-x-1 text-base rounded-lg border border-transparent text-white focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50;
+  @apply flex  items-center gap-x-2 text-base rounded-xl border border-transparent text-white focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50;
+  // Icon only button will be a square
+  &:not(.icon) {
+    @apply w-full;
+  }
+
+  .label {
+    flex: 0 0 auto;
+  }
+
+  &.content-center {
+    @apply justify-center;
+  }
+
+  &.content-right {
+    @apply justify-end;
+  }
+
+  &.content-left {
+    @apply justify-start;
+  }
+
   &.sm {
     &:not(.has-trailing-icon) {
       @include sm;
     }
 
-    &.has-trailing-icon {
+    &.icon {
+      @apply p-2;
+    }
+
+    &.has-trailing-icon:not(.icon) {
       @include sm(true);
     }
 
-    .trailing-icon {
+    .button-icon {
       @apply w-4 h-4;
     }
   }
@@ -52,11 +80,15 @@
       @include md;
     }
 
-    &.has-trailing-icon {
+    &.icon {
+      @apply p-3;
+    }
+
+    &.has-trailing-icon:not(.icon) {
       @include md(true);
     }
 
-    .trailing-icon {
+    .button-icon {
       @apply w-5 h-5;
     }
   }
@@ -66,11 +98,15 @@
       @include lg;
     }
 
-    &.has-trailing-icon {
+    &.icon {
+      @apply p-4;
+    }
+
+    &.has-trailing-icon:not(.icon) {
       @include lg(true);
     }
 
-    .trailing-icon {
+    .button-icon {
       @apply w-6 h-6;
     }
   }
@@ -83,8 +119,20 @@
     @include neutral;
   }
 
+  &.plain {
+    @include plain;
+  }
+
+  &.destructive {
+    @apply bg-white hover:bg-red-50 text-red-600 focus:ring-red-500 focus:bg-red-50;
+  }
+
   &:disabled {
     @apply cursor-not-allowed;
   }
 
+  &.icon {
+    @include plain;
+    @apply justify-center items-center;
+  }
 }

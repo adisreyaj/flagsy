@@ -14,12 +14,16 @@ export interface FeatureCreateData {
   key: string;
   projectId: string;
   valueType: FeatureValueType;
+  description?: string;
   value: SupportedFeatureValueTypes;
+}
+
+export type FeatureUpdateData = Omit<FeatureCreateData, 'value'> & {
   environmentOverrides: {
     environmentId: string;
     value: SupportedFeatureValueTypes;
   }[];
-}
+};
 
 export interface FeatureUser {
   id: string;
@@ -63,3 +67,8 @@ export enum FeatureValueType {
 }
 
 export type SupportedFeatureValueTypes = boolean | string | number | object;
+
+export enum FeatureSortBy {
+  Key = 'key',
+  LastUpdated = 'updatedAt',
+}

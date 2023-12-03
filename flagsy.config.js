@@ -8,7 +8,7 @@ const [baseFontSize, { lineHeight: baseLineHeight }] =
 const { spacing, borderWidth, borderRadius, boxShadow } = defaultTheme;
 
 module.exports = plugin.withOptions(function (options = {}) {
-  // Enable forms and tooltip by default if not specified in options
+  // Enable forms and tooltip by default if not specified in options.
   const { charts = false, forms = true, tooltips = true } = options;
 
   return function ({ addBase, addComponents, theme }) {
@@ -33,7 +33,7 @@ module.exports = plugin.withOptions(function (options = {}) {
           '--tw-shadow': '0 0 #0000',
         },
         [`[type='checkbox']`]: {
-          'border-radius': borderRadius['md'],
+          'border-radius': borderRadius['lg'],
         },
         [`[type='radio']`]: {
           'border-radius': '100%',

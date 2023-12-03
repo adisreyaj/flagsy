@@ -26,7 +26,7 @@ import { ProjectConfigSheetComponent } from '../../shared/components/project-con
         <ul class="flex gap-4">
           @for (project of this.projects | async; track project.id) {
             <li
-              class="flex p-4 rounded-md border border-gray-300 cursor-pointer"
+              class="flex p-4 rounded-xl border border-gray-300 cursor-pointer"
             >
               <a>
                 {{ project.name }}

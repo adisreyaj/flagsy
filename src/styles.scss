@@ -4,7 +4,6 @@
 
 @import '@angular/cdk/overlay-prebuilt.css';
 
-
 :root {
   --primary: #064e41;
 }
@@ -13,14 +12,6 @@
   font-family: 'Manrope', sans-serif;
   letter-spacing: 0.5px;
   outline: none;
-
-  ::-moz-selection { /* Code for Firefox */
-    @apply bg-primary-100;
-  }
-
-  ::selection {
-    @apply bg-primary-100;
-  }
 }
 
 @layer components {
@@ -34,16 +25,21 @@
 }
 
 .cdk-menu {
-  @apply flex flex-col gap-2 shadow-md rounded-md mt-2 p-2 z-50 bg-white;
+  @apply flex flex-col gap-2 shadow-md rounded-xl mt-2 p-2 z-50 bg-white;
 }
 
 .sheet {
-  @apply bg-white rounded-tl-lg rounded-br-lg border-l border-gray-200;
+  @apply bg-white rounded-tl-xl rounded-bl-xl border-l border-gray-200;
   box-shadow: -9px 0px 32px -6px rgba(0, 0, 0, 0.1);
 }
 
-.sheet-backdrop {
+.overlay-backdrop {
   background-color: rgba(0, 0, 0, 0.3);
+}
+
+.modal {
+  @apply bg-white rounded-xl border border-gray-200;
+  box-shadow: -9px 0px 32px -6px rgba(0, 0, 0, 0.1);
 }
 
 .page-content {

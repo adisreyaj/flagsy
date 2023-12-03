@@ -4,7 +4,7 @@ import { Component, Input } from '@angular/core';
   selector: 'ui-checkbox',
   template: ` <div class="text-sm font-normal">
     <label [for]="this.label" class="flex items-center gap-2 cursor-pointer">
-      <input [id]="this.label" type="checkbox" class="h-5 w-5" />
+      <input [id]="this.label" type="checkbox" class="h-5 w-5 cursor-pointer" />
       <div>
         {{ this.label }}
       </div>

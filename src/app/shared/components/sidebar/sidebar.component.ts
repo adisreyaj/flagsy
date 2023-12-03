@@ -14,7 +14,7 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
 @Component({
   selector: 'app-sidebar',
   template: `
-    <div class="group flex flex-col bg-white rounded-md h-full relative">
+    <div class="group flex flex-col bg-white rounded-xl h-full relative">
       <button
         class="transform-gpu transition-all duration-300 group-hover:opacity-100 focus:opacity-100 flex top-6 bg-primary-500 opacity-0 absolute -right-3 cursor-pointer rounded-full w-6 h-6 shadow-md hover:bg-primary-600 items-center justify-center text-white focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:outline-none"
         (click)="this.toggleSidebar()"
@@ -92,7 +92,7 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
   `,
   styles: `
     .item {
-      @apply cursor-pointer flex gap-2 items-center px-4 py-2 rounded-md w-full relative transition-all duration-300;
+      @apply cursor-pointer flex gap-2 items-center px-4 py-2 rounded-xl w-full relative transition-all duration-300;
       @apply focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:outline-none;
       min-height:40px;
       

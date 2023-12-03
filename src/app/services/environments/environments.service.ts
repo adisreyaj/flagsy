@@ -1,6 +1,13 @@
 import { HttpClient } from '@angular/common/http';
-import { computed, inject, Injectable, Signal, signal } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import {
+  computed,
+  inject,
+  Injectable,
+  Signal,
+  signal,
+  WritableSignal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isNotUndefined } from '@app/types/common.type';
 import {
   Environment,
@@ -8,7 +15,15 @@ import {
 } from '@app/types/environment.type';
 import { Project } from '@app/types/project.type';
 import { isEmpty } from 'lodash-es';
-import { filter, Observable, startWith, Subject, switchMap, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  filter,
+  Observable,
+  startWith,
+  Subject,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SelectOption } from '../../shared/components/select.type';
 import { ProjectsService } from '../projects/projects.service';
@@ -17,35 +32,38 @@ import { ProjectsService } from '../projects/projects.service';
   providedIn: 'root',
 })
 export class EnvironmentsService {
-  readonly activeEnvironment = signal<Environment | undefined>(undefined);
-  readonly environments: Signal<Environment[]>;
+  readonly environments: WritableSignal<Environment[]> = signal([]);
+
+  readonly #activeEnvironmentSubject = new BehaviorSubject<
+    Environment | undefined
+  >(undefined);
+  readonly activeEnvironment$: Observable<Environment> =
+    this.#activeEnvironmentSubject.asObservable().pipe(filter(isNotUndefined));
 
   readonly #refreshSubject = new Subject<void>();
   readonly #refresh$: Observable<void> = this.#refreshSubject
     .asObservable()
     .pipe(startWith(undefined));
+
   readonly #http = inject(HttpClient);
   readonly #projectService = inject(ProjectsService);
 
   constructor() {
-    this.environments = toSignal(
-      this.#projectService.activeProject$
-        .pipe(
-          filter(isNotUndefined),
-          switchMap((activeProject: Project) =>
-            this.#getAllEnvironments(activeProject.id),
-          ),
-          tap((environments) => {
-            if (this.activeEnvironment()?.id !== environments?.[0]?.id) {
-              this.activeEnvironment.set(environments?.[0]);
-            }
-          }),
-        )
-        .pipe(takeUntilDestroyed()),
-      {
-        initialValue: [],
-      },
-    );
+    this.#projectService.activeProject$
+      .pipe(
+        filter(isNotUndefined),
+        switchMap((activeProject: Project) =>
+          this.#getAllEnvironments(activeProject.id),
+        ),
+        tap((environments) => {
+          this.environments.set(environments);
+          if (this.#activeEnvironmentSubject.value === undefined) {
+            this.#activeEnvironmentSubject.next(environments[0]);
+          }
+        }),
+      )
+      .pipe(takeUntilDestroyed())
+      .subscribe();
   }
 
   #getAllEnvironments = (projectId?: string) => {
@@ -66,15 +84,23 @@ export class EnvironmentsService {
   };
 
   createEnvironment(data: EnvironmentCreateInput): Observable<string> {
-    return this.#http.post<string>(
-      `${environment.api}/environments`,
-      {
-        ...data,
-      },
-      {
-        withCredentials: true,
-      },
-    );
+    return this.#http
+      .post<string>(
+        `${environment.api}/environments`,
+        {
+          ...data,
+        },
+        {
+          withCredentials: true,
+        },
+      )
+      .pipe(
+        tap({
+          next: () => {
+            this.#refreshSubject.next();
+          },
+        }),
+      );
   }
 
   getEnvironmentSelectOptions = (): Signal<SelectOption<string>[]> => {
@@ -87,7 +113,7 @@ export class EnvironmentsService {
   };
 
   setActiveEnvironment = (environmentId: string) => {
-    this.activeEnvironment.set(
+    this.#activeEnvironmentSubject.next(
       this.environments().find((env) => env.id === environmentId),
     );
   };

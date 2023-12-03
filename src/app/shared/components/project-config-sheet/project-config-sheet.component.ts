@@ -17,6 +17,7 @@ import {
   InputComponent,
   SheetRef,
 } from '@ui/components';
+import { ValidatorsUtil } from '../../../utils/validators.util';
 
 @Component({
   selector: 'app-project-config-sheet',
@@ -48,7 +49,10 @@ import {
         label="Close"
         (click)="this.closeSheet()"
       ></ui-button>
-      <ui-button label="Save" (click)="this.saveProject()"></ui-button>
+      <ui-button
+        label="Create Project"
+        (click)="this.saveProject()"
+      ></ui-button>
     </footer>
   </div>`,
   standalone: true,
@@ -65,13 +69,12 @@ export class ProjectConfigSheetComponent {
   protected readonly form: FormGroup<ProjectFormType>;
   protected readonly submitted = signal(false);
 
-  private readonly KEY_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/i;
   private readonly sheetRef = inject(SheetRef);
   private readonly projectsService = inject(ProjectsService);
   private readonly fb: NonNullableFormBuilder = inject(FormBuilder).nonNullable;
 
   constructor() {
-    this.form = this.buildForm();
+    this.form = this.#buildForm();
   }
 
   hasErrors(control: AbstractControl): boolean {
@@ -102,13 +105,13 @@ export class ProjectConfigSheetComponent {
     }
   }
 
-  private buildForm(): FormGroup<ProjectFormType> {
+  #buildForm(): FormGroup<ProjectFormType> {
     const form = this.fb.group<ProjectFormType>({
       name: this.fb.control('', Validators.required),
       key: this.fb.control('', [
         Validators.required,
         Validators.minLength(3),
-        Validators.pattern(this.KEY_REGEX),
+        Validators.pattern(ValidatorsUtil.ALPHANUMERIC_WITH_DASHES),
       ]),
     });
 

@@ -22,6 +22,8 @@
     "@angular/platform-browser-dynamic": "^17.0.3",
     "@angular/router": "^17.0.3",
     "@floating-ui/dom": "^1.5.3",
+    "@ngneat/hot-toast": "^6.0.1",
+    "@ngneat/overview": "^5.1.0",
     "angular-remix-icon": "^5.0.0",
     "D": "^1.0.0",
     "lodash-es": "^4.17.21",
