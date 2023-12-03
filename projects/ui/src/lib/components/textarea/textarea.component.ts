@@ -16,7 +16,7 @@ import { FormFieldComponent } from '../form-field/form-field.component';
 @Component({
   selector: 'ui-textarea',
   template: ` <textarea
-    class="p-2 block w-full border border-gray-200 rounded-lg resize-none focus:ring-1 focus:border-primary-500 focus:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none transition-all duration-300"
+    class="p-2 block w-full border border-gray-200 rounded-xl resize-none focus:ring-1 focus:border-primary-500 focus:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none transition-all duration-300"
     [rows]="this.rows"
     [disabled]="this.isDisabled()"
     [placeholder]="this.placeholder"

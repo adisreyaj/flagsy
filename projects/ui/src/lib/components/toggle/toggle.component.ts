@@ -33,6 +33,10 @@ import {
   `,
   styles: [
     `
+      :host {
+        display: block;
+        width: fit-content;
+      }
       .disabled {
         cursor: not-allowed;
       }

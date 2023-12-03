@@ -22,7 +22,7 @@ import { SelectOptionComponent } from './select-option.component';
   selector: 'ui-select',
   template: `
     <button
-      class="py-2 px-4 pr-2 flex gap-4 justify-between items-center w-full border border-gray-200 rounded-lg focus:ring-1 focus:border-primary-500 focus:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none transition-all duration-300"
+      class="py-2 px-4 pr-2 flex gap-4 justify-between items-center w-full border border-gray-200 rounded-xl focus:ring-1 focus:border-primary-500 focus:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none transition-all duration-300"
       [cdkMenuTriggerFor]="menu"
       [disabled]="this.isDisabled()"
       (cdkMenuOpened)="this.isOpen.set(true)"

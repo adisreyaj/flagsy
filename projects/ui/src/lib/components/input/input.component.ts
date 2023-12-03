@@ -20,7 +20,7 @@ import { FormFieldComponent } from '../form-field/form-field.component';
   template: `
     <div class="flex gap-2 items-center relative group h-[42px]">
       @if (this.prefixIcon; as prefixIcon) {
-        <div class="absolute h-full top-0 left-2 flex items-center z-10">
+        <div class="absolute h-full top-0 left-3 flex items-center z-10">
           <rmx-icon
             class="icon text-gray-500"
             [class.error]="this.hasError"
@@ -29,8 +29,8 @@ import { FormFieldComponent } from '../form-field/form-field.component';
         </div>
       }
       <input
-        class="absolute w-full py-2 px-3 block border border-gray-200 rounded-lg focus:ring-1 focus:border-primary-500 focus:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none transition-all duration-300"
-        [class.pl-8]="this.prefixIcon"
+        class="absolute w-full py-2 px-4 block border border-gray-200 rounded-xl focus:ring-1 focus:border-primary-500 focus:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none transition-all duration-300"
+        [class.pl-10]="this.prefixIcon"
         [class.form-field-input]="this.isWithinFormField"
         [class.error]="this.hasError"
         [type]="this.type"

@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { EnvironmentsService } from '@app/services/environments/environments.service';
 import {
@@ -6,14 +7,15 @@ import {
   SelectComponent,
   SelectOptionComponent,
 } from '@ui/components';
+import { map, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-environment-selector',
   template: `
-    @if (this.environmentSelectOptions().length > 1) {
+    @if (this.environmentSelectOptions().length > 0) {
       <ui-select
         class="block bg-white w-full"
-        [ngModel]="this.activeEnvironment()?.id"
+        [ngModel]="activeEnvironmentId$ | async"
         (ngModelChange)="this.updateActiveEnvironment($event)"
       >
         @for (option of this.environmentSelectOptions(); track option.value) {
@@ -31,21 +33,30 @@ import {
     SelectComponent,
     SelectOptionComponent,
     FormsModule,
+    AsyncPipe,
   ],
 })
 export class EnvironmentSelectorComponent {
+  @Output()
+  environmentSelect = new EventEmitter<string>();
+
   protected readonly environmentSelectOptions;
   private readonly environmentsService = inject(EnvironmentsService);
 
-  protected readonly activeEnvironment;
+  protected readonly activeEnvironmentId$: Observable<string | undefined>;
 
   constructor() {
-    this.activeEnvironment = this.environmentsService.activeEnvironment;
+    this.activeEnvironmentId$ =
+      this.environmentsService.activeEnvironment$.pipe(
+        map((environment) => environment?.id),
+      );
+
     this.environmentSelectOptions =
       this.environmentsService.getEnvironmentSelectOptions();
   }
 
   public updateActiveEnvironment(environmentId: string): void {
     this.environmentsService.setActiveEnvironment(environmentId);
+    this.environmentSelect.emit(environmentId);
   }
 }

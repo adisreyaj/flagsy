@@ -12,7 +12,9 @@ import { SheetRef } from './sheet-ref';
     class="flex flex-col h-full"
     [cdkTrapFocus]="true"
   >
-    <header class="flex flex-none items-center justify-between px-6 py-4">
+    <header
+      class="flex flex-none items-center border-b justify-between px-6 py-4"
+    >
       <div class="font-bold text-xl text-gray-800">
         {{ this.title }}
       </div>
@@ -66,11 +68,11 @@ export class SheetComponent<T> {
 }
 
 export const SHEET_COMPONENT_ARGS = new InjectionToken<
-  SheetComponentArgs<unknown, unknown>
+  SheetComponentArgs<unknown>
 >('Sheet Component Args');
 
-export interface SheetComponentArgs<C, D> {
-  content: Type<C>;
+export interface SheetComponentArgs<D> {
+  content: Type<unknown>;
   title?: string;
   showCloseButton?: boolean;
   data?: D;

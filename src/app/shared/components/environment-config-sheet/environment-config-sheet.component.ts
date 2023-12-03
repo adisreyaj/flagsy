@@ -3,7 +3,6 @@ import { AsyncPipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import {
   AbstractControl,
-  FormBuilder,
   FormControl,
   FormGroup,
   FormsModule,
@@ -12,6 +11,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { EnvironmentsService } from '@app/services/environments/environments.service';
+import { ProjectsService } from '@app/services/projects/projects.service';
+import { Project } from '@app/types/project.type';
 import {
   ButtonComponent,
   FormFieldComponent,
@@ -20,6 +21,9 @@ import {
   SelectOptionComponent,
   SheetRef,
 } from '@ui/components';
+import { isNil } from 'lodash-es';
+import { filter, switchMap } from 'rxjs';
+import { ValidatorsUtil } from '../../../utils/validators.util';
 
 @Component({
   selector: 'app-environment-config-sheet',
@@ -39,6 +43,14 @@ import {
           placeholder="Eg: staging"
         ></ui-input>
       </ui-form-field>
+
+      <ui-form-field
+        label="Key"
+        errorMessage="key is required."
+        [showError]="this.hasErrors(this.form.controls.key)"
+      >
+        <ui-input cdkFocusInitial formControlName="key"></ui-input>
+      </ui-form-field>
     </form>
     <footer class="flex items-center gap-3 flex-none px-6 py-4 justify-end">
       <ui-button
@@ -46,7 +58,10 @@ import {
         label="Close"
         (click)="this.closeSheet()"
       ></ui-button>
-      <ui-button label="Continue" (click)="this.saveEnvironment()"></ui-button>
+      <ui-button
+        label="Create Environment"
+        (click)="this.saveEnvironment()"
+      ></ui-button>
     </footer>
   </div>`,
   standalone: true,
@@ -66,16 +81,13 @@ export class EnvironmentConfigSheetComponent {
   protected readonly form: FormGroup<EnvironmentFormType>;
   protected readonly submitted = signal(false);
 
-  private readonly environmentService = inject(EnvironmentsService);
-
-  private readonly sheetRef = inject(SheetRef);
-  private readonly fb: NonNullableFormBuilder = inject(FormBuilder).nonNullable;
+  readonly #environmentService = inject(EnvironmentsService);
+  readonly #projectsService = inject(ProjectsService);
+  readonly #sheetRef = inject(SheetRef);
+  readonly #fb: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
   constructor() {
-    this.form = this.fb.group<EnvironmentFormType>({
-      name: this.fb.control('', Validators.required),
-      projectId: this.fb.control('', Validators.required),
-    });
+    this.form = this.#buildForm();
   }
 
   hasErrors(control: AbstractControl): boolean {
@@ -85,24 +97,48 @@ export class EnvironmentConfigSheetComponent {
   }
 
   closeSheet() {
-    this.sheetRef.close();
+    this.#sheetRef.close();
   }
 
-  public saveEnvironment(): void {
-    this.environmentService
-      .createEnvironment({
-        name: this.form.controls.name.value,
-        projectId: 'cloy8rqy40001xc2kaqlv7hs5',
-      })
+  saveEnvironment(): void {
+    this.#projectsService.activeProject$
+      .pipe(
+        filter((project): project is Project => !isNil(project)),
+        switchMap((project) => {
+          return this.#environmentService.createEnvironment({
+            name: this.form.controls.name.value,
+            key: this.form.controls.key.value,
+            projectId: project.id,
+          });
+        }),
+      )
       .subscribe({
         next: () => {
           this.closeSheet();
         },
       });
   }
+
+  #buildForm(): FormGroup<EnvironmentFormType> {
+    const form = this.#fb.group<EnvironmentFormType>({
+      name: this.#fb.control('', Validators.required),
+      key: this.#fb.control('', [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.pattern(ValidatorsUtil.ALPHANUMERIC_WITH_DASHES),
+      ]),
+      projectId: this.#fb.control('', Validators.required),
+    });
+    form.controls.name.valueChanges.subscribe((value) => {
+      form.controls.key.setValue(value.toLowerCase().replaceAll(/\s/g, '-'));
+    });
+
+    return form;
+  }
 }
 
 interface EnvironmentFormType {
   name: FormControl<string>;
+  key: FormControl<string>;
   projectId: FormControl<string>;
 }

@@ -11,13 +11,16 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { EnvironmentsService } from '@app/services/environments/environments.service';
 import { FeatureService } from '@app/services/features/feature.service';
 import { ProjectsService } from '@app/services/projects/projects.service';
 import {
   Feature,
   FeatureCreateData,
+  FeatureUpdateData,
   FeatureValueType,
 } from '@app/types/feature.type';
+import { HotToastService } from '@ngneat/hot-toast';
 import {
   ButtonComponent,
   FormFieldComponent,
@@ -28,6 +31,7 @@ import {
   TextareaComponent,
   ToggleComponent,
 } from '@ui/components';
+import { switchMap, take } from 'rxjs';
 import { SHEET_DATA } from '../../../../../projects/ui/src/lib/components/sheet/sheet.type';
 import { FormUtil } from '../../../utils/form.util';
 
@@ -77,18 +81,18 @@ import { FormUtil } from '../../../utils/form.util';
         <div>
           @switch (this.form.controls.valueType.value) {
             @case (FeatureValueType.Boolean) {
-              <ui-form-field label="">
-                <ui-toggle></ui-toggle>
+              <ui-form-field label="Value">
+                <ui-toggle formControlName="value"></ui-toggle>
               </ui-form-field>
             }
             @case (FeatureValueType.Number) {
               <ui-form-field label="Value">
-                <ui-input type="number"></ui-input>
+                <ui-input formControlName="value" type="number"></ui-input>
               </ui-form-field>
             }
             @default {
               <ui-form-field label="Value">
-                <ui-input></ui-input>
+                <ui-input formControlName="value"></ui-input>
               </ui-form-field>
             }
           }
@@ -101,7 +105,7 @@ import { FormUtil } from '../../../utils/form.util';
           label="Close"
           (click)="this.closeSheet()"
         ></ui-button>
-        <ui-button label="Save Flag" (click)="this.saveFlag()"></ui-button>
+        <ui-button label="Save" (click)="this.saveOrUpdate()"></ui-button>
       </footer>
     </div>
   `,
@@ -131,16 +135,13 @@ export class FeatureConfigSheetComponent {
   readonly #featuresService = inject(FeatureService);
   readonly #projectsService = inject(ProjectsService);
   readonly #sheetData = inject<FeatureConfigSheetData>(SHEET_DATA);
+  readonly #toast = inject(HotToastService);
+  readonly #environmentService = inject(EnvironmentsService);
 
   constructor() {
     this.featureTypeSelectOptions =
       this.#featuresService.getFeatureTypeSelectOptions();
-    this.form = this.#fb.group<FeatureFormType>({
-      key: this.#fb.control('', Validators.required),
-      description: this.#fb.control(''),
-      valueType: this.#fb.control(FeatureValueType.Boolean),
-      value: this.#fb.control(false),
-    });
+    this.form = this.#buildForm();
 
     if (this.#sheetData.type === FeatureConfigSheetMode.Edit) {
       this.form.patchValue({
@@ -160,21 +161,90 @@ export class FeatureConfigSheetComponent {
     this.#sheetRef.close();
   }
 
-  saveFlag(): void {
+  saveOrUpdate(): void {
+    if (this.#sheetData.type === FeatureConfigSheetMode.Create) {
+      this.#saveFlag();
+    } else {
+      this.#updateFlag(this.#sheetData.feature.id);
+    }
+  }
+
+  #saveFlag(): void {
     this.submitted.set(true);
     const activeProject = this.#projectsService.activeProject();
     if (this.form.valid && activeProject) {
       const { key, value, valueType, description } = this.form.getRawValue();
       const createFeatureData: FeatureCreateData = {
         key,
-        environmentOverrides: [],
         value,
+        description,
         valueType,
         projectId: activeProject.id,
       };
 
-      this.#featuresService.createFeature(createFeatureData).subscribe();
+      this.#featuresService
+        .createFeature(createFeatureData)
+        .pipe(
+          this.#toast.observe({
+            loading: 'Saving...',
+            success: () => 'Feature flag created successfully!',
+            error: () => 'Failed to create feature flag!',
+          }),
+        )
+        .subscribe({
+          next: () => this.closeSheet(),
+        });
     }
+  }
+
+  #updateFlag(id: string): void {
+    this.submitted.set(true);
+    const activeProject = this.#projectsService.activeProject();
+    if (this.form.valid && activeProject) {
+      const { key, value, valueType, description } = this.form.getRawValue();
+      const createFeatureData = (
+        activeEnvironmentId: string,
+      ): FeatureUpdateData => ({
+        key,
+        valueType,
+        description,
+        projectId: activeProject.id,
+        environmentOverrides: [
+          {
+            environmentId: activeEnvironmentId,
+            value,
+          },
+        ],
+      });
+
+      this.#environmentService.activeEnvironment$
+        .pipe(
+          take(1),
+          switchMap((environment) =>
+            this.#featuresService.updateFeature(
+              id,
+              createFeatureData(environment.id),
+            ),
+          ),
+          this.#toast.observe({
+            loading: 'Updating...',
+            success: () => 'Feature flag updated successfully!',
+            error: () => 'Failed to update feature flag!',
+          }),
+        )
+        .subscribe({
+          next: () => this.closeSheet(),
+        });
+    }
+  }
+
+  #buildForm(): FormGroup<FeatureFormType> {
+    return this.#fb.group<FeatureFormType>({
+      key: this.#fb.control('', Validators.required),
+      description: this.#fb.control(''),
+      valueType: this.#fb.control(FeatureValueType.Boolean),
+      value: this.#fb.control(false),
+    });
   }
 }
 

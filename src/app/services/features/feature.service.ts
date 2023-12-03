@@ -1,15 +1,16 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, Signal } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { inject, Injectable } from '@angular/core';
 import { isNotUndefined } from '@app/types/common.type';
 import { Environment } from '@app/types/environment.type';
 import {
   Feature,
   FeatureCreateData,
+  FeatureSortBy,
+  FeatureUpdateData,
   FeatureValueType,
 } from '@app/types/feature.type';
-import { startCase } from 'lodash-es';
-import { filter, Observable, startWith, Subject, switchMap } from 'rxjs';
+import { isEmpty, startCase } from 'lodash-es';
+import { filter, Observable, startWith, Subject, switchMap, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SelectOption } from '../../shared/components/select.type';
 import { EnvironmentsService } from '../environments/environments.service';
@@ -22,26 +23,27 @@ export class FeatureService {
   #http = inject(HttpClient);
   #environmentService = inject(EnvironmentsService);
 
-  getFeatures(): Signal<Feature[]> {
-    return toSignal(
-      this.#refreshSubject.pipe(
-        startWith(undefined),
-        switchMap(() =>
-          toObservable(this.#environmentService.activeEnvironment),
-        ),
-        filter(isNotUndefined),
-        switchMap((activeEnvironment: Environment) =>
-          this.#http.get<Feature[]>(`${environment.api}/features`, {
-            params: {
-              environmentId: activeEnvironment.id,
-            },
-            withCredentials: true,
-          }),
-        ),
+  getFeatures({
+    sort,
+    search,
+  }: {
+    sort?: FeatureSortBy;
+    search?: string;
+  }): Observable<Feature[]> {
+    return this.#refreshSubject.pipe(
+      startWith(undefined),
+      switchMap(() => this.#environmentService.activeEnvironment$),
+      filter(isNotUndefined),
+      switchMap((activeEnvironment: Environment) =>
+        this.#http.get<Feature[]>(`${environment.api}/features`, {
+          params: {
+            environmentId: activeEnvironment.id,
+            sortBy: sort ?? FeatureSortBy.Key,
+            ...(!isEmpty(search?.trim()) ? { search } : {}),
+          },
+          withCredentials: true,
+        }),
       ),
-      {
-        initialValue: [],
-      },
     );
   }
 
@@ -55,8 +57,21 @@ export class FeatureService {
   }
 
   createFeature(data: FeatureCreateData): Observable<Feature> {
-    return this.#http.post<Feature>(`${environment.api}/features`, data, {
-      withCredentials: true,
-    });
+    return this.#http
+      .post<Feature>(`${environment.api}/features`, data, {
+        withCredentials: true,
+      })
+      .pipe(tap(() => this.#refreshSubject.next()));
+  }
+
+  updateFeature(
+    id: string,
+    data: Partial<FeatureUpdateData>,
+  ): Observable<Feature> {
+    return this.#http
+      .post<Feature>(`${environment.api}/features/${id}`, data, {
+        withCredentials: true,
+      })
+      .pipe(tap(() => this.#refreshSubject.next()));
   }
 }

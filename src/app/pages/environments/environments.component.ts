@@ -37,7 +37,7 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
         <ul class="flex gap-4">
           @for (environment of this.environments(); track environment.id) {
             <li
-              class="flex p-4 rounded-md border border-gray-300 cursor-pointer"
+              class="flex p-4 rounded-xl border border-gray-300 cursor-pointer"
             >
               <a [routerLink]="environment.route">
                 {{ environment.name }}
