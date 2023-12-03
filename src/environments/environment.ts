@@ -1,3 +1,3 @@
 export const environment = {
-  api: 'http://localhost:3000',
+  api: 'https://flagsy-api.adi.so',
 };
