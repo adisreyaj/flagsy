@@ -34,7 +34,6 @@ import { ButtonComponent, ButtonVariant } from '../button/button.component';
   styles: `
   :host {
     display: block;
-    width: fit-content;
   }
   `,
   standalone: true,

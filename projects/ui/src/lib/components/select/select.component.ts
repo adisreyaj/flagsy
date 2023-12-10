@@ -16,6 +16,7 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AngularRemixIconComponent } from 'angular-remix-icon';
+import { IconName } from 'angular-remix-icon/lib/icon-names';
 import { SelectOptionComponent } from './select-option.component';
 
 @Component({
@@ -28,7 +29,14 @@ import { SelectOptionComponent } from './select-option.component';
       (cdkMenuOpened)="this.isOpen.set(true)"
       (cdkMenuClosed)="this.isOpen.set(false)"
     >
-      <div>{{ this.selectedItemLabel() }}</div>
+      <div class="flex items-center gap-2">
+        @if (this.prefixIcon) {
+          <div>
+            <rmx-icon class="!w-5 !h-5" [name]="this.prefixIcon"></rmx-icon>
+          </div>
+        }
+        <div>{{ this.selectedItemLabel() }}</div>
+      </div>
       <div>
         <rmx-icon
           class="!w-5 !h-5 transform-gpu duration-300"
@@ -99,6 +107,9 @@ export class SelectComponent<Value = unknown>
   public set disabled(isDisabled: boolean) {
     this.isDisabled.set(isDisabled);
   }
+
+  @Input()
+  public prefixIcon?: IconName;
 
   protected isDisabled = signal(false);
   protected isOpen = signal(false);

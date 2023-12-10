@@ -3,6 +3,7 @@ import {
   RiArchiveDrawerFill,
   RiArchiveDrawerLine,
   RiArrowDownSLine,
+  RiArrowRightLine,
   RiArrowRightSLine,
   RiBriefcaseFill,
   RiBriefcaseLine,
@@ -17,10 +18,12 @@ import {
   RiHome2Line,
   RiInformationFill,
   RiLockPasswordLine,
+  RiLogoutCircleLine,
   RiMailLine,
   RiMoreFill,
   RiPencilLine,
   RiSearchLine,
+  RiUser3Line,
 } from 'angular-remix-icon';
 
 export const ICONS = {
@@ -46,4 +49,7 @@ export const ICONS = {
   RiDeleteBin6Line,
   RiInformationFill,
   RiErrorWarningFill,
+  RiLogoutCircleLine,
+  RiUser3Line,
+  RiArrowRightLine,
 };

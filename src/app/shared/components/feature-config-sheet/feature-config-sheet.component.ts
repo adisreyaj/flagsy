@@ -86,7 +86,7 @@ import { FormUtil } from '../../../utils/form.util';
               </ui-form-field>
             }
             @case (FeatureValueType.Number) {
-              <ui-form-field label="Value">
+              <ui-form-field class="block w-40" label="Value">
                 <ui-input formControlName="value" type="number"></ui-input>
               </ui-form-field>
             }
@@ -99,7 +99,9 @@ import { FormUtil } from '../../../utils/form.util';
         </div>
       </form>
 
-      <footer class="flex items-center gap-3 flex-none px-6 py-4 justify-end ">
+      <footer
+        class="flex items-center gap-3 flex-none px-6 py-4 justify-end border-t"
+      >
         <ui-button
           variant="neutral"
           label="Close"

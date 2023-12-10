@@ -7,7 +7,7 @@ import {
   signal,
   WritableSignal,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { isNotUndefined } from '@app/types/common.type';
 import {
   Environment,
@@ -40,6 +40,13 @@ export class EnvironmentsService {
   readonly activeEnvironment$: Observable<Environment> =
     this.#activeEnvironmentSubject.asObservable().pipe(filter(isNotUndefined));
 
+  readonly activeEnvironment: Signal<Environment | undefined> = toSignal(
+    this.activeEnvironment$,
+    {
+      initialValue: undefined,
+    },
+  );
+
   readonly #refreshSubject = new Subject<void>();
   readonly #refresh$: Observable<void> = this.#refreshSubject
     .asObservable()
@@ -55,15 +62,12 @@ export class EnvironmentsService {
         switchMap((activeProject: Project) =>
           this.#getAllEnvironments(activeProject.id),
         ),
-        tap((environments) => {
-          this.environments.set(environments);
-          if (this.#activeEnvironmentSubject.value === undefined) {
-            this.#activeEnvironmentSubject.next(environments[0]);
-          }
-        }),
+        takeUntilDestroyed(),
       )
-      .pipe(takeUntilDestroyed())
-      .subscribe();
+      .subscribe((environments) => {
+        this.environments.set(environments);
+        this.#activeEnvironmentSubject.next(environments[0]);
+      });
   }
 
   #getAllEnvironments = (projectId?: string) => {

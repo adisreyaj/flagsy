@@ -38,6 +38,7 @@ import { FormFieldComponent } from '../form-field/form-field.component';
         [placeholder]="this.placeholder"
         [ngModel]="this.value()"
         (ngModelChange)="this.updateValue($event)"
+        [spellcheck]="false"
       />
     </div>
   `,

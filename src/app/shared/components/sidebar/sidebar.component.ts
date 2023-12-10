@@ -3,12 +3,21 @@ import { SlicePipe } from '@angular/common';
 import { Component, inject, Signal } from '@angular/core';
 import {
   IsActiveMatchOptions,
+  Router,
   RouterLink,
   RouterLinkActive,
 } from '@angular/router';
+import { AuthService } from '@app/services/auth/auth.service';
 import { SidebarService } from '@app/services/sidebar/sidebar.service';
+import {
+  ButtonComponent,
+  DropdownComponent,
+  DropdownOption,
+} from '@ui/components';
 import { AngularRemixIconComponent } from 'angular-remix-icon';
+import { switchMap } from 'rxjs';
 import { NAVIGATION_DATA } from '../../../config/navigation-definition.data';
+import { AppRoutes } from '../../../config/routes/app.routes';
 import { ProjectSelectorComponent } from '../project-selector/project-selector.component';
 
 @Component({
@@ -41,12 +50,7 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
           }
         </a>
       </header>
-      <section class="p-4">
-        <div style="height: 64px">
-          @if (this.isSidebarOpen()) {
-            <app-project-selector @logoEnter></app-project-selector>
-          }
-        </div>
+      <section class="p-4 flex-auto">
         <ul class="flex flex-col gap-4">
           <li>
             <a
@@ -88,6 +92,33 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
           }
         </ul>
       </section>
+      <footer class="p-2">
+        @if (this.currentLoggedInAccount(); as account) {
+          <ui-dropdown
+            class="block w-full"
+            [options]="this.menuOptions"
+            (optionClick)="this.handleOptionClick($event)"
+          >
+            <div
+              class="w-full flex cursor-pointer items-center gap-2 hover:bg-slate-100 rounded-xl p-2"
+              [class.justify-center]="!this.isSidebarOpen()"
+            >
+              <img
+                @logoEnter
+                class="w-10 h-10 rounded-full"
+                src="https://avatar.tobi.sh/test"
+                [alt]="account.firstName"
+              />
+              @if (this.isSidebarOpen()) {
+                <div @logoEnter>
+                  <p class="text-sm font-medium">{{ account.firstName }}</p>
+                  <p class="text-xs">{{ account.email }}</p>
+                </div>
+              }
+            </div>
+          </ui-dropdown>
+        }
+      </footer>
     </div>
   `,
   styles: `
@@ -116,6 +147,8 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
     SlicePipe,
     ProjectSelectorComponent,
     AngularRemixIconComponent,
+    ButtonComponent,
+    DropdownComponent,
   ],
   animations: [
     trigger('fadeSlideInOut', [
@@ -153,11 +186,39 @@ export class SidebarComponent {
     matrixParams: 'subset',
   };
 
-  private readonly sidebarService = inject(SidebarService);
+  protected readonly menuOptions: DropdownOption[] = [
+    {
+      label: 'My Profile',
+      prefixIcon: 'user-3-line',
+    },
+    {
+      label: 'Logout',
+      variant: 'destructive',
+      prefixIcon: 'logout-circle-line',
+    },
+  ];
 
+  private readonly sidebarService = inject(SidebarService);
+  protected readonly currentLoggedInAccount = inject(AuthService).account;
   protected isSidebarOpen: Signal<boolean> = this.sidebarService.isOpen;
+
+  readonly #router = inject(Router);
+  readonly #authService = inject(AuthService);
 
   toggleSidebar(): void {
     this.sidebarService.toggleSidebar();
+  }
+
+  public handleOptionClick(event: DropdownOption) {
+    if (event.label === this.menuOptions[0].label) {
+      return this.#router.navigate([AppRoutes.Profile]);
+    }
+    if (event.label === this.menuOptions[1].label) {
+      return this.#authService
+        .logout()
+        .pipe(switchMap(() => this.#router.navigate([AppRoutes.Login])))
+        .subscribe(() => {});
+    }
+    return;
   }
 }

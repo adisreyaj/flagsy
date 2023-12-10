@@ -56,4 +56,15 @@ export class AuthService {
         }),
       );
   }
+
+  logout() {
+    return this.#http
+      .get(`${environment.api}/auth/logout`, { withCredentials: true })
+      .pipe(
+        map(() => {
+          this.#account.set(undefined);
+          return;
+        }),
+      );
+  }
 }

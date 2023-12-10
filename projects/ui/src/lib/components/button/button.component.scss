@@ -27,7 +27,7 @@
 }
 
 @mixin neutral() {
-  @apply bg-white border border-gray-300 text-gray-800 hover:bg-gray-100;
+  @apply bg-gray-100 border border-gray-200 text-gray-800 hover:bg-gray-200;
 }
 
 @mixin plain() {

@@ -1,8 +1,24 @@
 import { HttpClient } from '@angular/common/http';
-import { computed, inject, Injectable, signal, Signal } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import {
+  computed,
+  inject,
+  Injectable,
+  signal,
+  Signal,
+  WritableSignal,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { isNotUndefined } from '@app/types/common.type';
 import { Project, ProjectCreateInput } from '@app/types/project.type';
-import { Observable, startWith, Subject, switchMap, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  filter,
+  Observable,
+  startWith,
+  Subject,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SelectOption } from '../../shared/components/select.type';
 
@@ -10,10 +26,21 @@ import { SelectOption } from '../../shared/components/select.type';
   providedIn: 'root',
 })
 export class ProjectsService {
-  public readonly activeProject = signal<Project | undefined>(undefined);
-  public readonly activeProject$ = toObservable(this.activeProject);
+  readonly #activeProjectSubject = new BehaviorSubject<Project | undefined>(
+    undefined,
+  );
+  readonly activeProject$: Observable<Project> = this.#activeProjectSubject
+    .asObservable()
+    .pipe(filter(isNotUndefined));
 
-  private readonly projects: Signal<Project[]>;
+  readonly activeProject: Signal<Project | undefined> = toSignal(
+    this.activeProject$,
+    {
+      initialValue: undefined,
+    },
+  );
+
+  private readonly projects: WritableSignal<Project[]> = signal([]);
   private readonly refreshSubject = new Subject<void>();
   private readonly refresh$: Observable<void> = this.refreshSubject
     .asObservable()
@@ -22,9 +49,16 @@ export class ProjectsService {
   private readonly http = inject(HttpClient);
 
   constructor() {
-    this.projects = toSignal(this.getAllProjects(), {
-      initialValue: [],
-    });
+    this.getAllProjects()
+      .pipe(
+        tap((projects) => {
+          this.projects.set(projects);
+          if (!this.#activeProjectSubject.value) {
+            this.#activeProjectSubject.next(projects?.[0]);
+          }
+        }),
+      )
+      .subscribe();
   }
 
   getAllProjects = () => {
@@ -34,11 +68,6 @@ export class ProjectsService {
           withCredentials: true,
         }),
       ),
-      tap((projects) => {
-        if (!this.activeProject()) {
-          this.activeProject.set(projects?.[0]);
-        }
-      }),
     );
   };
 
@@ -72,6 +101,8 @@ export class ProjectsService {
   };
 
   setActiveProject = (projectId: string) => {
-    this.activeProject.set(this.projects().find((p) => p.id === projectId));
+    this.#activeProjectSubject.next(
+      this.projects().find((p) => p.id === projectId),
+    );
   };
 }

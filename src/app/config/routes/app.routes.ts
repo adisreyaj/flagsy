@@ -20,6 +20,15 @@ export const APP_ROUTES: Routes = [
           import('../../shell.component').then((m) => m.ShellComponent),
         children: [
           {
+            path: AppRoutes.Profile,
+            title: 'Profile',
+            canMatch: [loggedInGuard],
+            loadComponent: () =>
+              import('../../pages/profile/profile.component').then(
+                (m) => m.ProfileComponent,
+              ),
+          },
+          {
             path: AppRoutes.Orgs,
             loadChildren: () =>
               import('./org.routes').then((m) => m.ORG_ROUTES),
@@ -52,4 +61,5 @@ export const enum AppRoutes {
   Projects = 'projects',
   Environments = 'environments',
   Features = 'features',
+  Profile = 'profile',
 }

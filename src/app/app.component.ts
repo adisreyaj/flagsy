@@ -7,7 +7,11 @@ import { LoadingBarModule } from '@ngx-loading-bar/core';
   selector: 'app-root',
   template: `
     <router-outlet></router-outlet>
-    <ngx-loading-bar color="hsl(165, 84%, 39%)" height="3px"></ngx-loading-bar>
+    <ngx-loading-bar
+      color="hsl(165, 84%, 39%)"
+      height="3px"
+      [includeSpinner]="false"
+    ></ngx-loading-bar>
   `,
   standalone: true,
   imports: [CommonModule, RouterOutlet, LoadingBarModule],

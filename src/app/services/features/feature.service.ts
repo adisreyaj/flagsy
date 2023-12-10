@@ -1,7 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { isNotUndefined } from '@app/types/common.type';
-import { Environment } from '@app/types/environment.type';
 import {
   Feature,
   FeatureCreateData,
@@ -10,10 +8,18 @@ import {
   FeatureValueType,
 } from '@app/types/feature.type';
 import { isEmpty, startCase } from 'lodash-es';
-import { filter, Observable, startWith, Subject, switchMap, tap } from 'rxjs';
+import {
+  combineLatest,
+  Observable,
+  startWith,
+  Subject,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SelectOption } from '../../shared/components/select.type';
 import { EnvironmentsService } from '../environments/environments.service';
+import { ProjectsService } from '../projects/projects.service';
 
 @Injectable({
   providedIn: 'root',
@@ -22,6 +28,7 @@ export class FeatureService {
   #refreshSubject = new Subject<void>();
   #http = inject(HttpClient);
   #environmentService = inject(EnvironmentsService);
+  #projectsService = inject(ProjectsService);
 
   getFeatures({
     sort,
@@ -32,11 +39,16 @@ export class FeatureService {
   }): Observable<Feature[]> {
     return this.#refreshSubject.pipe(
       startWith(undefined),
-      switchMap(() => this.#environmentService.activeEnvironment$),
-      filter(isNotUndefined),
-      switchMap((activeEnvironment: Environment) =>
+      switchMap(() =>
+        combineLatest([
+          this.#projectsService.activeProject$,
+          this.#environmentService.activeEnvironment$,
+        ]),
+      ),
+      switchMap(([activeProject, activeEnvironment]) =>
         this.#http.get<Feature[]>(`${environment.api}/features`, {
           params: {
+            projectId: activeProject.id,
             environmentId: activeEnvironment.id,
             sortBy: sort ?? FeatureSortBy.Key,
             ...(!isEmpty(search?.trim()) ? { search } : {}),
@@ -73,5 +85,11 @@ export class FeatureService {
         withCredentials: true,
       })
       .pipe(tap(() => this.#refreshSubject.next()));
+  }
+
+  public deleteFeature(id: string): Observable<void> {
+    return this.#http.delete<void>(`${environment.api}/features/${id}`, {
+      withCredentials: true,
+    });
   }
 }

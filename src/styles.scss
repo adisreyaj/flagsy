@@ -18,8 +18,18 @@
   .link {
     @apply decoration-1 decoration-wavy underline-offset-2;
 
-    &:focus,&:hover {
+    &:focus,
+    &:hover {
       @apply underline text-primary-500 bg-primary-100;
+    }
+  }
+
+  input[type='number'] {
+    -moz-appearance: textfield;
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
   }
 }
@@ -45,7 +55,6 @@
 .page-content {
   @apply p-4 overflow-y-auto bg-white min-h-0 flex-auto;
 }
-
 
 @keyframes fade-in {
   from {
