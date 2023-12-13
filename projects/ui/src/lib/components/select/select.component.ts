@@ -35,7 +35,7 @@ import { SelectOptionComponent } from './select-option.component';
             <rmx-icon class="!w-5 !h-5" [name]="this.prefixIcon"></rmx-icon>
           </div>
         }
-        <div>{{ this.selectedItemLabel() }}</div>
+        <div>{{ this.selectedItemLabel() ?? this.placeholder }}</div>
       </div>
       <div>
         <rmx-icon
@@ -46,38 +46,40 @@ import { SelectOptionComponent } from './select-option.component';
       </div>
     </button>
     <ng-template #menu>
-      <ul
-        class="border shadow-sm w-full min-w-[200px]"
-        cdkMenu
-        [cdkTrapFocus]="true"
-      >
-        @for (
-          item of options?.toArray();
-          track item.value;
-          let index = $index
-        ) {
-          <button
-            class="flex items-center gap-2 justify-between cursor-pointer px-4 pr-2 py-2 hover:bg-gray-100 rounded-md focus:ring-2 focus:ring-primary-500"
-            cdkMenuItemRadio
-            [class.bg-gray-100]="this.selectedItemValue() === item.value"
-            [cdkMenuItemChecked]="this.selectedItemValue() === item.value"
-            (cdkMenuItemTriggered)="this.selectItem(item)"
-            [cdkMenuItemDisabled]="item.disabled"
-          >
-            <div>
-              {{ item.label }}
-            </div>
-            @if (this.selectedItemValue() === item.value) {
+      @if (this.options && this.options.length > 0) {
+        <ul
+          class="border shadow-sm w-full min-w-[200px]"
+          cdkMenu
+          [cdkTrapFocus]="true"
+        >
+          @for (
+            item of options?.toArray();
+            track item.value;
+            let index = $index
+          ) {
+            <button
+              class="flex items-center gap-2 justify-between cursor-pointer px-4 pr-2 py-2 hover:bg-gray-100 rounded-md focus:ring-2 focus:ring-primary-500"
+              cdkMenuItemRadio
+              [class.bg-gray-100]="this.selectedItemValue() === item.value"
+              [cdkMenuItemChecked]="this.selectedItemValue() === item.value"
+              (cdkMenuItemTriggered)="this.selectItem(item)"
+              [cdkMenuItemDisabled]="item.disabled"
+            >
               <div>
-                <rmx-icon
-                  class="!w-5 !h-5 text-primary-500"
-                  name="check-line"
-                ></rmx-icon>
+                {{ item.label }}
               </div>
-            }
-          </button>
-        }
-      </ul>
+              @if (this.selectedItemValue() === item.value) {
+                <div>
+                  <rmx-icon
+                    class="!w-5 !h-5 text-primary-500"
+                    name="check-line"
+                  ></rmx-icon>
+                </div>
+              }
+            </button>
+          }
+        </ul>
+      }
     </ng-template>
   `,
   standalone: true,
@@ -107,6 +109,9 @@ export class SelectComponent<Value = unknown>
   public set disabled(isDisabled: boolean) {
     this.isDisabled.set(isDisabled);
   }
+
+  @Input()
+  public placeholder: string = 'Select';
 
   @Input()
   public prefixIcon?: IconName;

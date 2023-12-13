@@ -6,7 +6,7 @@ export type Feature = {
   createdBy: FeatureUser;
   createdAt: Date;
   archived: boolean;
-  lastUpdated?: Date;
+  updatedAt?: Date;
   lastUpdatedBy?: FeatureUser;
 } & FeatureValue;
 
@@ -16,6 +16,10 @@ export interface FeatureCreateData {
   valueType: FeatureValueType;
   description?: string;
   value: SupportedFeatureValueTypes;
+  environmentOverrides: {
+    environmentId: string;
+    value: SupportedFeatureValueTypes;
+  }[];
 }
 
 export type FeatureUpdateData = Omit<FeatureCreateData, 'value'> & {

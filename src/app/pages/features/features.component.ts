@@ -50,7 +50,7 @@ import { FeaturesListComponent } from './features-list.component';
           <ui-button
             label="Create Flag"
             trailingIcon="add-line"
-            (click)="this.open()"
+            (click)="this.openCreateFeatureSheet()"
           ></ui-button>
         </div>
       </app-page-header>
@@ -134,7 +134,7 @@ export class FeaturesComponent {
     );
   }
 
-  public open(): void {
+  public openCreateFeatureSheet(): void {
     this.#sheetService.open<FeatureConfigSheetData>(
       FeatureConfigSheetComponent,
       {

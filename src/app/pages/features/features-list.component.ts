@@ -26,6 +26,7 @@ import {
 } from '@ui/components';
 import { BehaviorSubject, filter, switchMap, withLatestFrom } from 'rxjs';
 import { SheetSize } from '../../../../projects/ui/src/lib/components/sheet/sheet.type';
+import { TimeAgoPipe } from '../../../../projects/ui/src/lib/pipes';
 import {
   FeatureConfigSheetComponent,
   FeatureConfigSheetData,
@@ -46,6 +47,7 @@ import { SelectOption } from '../../shared/components/select.type';
           </div>
           <div>Key</div>
           <div>Value</div>
+          <div>Last Updated</div>
         </li>
         @for (feature of this.features; track feature.id; let index = $index) {
           <li
@@ -62,7 +64,15 @@ import { SelectOption } from '../../shared/components/select.type';
               tabindex="0"
               class="cursor-pointer w-fit"
             >
-              {{ feature.key }}
+              <p class="font-medium">
+                {{ feature.key }}
+              </p>
+
+              @if (feature.description) {
+                <p class="text-gray-500 text-sm line-clamp-1">
+                  {{ feature.description }}
+                </p>
+              }
             </div>
             @switch (feature.type) {
               @case (FeatureValueType.Boolean) {
@@ -71,7 +81,7 @@ import { SelectOption } from '../../shared/components/select.type';
                     (click)="
                       $event.preventDefault(); this.toggleFeatureState(feature)
                     "
-                    [enabled]="feature.value"
+                    [checked]="feature.value"
                   ></ui-toggle>
                 </div>
               }
@@ -90,6 +100,9 @@ import { SelectOption } from '../../shared/components/select.type';
                 </div>
               }
             }
+            <div>
+              {{ feature.updatedAt | timeAgo }}
+            </div>
             <div>
               <ui-dropdown
                 [options]="this.menuOptions"
@@ -135,7 +148,7 @@ import { SelectOption } from '../../shared/components/select.type';
   styles: `
     .list-item {
       @apply grid gap-3;
-      grid-template-columns: 20px 1fr 200px 34px;
+      grid-template-columns: 20px 1fr 200px 200px 34px;
       &:not(:last-child) {
         @apply border-b border-gray-200
       }
@@ -148,6 +161,7 @@ import { SelectOption } from '../../shared/components/select.type';
     AsyncPipe,
     ToggleComponent,
     ButtonComponent,
+    TimeAgoPipe,
   ],
 })
 export class FeaturesListComponent {

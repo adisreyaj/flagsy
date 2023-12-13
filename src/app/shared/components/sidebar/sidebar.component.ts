@@ -125,6 +125,7 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
     .item {
       @apply cursor-pointer flex gap-2 items-center px-4 py-2 rounded-xl w-full relative transition-all duration-300;
       @apply focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:outline-none;
+      @apply hover:bg-gray-100;
       min-height:40px;
       
       .icon {

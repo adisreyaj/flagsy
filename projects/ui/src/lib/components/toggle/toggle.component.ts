@@ -21,7 +21,7 @@ import {
       />
 
       <span
-        class="absolute inset-0 rounded-full bg-gray-300 transition peer-checked:bg-primary-600 peer-disabled:bg-gray-200 ring-offset-2 peer-focus:ring-2 peer-focus:ring-primary-500"
+        class="absolute inset-0 rounded-full bg-gray-300 transition peer-checked:bg-primary-600 peer-disabled:opacity-70 ring-offset-2 peer-focus:ring-2 peer-focus:ring-primary-500"
       >
       </span>
 
@@ -34,8 +34,10 @@ import {
   styles: [
     `
       :host {
-        display: block;
+        display: flex;
         width: fit-content;
+        height: 42px;
+        align-items: center;
       }
       .disabled {
         cursor: not-allowed;
@@ -54,7 +56,7 @@ import {
 })
 export class ToggleComponent implements ControlValueAccessor {
   @Input({ transform: booleanAttribute })
-  public set enabled(isEnabled: boolean) {
+  public set checked(isEnabled: boolean) {
     this.isChecked.set(isEnabled);
   }
 

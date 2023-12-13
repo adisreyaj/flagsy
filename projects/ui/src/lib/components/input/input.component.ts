@@ -18,7 +18,10 @@ import { FormFieldComponent } from '../form-field/form-field.component';
 @Component({
   selector: 'ui-input',
   template: `
-    <div class="flex gap-2 items-center relative group h-[42px]">
+    <div
+      class="flex gap-2 items-center relative group h-[42px]"
+      [class.disabled]="this.isDisabled()"
+    >
       @if (this.prefixIcon; as prefixIcon) {
         <div class="absolute h-full top-0 left-3 flex items-center z-10">
           <rmx-icon
@@ -43,13 +46,17 @@ import { FormFieldComponent } from '../form-field/form-field.component';
     </div>
   `,
   styles: `
+ 
+    .disabled {
+     @apply cursor-not-allowed opacity-70;
+    }
       @mixin errorBorder() {
         @apply border-red-500 ring-red-500;
       }
 
       :host {
         &.ng-dirty.ng-invalid {
-          input:not(.form-field-input) {
+          input {
             @include errorBorder;
           }
         }

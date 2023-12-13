@@ -10,11 +10,15 @@ import { SidebarComponent } from './shared/components/sidebar/sidebar.component'
       <aside class="aside p-2 pr-0">
         <app-sidebar
           [class.sidebar-open]="this.isSidebarOpen()"
-          class="block sidebar h-full transition-all duration-500 "
+          class="block sidebar h-full transition-all duration-500"
         ></app-sidebar>
       </aside>
-      <main class="content transition-all duration-500 flex-auto p-2">
-        <router-outlet></router-outlet>
+      <main
+        class="content transition-all duration-500 flex-auto p-2 rounded-xl"
+      >
+        <div class="h-full bg-white rounded-xl">
+          <router-outlet></router-outlet>
+        </div>
       </main>
     </div>
   `,
