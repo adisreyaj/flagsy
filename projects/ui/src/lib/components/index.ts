@@ -14,3 +14,5 @@ export * from './select';
 export * from './sheet';
 
 export * from './modal';
+
+export * from './tabs';

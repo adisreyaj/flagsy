@@ -5,7 +5,7 @@ import {
   importProvidersFrom,
 } from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { AuthService } from '@app/services/auth/auth.service';
 import { provideHotToastConfig } from '@ngneat/hot-toast';
 import { LoadingBarRouterModule } from '@ngx-loading-bar/router';
@@ -21,7 +21,7 @@ export function initializeApp(authService: AuthService) {
 
 export const APP_CONFIG: ApplicationConfig = {
   providers: [
-    provideRouter(APP_ROUTES),
+    provideRouter(APP_ROUTES, withComponentInputBinding()),
     provideAnimations(),
     provideHttpClient(),
     provideRemixIcon(ICONS),
