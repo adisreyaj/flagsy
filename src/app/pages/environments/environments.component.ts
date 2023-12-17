@@ -1,17 +1,22 @@
+import { FocusKeyManager } from '@angular/cdk/a11y';
 import { AsyncPipe } from '@angular/common';
 import {
+  AfterViewInit,
   Component,
   computed,
   effect,
   inject,
   Input,
+  QueryList,
   Signal,
   signal,
+  ViewChildren,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { EnvironmentsService } from '@app/services/environments/environments.service';
 import { Environment } from '@app/types/environment.type';
+import { FocusableDirective } from '@ui/a11y';
 import {
   ButtonComponent,
   FormFieldComponent,
@@ -35,32 +40,36 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
   template: `
     <div class="flex flex-col h-full">
       <app-page-header title="Environments"></app-page-header>
-      <section class="page-content grid grid-cols-[240px,1fr] p-0">
-        <aside class="border-r p-4">
-          <ul class="flex flex-col gap-4">
-            <li>
-              <ui-input
-                type="text"
-                class="w-full"
-                prefixIcon="search-line"
-                placeholder="Search"
-                [debounceTime]="400"
-                [ngModel]="this.searchText()"
-                (ngModelChange)="this.search($event)"
-              ></ui-input>
-            </li>
-            @for (environment of this.environments(); track environment.id) {
+      <section class="page-content grid grid-cols-[250px,1fr] p-0">
+        <aside class="border-r p-4 flex flex-col gap-4">
+          <header>
+            <ui-input
+              type="text"
+              class="w-full"
+              prefixIcon="search-line"
+              placeholder="Search"
+              [debounceTime]="400"
+              [ngModel]="this.searchText()"
+              (ngModelChange)="this.search($event)"
+            ></ui-input>
+          </header>
+          <ul class="flex flex-col gap-4" (keydown)="this.onKeydown($event)">
+            @for (
+              environment of this.environments();
+              track environment.id;
+              let index = $index
+            ) {
               <li
+                focusable
+                tabindex="0"
                 class="item justify-between"
                 [class.active]="
                   this.selectedEnvironment()?.id === environment.id
                 "
-                [tabIndex]="
-                  this.selectedEnvironment()?.id === environment.id ? -1 : 0
-                "
                 (keydown.enter)="this.selectEnvironment(environment)"
                 (keydown.space)="this.selectEnvironment(environment)"
                 (click)="this.selectEnvironment(environment)"
+                (focus)="keyManager?.setActiveItem(index)"
               >
                 <a>
                   {{ environment.name }}
@@ -73,16 +82,16 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
                 }
               </li>
             }
-            <li>
-              <ui-button
-                size="sm"
-                variant="primary"
-                label="Create New"
-                trailingIcon="add-line"
-                (click)="this.openEnvironmentSheet()"
-              ></ui-button>
-            </li>
           </ul>
+          <footer>
+            <ui-button
+              size="sm"
+              variant="primary"
+              label="Create New"
+              trailingIcon="add-line"
+              (click)="this.openEnvironmentSheet()"
+            ></ui-button>
+          </footer>
         </aside>
         <section>
           <header>
@@ -117,8 +126,8 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
                     <div class="flex gap-2">
                       <ui-input class="flex-auto"></ui-input>
                       <ui-button prefixIcon="clipboard-line" label="Copy"
-                        >Copy</ui-button
-                      >
+                        >Copy
+                      </ui-button>
                     </div>
                   </ui-form-field>
                   <div>
@@ -172,9 +181,13 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
     TabComponent,
     FormFieldComponent,
     TextareaComponent,
+    FocusableDirective,
   ],
 })
-export class EnvironmentsComponent {
+export class EnvironmentsComponent implements AfterViewInit {
+  @ViewChildren(FocusableDirective)
+  environmentListItems!: QueryList<FocusableDirective>;
+
   @Input()
   set environmentId(environmentId: string) {
     this.selectedEnvironmentId.set(environmentId);
@@ -208,6 +221,7 @@ export class EnvironmentsComponent {
       : 0;
   });
 
+  keyManager?: FocusKeyManager<unknown>;
   readonly #sheetService = inject(SheetService);
   readonly #environmentsService = inject(EnvironmentsService);
   readonly #router = inject(Router);
@@ -231,6 +245,14 @@ export class EnvironmentsComponent {
         allowSignalWrites: true,
       },
     );
+  }
+
+  public ngAfterViewInit(): void {
+    this.environmentListItems.changes.subscribe(() => {
+      this.keyManager = new FocusKeyManager(this.environmentListItems).withWrap(
+        true,
+      );
+    });
   }
 
   public search(searchText: string): void {
@@ -269,10 +291,8 @@ export class EnvironmentsComponent {
       indexToRoutesMap[event.currIndex],
     ]);
   }
-}
 
-enum EnvironmentSection {
-  General = 'General',
-  AccessKeys = 'Access Keys',
-  Webhooks = 'Webhooks',
+  onKeydown(event: KeyboardEvent) {
+    this.keyManager?.onKeydown(event);
+  }
 }

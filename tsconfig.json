@@ -21,20 +21,13 @@
     "module": "ES2022",
     "useDefineForClassFields": false,
     "paths": {
-      "@ui/components": [
-        "./projects/ui/src/lib/components/index.ts"
-      ],
-      "@app/services/*": [
-        "./src/app/services/*"
-      ],
-      "@app/types/*": [
-        "./src/app/types/*"
-      ]
+      "@ui/components": ["./projects/ui/src/lib/components/index.ts"],
+      "@ui/a11y": ["./projects/ui/src/lib/a11y/index.ts"],
+      "@ui/pipes": ["./projects/ui/src/lib/pipes/index.ts"],
+      "@app/services/*": ["./src/app/services/*"],
+      "@app/types/*": ["./src/app/types/*"]
     },
-    "lib": [
-      "ES2022",
-      "dom"
-    ]
+    "lib": ["ES2022", "dom"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

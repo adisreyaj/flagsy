@@ -1,3 +1,4 @@
+import { FocusKeyManager } from '@angular/cdk/a11y';
 import { NgTemplateOutlet } from '@angular/common';
 import {
   AfterContentInit,
@@ -9,9 +10,11 @@ import {
   Output,
   QueryList,
   signal,
+  ViewChildren,
 } from '@angular/core';
+import { FocusableDirective } from '@ui/a11y';
 import { AngularRemixIconComponent } from 'angular-remix-icon';
-import { merge, of } from 'rxjs';
+import { debounceTime, merge, of, switchMap, tap } from 'rxjs';
 import { TabComponent } from './tab.component';
 
 @Component({
@@ -19,9 +22,11 @@ import { TabComponent } from './tab.component';
   template: ` <div class="">
     <ul
       class="-mb-px flex items-center text-base text-gray-600 border-b border-b-gray-200"
+      (keydown)="this.onKeydown($event)"
     >
       @for (tab of this.tabs(); track tab; let i = $index) {
         <li
+          focusable
           class="flex item flex-1 cursor-pointer relative transition-colors duration-300"
           [tabIndex]="tab.disabled ? -1 : 0"
           [class.active]="this.selectedTabIndex() === i"
@@ -29,6 +34,7 @@ import { TabComponent } from './tab.component';
           (click)="this.selectTab(i)"
           (keydown.enter)="this.selectTab(i)"
           (keydown.space)="this.selectTab(i)"
+          (focus)="this.keyManager?.setActiveItem(i)"
         >
           <div
             class="relative flex items-center justify-center gap-2 px-1 py-3 w-full"
@@ -71,11 +77,16 @@ import { TabComponent } from './tab.component';
     }
   `,
   standalone: true,
-  imports: [NgTemplateOutlet, AngularRemixIconComponent],
+  imports: [NgTemplateOutlet, AngularRemixIconComponent, FocusableDirective],
 })
 export class TabsComponent implements AfterContentInit {
   @ContentChildren(TabComponent)
   tabsChildren?: QueryList<TabComponent>;
+
+  @ViewChildren(FocusableDirective)
+  tabsListItems!: QueryList<FocusableDirective>;
+
+  keyManager?: FocusKeyManager<unknown>;
 
   @Input()
   set tabIndex(selectedTabIndex: number) {
@@ -97,11 +108,21 @@ export class TabsComponent implements AfterContentInit {
 
   public ngAfterContentInit(): void {
     if (this.tabsChildren) {
-      merge(of(this.tabsChildren), this.tabsChildren?.changes).subscribe(
-        (tabs) => {
-          this.tabs.set(tabs.toArray());
-        },
-      );
+      merge(of(this.tabsChildren), this.tabsChildren?.changes)
+        .pipe(
+          tap((tabs) => {
+            this.tabs.set(tabs.toArray());
+          }),
+          debounceTime(0),
+          switchMap(() =>
+            merge(of(this.tabsListItems), this.tabsListItems?.changes),
+          ),
+        )
+        .subscribe((items) => {
+          this.keyManager = new FocusKeyManager(items)
+            .withWrap(true)
+            .withHorizontalOrientation('ltr');
+        });
     }
   }
 
@@ -109,6 +130,10 @@ export class TabsComponent implements AfterContentInit {
     const prevIndex = this.selectedTabIndex();
     this.selectedTabIndex.set(i);
     this.tabChange.emit({ prevIndex, currIndex: i });
+  }
+
+  onKeydown(event: KeyboardEvent) {
+    this.keyManager?.onKeydown(event);
   }
 }
 
