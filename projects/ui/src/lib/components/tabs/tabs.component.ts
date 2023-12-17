@@ -21,19 +21,20 @@ import { TabComponent } from './tab.component';
   selector: 'ui-tabs',
   template: ` <div class="">
     <ul
-      class="-mb-px flex items-center text-base text-gray-600 border-b border-b-gray-200"
+      class="-mb-px flex items-center text-base text-gray-500 border-b border-b-gray-200"
       (keydown)="this.onKeydown($event)"
     >
       @for (tab of this.tabs(); track tab; let i = $index) {
         <li
           focusable
+          [disabled]="tab.disabled"
           class="flex item flex-1 cursor-pointer relative transition-colors duration-300"
-          [tabIndex]="tab.disabled ? -1 : 0"
+          [tabIndex]="tab.disabled || this.selectedTabIndex() === i ? -1 : 0"
           [class.active]="this.selectedTabIndex() === i"
           [class.disabled]="tab.disabled"
-          (click)="this.selectTab(i)"
-          (keydown.enter)="this.selectTab(i)"
-          (keydown.space)="this.selectTab(i)"
+          (click)="!tab.disabled && this.selectTab(i)"
+          (keydown.enter)="!tab.disabled && this.selectTab(i)"
+          (keydown.space)="!tab.disabled && this.selectTab(i)"
           (focus)="this.keyManager?.setActiveItem(i)"
         >
           <div
@@ -59,23 +60,33 @@ import { TabComponent } from './tab.component';
       }
     </div>
   </div>`,
-  styles: `
-  .item {
-    &:not(.disabled) {
-      @apply hover:bg-gray-100 hover:text-primary-500;
-      @apply focus:ring-inset focus:ring-2 focus:ring-inset focus:ring-primary-500 focus:outline-none;
-    }
-    
-    &.disabled {
-      @apply cursor-not-allowed;
-      @apply opacity-50;
-    }
-  }
-  
-  .active {
-     @apply text-primary-500 after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-full after:bg-primary-500;
-    }
-  `,
+  styles: [
+    `
+      @mixin borderBottom() {
+        @apply after:absolute after:left-0 after:bottom-[-1px] after:h-0.5 after:w-full;
+      }
+
+      .item {
+        &:not(.disabled) {
+          @apply hover:text-gray-600;
+          @apply focus:ring-inset focus:ring-2 focus:ring-inset focus:ring-primary-500 focus:outline-none;
+        }
+
+        &.disabled {
+          @apply cursor-not-allowed;
+          @apply opacity-50;
+        }
+        &:hover {
+          @include borderBottom();
+          @apply after:bg-gray-300;
+        }
+        &.active {
+          @include borderBottom();
+          @apply text-primary-500 after:bg-primary-500;
+        }
+      }
+    `,
+  ],
   standalone: true,
   imports: [NgTemplateOutlet, AngularRemixIconComponent, FocusableDirective],
 })
