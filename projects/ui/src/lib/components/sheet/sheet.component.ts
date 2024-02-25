@@ -1,6 +1,12 @@
 import { A11yModule } from '@angular/cdk/a11y';
 import { NgComponentOutlet } from '@angular/common';
-import { Component, inject, InjectionToken, Type } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  inject,
+  InjectionToken,
+  Type,
+} from '@angular/core';
 import { trim } from 'lodash-es';
 import { ButtonComponent } from '../button/button.component';
 import { SheetRef } from './sheet-ref';
@@ -47,6 +53,11 @@ import { SheetRef } from './sheet-ref';
   imports: [NgComponentOutlet, ButtonComponent, A11yModule],
 })
 export class SheetComponent<T> {
+  @HostListener('keydown.escape')
+  public onEscape() {
+    this.close();
+  }
+
   readonly #sheetConfig = inject(SHEET_COMPONENT_ARGS);
   readonly #sheetRef: SheetRef = inject(SheetRef);
 

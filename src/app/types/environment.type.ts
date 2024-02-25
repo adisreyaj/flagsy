@@ -13,3 +13,8 @@ export interface EnvironmentCreateInput {
   key: string;
   projectId: string;
 }
+
+export type EnvironmentUpdateInput = { id: string } & Pick<
+  EnvironmentCreateInput,
+  'name'
+>;

@@ -34,8 +34,22 @@
   @apply bg-transparent hover:bg-gray-100 text-inherit;
 }
 
+@mixin button-focus(){
+}
+
+:host:focus:not(:disabled) {
+  .btn {
+    @apply ring-2 ring-primary-500 ring-offset-2;
+
+    &.destructive {
+      @apply ring-red-500;
+    }
+  }
+}
+
 .btn {
-  @apply flex items-center gap-x-2 text-base rounded-xl border border-transparent text-white focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50;
+  @apply flex items-center gap-x-2 text-base rounded-xl border border-transparent text-white disabled:opacity-50;
+  @apply focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
   // Icon only button will be a square
   &:not(.icon) {
     @apply w-full;

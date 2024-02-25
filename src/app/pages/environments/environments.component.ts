@@ -12,7 +12,12 @@ import {
   signal,
   ViewChildren,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {
+  FormsModule,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { EnvironmentsService } from '@app/services/environments/environments.service';
 import { Environment } from '@app/types/environment.type';
@@ -100,42 +105,62 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
               [tabIndex]="this.selectedTabIndex()"
             >
               <ui-tab title="General" icon="settings-3-line">
-                <div class="p-6 max-w-md">
+                <div class="p-6 max-w-md" [formGroup]="this.detailForm">
                   <ui-form-field label="Name" errorMessage="Name is required.">
-                    <ui-input></ui-input>
+                    <ui-input formControlName="name"></ui-input>
                   </ui-form-field>
 
                   <ui-form-field
                     label="Description"
                     errorMessage="Name is required."
                   >
-                    <ui-textarea></ui-textarea>
+                    <ui-textarea formControlName="description"></ui-textarea>
                   </ui-form-field>
 
                   <footer class="flex justify-end">
-                    <ui-button label="Update"></ui-button>
+                    <ui-button
+                      label="Update"
+                      (click)="
+                        this.updateEnvironment(this.selectedEnvironmentId())
+                      "
+                    ></ui-button>
                   </footer>
                 </div>
               </ui-tab>
-              <ui-tab title="Access Keys" icon="key-2-line">
-                <div class="p-6 max-w-md">
-                  <ui-form-field
-                    label="Access Key"
-                    errorMessage="Name is required."
-                  >
-                    <div class="flex gap-2">
-                      <ui-input class="flex-auto"></ui-input>
-                      <ui-button prefixIcon="clipboard-line" label="Copy"
-                        >Copy
-                      </ui-button>
+              <ui-tab title="Keys" icon="key-2-line">
+                <div class="p-6 max-w-md flex flex-col gap-8">
+                  <section>
+                    <ui-form-field label="Environment Key">
+                      <div class="flex gap-2">
+                        <ui-input
+                          class="flex-auto"
+                          [ngModel]="this.selectedEnvironmentId()"
+                          disabled
+                        ></ui-input>
+                        <ui-button prefixIcon="clipboard-line"></ui-button>
+                      </div>
+                    </ui-form-field>
+                    <div class="text-sm text-gray-500">
+                      Environment key is the unique identifier of the
+                      environment.
                     </div>
-                  </ui-form-field>
-                  <div>
+                  </section>
+
+                  <section>
+                    <ui-form-field
+                      label="Access Key"
+                      errorMessage="Name is required."
+                    >
+                      <div class="flex gap-2">
+                        <ui-input class="flex-auto"></ui-input>
+                        <ui-button prefixIcon="clipboard-line"> </ui-button>
+                      </div>
+                    </ui-form-field>
                     <div class="text-sm text-gray-500">
                       Access key needs to be provided to the SDK to access the
                       flags for this environment.
                     </div>
-                  </div>
+                  </section>
                 </div>
               </ui-tab>
               <ui-tab title="Webhooks" icon="terminal-box-line">
@@ -160,7 +185,7 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
       }
       
       &.active {
-        @apply text-slate-800 bg-slate-100 font-semibold;
+        @apply text-primary-600 bg-slate-100 font-medium;
         
         .icon {
             @apply text-primary-600;
@@ -182,6 +207,7 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
     FormFieldComponent,
     TextareaComponent,
     FocusableDirective,
+    ReactiveFormsModule,
   ],
 })
 export class EnvironmentsComponent implements AfterViewInit {
@@ -221,10 +247,13 @@ export class EnvironmentsComponent implements AfterViewInit {
       : 0;
   });
 
+  protected readonly detailForm;
+
   keyManager?: FocusKeyManager<unknown>;
   readonly #sheetService = inject(SheetService);
   readonly #environmentsService = inject(EnvironmentsService);
   readonly #router = inject(Router);
+  readonly #fb = inject(NonNullableFormBuilder);
 
   constructor() {
     this.environments = computed(() => {
@@ -235,10 +264,31 @@ export class EnvironmentsComponent implements AfterViewInit {
         );
     });
 
+    this.detailForm = this.#fb.group({
+      name: ['', Validators.required],
+      description: [''],
+    });
+
     effect(
       () => {
         if (isNil(this.selectedEnvironment())) {
           this.selectEnvironment(this.#environmentsService.environments()[0]);
+        }
+      },
+      {
+        allowSignalWrites: true,
+      },
+    );
+
+    effect(
+      () => {
+        const selectedEnvironment = this.selectedEnvironment();
+        console.log(selectedEnvironment);
+        if (!isNil(selectedEnvironment)) {
+          this.detailForm.patchValue({
+            name: selectedEnvironment.name,
+            description: '',
+          });
         }
       },
       {
@@ -294,5 +344,16 @@ export class EnvironmentsComponent implements AfterViewInit {
 
   onKeydown(event: KeyboardEvent) {
     this.keyManager?.onKeydown(event);
+  }
+
+  public updateEnvironment(id?: string): void {
+    if (!isNil(id)) {
+      this.#environmentsService
+        .updateEnvironment({
+          id,
+          name: this.detailForm.controls.name.value,
+        })
+        .subscribe();
+    }
   }
 }

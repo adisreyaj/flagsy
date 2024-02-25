@@ -133,11 +133,7 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
       }
       
       &.active {
-        @apply text-slate-800 bg-slate-100 font-semibold;
-        
-        .icon {
-            @apply text-primary-600;
-        }
+        @apply text-primary-600 bg-slate-100 font-semibold;
       }
     }
   `,

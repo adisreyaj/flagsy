@@ -50,21 +50,19 @@ import { SelectOption } from '../../shared/components/select.type';
           <div>Last Updated</div>
         </li>
         @for (feature of this.features; track feature.id; let index = $index) {
-          <li
-            [tabindex]="index"
-            class="list-item w-full justify-between items-center p-4"
-          >
+          <li class="list-item w-full justify-between items-center p-4">
             <div class="flex items-center">
               <ui-checkbox></ui-checkbox>
             </div>
             <div
               (keyup.enter)="this.editFeature(feature)"
-              (keyup.space)="this.editFeature(feature)"
               (click)="this.editFeature(feature)"
               tabindex="0"
-              class="cursor-pointer w-fit"
+              class="cursor-pointer w-full group rounded-md"
             >
-              <p class="font-medium">
+              <p
+                class="font-medium group-focus:text-primary-500 group-focus:underline decoration-1 decoration-wavy underline-offset-2"
+              >
                 {{ feature.key }}
               </p>
 
@@ -297,4 +295,6 @@ export class FeaturesListComponent {
       )
       .subscribe();
   }
+
+  protected readonly console = console;
 }

@@ -12,6 +12,7 @@ import { isNotUndefined } from '@app/types/common.type';
 import {
   Environment,
   EnvironmentCreateInput,
+  EnvironmentUpdateInput,
 } from '@app/types/environment.type';
 import { Project } from '@app/types/project.type';
 import { isEmpty } from 'lodash-es';
@@ -91,6 +92,29 @@ export class EnvironmentsService {
     return this.#http
       .post<string>(
         `${environment.api}/environments`,
+        {
+          ...data,
+        },
+        {
+          withCredentials: true,
+        },
+      )
+      .pipe(
+        tap({
+          next: () => {
+            this.#refreshSubject.next();
+          },
+        }),
+      );
+  }
+
+  updateEnvironment({
+    id,
+    ...data
+  }: EnvironmentUpdateInput): Observable<string> {
+    return this.#http
+      .patch<string>(
+        `${environment.api}/environments/${id}`,
         {
           ...data,
         },

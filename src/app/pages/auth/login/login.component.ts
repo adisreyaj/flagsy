@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -14,6 +15,7 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '@app/services/auth/auth.service';
+import { HotToastService } from '@ngneat/hot-toast';
 import {
   ButtonComponent,
   CheckboxComponent,
@@ -108,6 +110,7 @@ export class LoginComponent {
   private readonly fb = inject(FormBuilder).nonNullable;
   private readonly authService = inject(AuthService);
   protected readonly router = inject(Router);
+  readonly #toast = inject(HotToastService);
 
   constructor() {
     this.form = this.fb.group<LoginFormType>({
@@ -138,6 +141,11 @@ export class LoginComponent {
         .subscribe({
           next: () => {
             this.router.navigate(['/']);
+          },
+          error: (err) => {
+            const errorMessage =
+              err instanceof HttpErrorResponse ? err.statusText : err.message;
+            this.#toast.error(errorMessage);
           },
         });
     }

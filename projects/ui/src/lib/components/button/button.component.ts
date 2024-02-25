@@ -1,25 +1,19 @@
-import {
-  booleanAttribute,
-  Component,
-  computed,
-  Input,
-  signal,
-} from '@angular/core';
+import { Component, computed, input, Input } from '@angular/core';
 import { AngularRemixIconComponent } from 'angular-remix-icon';
 import { IconName } from 'angular-remix-icon/lib/icon-names';
 
 @Component({
   selector: 'ui-button',
   template: `
-    <button [class]="this.buttonClasses()" [disabled]="this.isDisabled()">
+    <button [class]="this.buttonClasses()" [disabled]="this.disabled()">
       @if (this.prefixIcon; as prefix) {
         <div>
           <rmx-icon class="button-icon prefix-icon" [name]="prefix"></rmx-icon>
         </div>
       }
-      @if (this.label) {
+      @if (this.label()) {
         <div class="label">
-          {{ this.label }}
+          {{ this.label() }}
         </div>
       }
       @if (this.trailingIcon; as trailingIcon) {
@@ -37,23 +31,13 @@ import { IconName } from 'angular-remix-icon/lib/icon-names';
   imports: [AngularRemixIconComponent],
 })
 export class ButtonComponent {
-  @Input()
-  public label: string = '';
+  public label = input<string>('');
 
-  @Input()
-  public set variant(variant: ButtonVariant) {
-    this.variantSelection.set(variant);
-  }
+  public variant = input<ButtonVariant>('primary');
 
-  @Input()
-  public set size(size: ButtonSize) {
-    this.sizeSelection.set(size);
-  }
+  public size = input<ButtonSize>('md');
 
-  @Input({ transform: booleanAttribute })
-  public set disabled(isDisabled: boolean) {
-    this.isDisabled.set(isDisabled);
-  }
+  public disabled = input<boolean>(false);
 
   @Input()
   public trailingIcon?: IconName;
@@ -64,15 +48,11 @@ export class ButtonComponent {
   @Input()
   public contentAlignment?: 'left' | 'center' | 'right' = 'center';
 
-  protected readonly isDisabled = signal(false);
-  private readonly sizeSelection = signal('md');
-  private readonly variantSelection = signal('primary');
-
   protected readonly buttonClasses = computed(() => {
     return [
       'btn',
-      this.sizeSelection(),
-      this.variantSelection(),
+      this.size(),
+      this.variant(),
       this.trailingIcon ? 'has-trailing-icon' : '',
       this.prefixIcon ? 'has-prefix-icon' : '',
       this.getContentAlignmentClass(),
