@@ -1,41 +1,43 @@
 import { FocusKeyManager } from '@angular/cdk/a11y';
 import { NgTemplateOutlet } from '@angular/common';
 import {
-  AfterContentInit,
+  ChangeDetectionStrategy,
   Component,
   computed,
-  ContentChildren,
+  contentChildren,
   EventEmitter,
   Input,
   Output,
-  QueryList,
+  Signal,
   signal,
-  ViewChildren,
+  viewChildren,
 } from '@angular/core';
 import { FocusableDirective } from '@ui/a11y';
 import { AngularRemixIconComponent } from 'angular-remix-icon';
-import { debounceTime, merge, of, switchMap, tap } from 'rxjs';
 import { TabComponent } from './tab.component';
 
 @Component({
   selector: 'ui-tabs',
-  template: ` <div class="">
-    <ul
+  template: ` <div class="tabs">
+    <div
+      role="tablist"
       class="-mb-px flex items-center text-base text-gray-500 border-b border-b-gray-200"
       (keydown)="this.onKeydown($event)"
     >
       @for (tab of this.tabs(); track tab; let i = $index) {
-        <li
+        <button
+          role="tab"
+          class="flex item flex-1 cursor-pointer relative transition-colors duration-300"
           focusable
           [disabled]="tab.disabled"
-          class="flex item flex-1 cursor-pointer relative transition-colors duration-300"
-          [tabIndex]="tab.disabled || this.selectedTabIndex() === i ? -1 : 0"
+          [tabindex]="this.selectedTabIndex() === i ? 0 : -1"
+          [attr.aria-selected]="this.selectedTabIndex() === i"
           [class.active]="this.selectedTabIndex() === i"
           [class.disabled]="tab.disabled"
           (click)="!tab.disabled && this.selectTab(i)"
           (keydown.enter)="!tab.disabled && this.selectTab(i)"
           (keydown.space)="!tab.disabled && this.selectTab(i)"
-          (focus)="this.keyManager?.setActiveItem(i)"
+          (focus)="this.setFocusedAsActiveInKeyManager(i)"
         >
           <div
             class="relative flex items-center justify-center gap-2 px-1 py-3 w-full"
@@ -49,9 +51,9 @@ import { TabComponent } from './tab.component';
               {{ tab.title }}
             </div>
           </div>
-        </li>
+        </button>
       }
-    </ul>
+    </div>
     <div>
       @if (this.selectedTab()?.content) {
         <ng-container
@@ -61,11 +63,8 @@ import { TabComponent } from './tab.component';
     </div>
   </div>`,
   styles: [
+    // language=scss
     `
-      @mixin borderBottom() {
-        @apply after:absolute after:left-0 after:bottom-[-1px] after:h-0.5 after:w-full;
-      }
-
       .item {
         &:not(.disabled) {
           @apply hover:text-gray-600;
@@ -76,28 +75,31 @@ import { TabComponent } from './tab.component';
           @apply cursor-not-allowed;
           @apply opacity-50;
         }
+
+        &:hover,
+        &.active {
+          @apply after:absolute after:left-0 after:bottom-[-1px] after:h-0.5 after:w-full;
+        }
         &:hover {
-          @include borderBottom();
           @apply after:bg-gray-300;
         }
         &.active {
-          @include borderBottom();
           @apply text-primary-500 after:bg-primary-500;
         }
       }
     `,
   ],
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgTemplateOutlet, AngularRemixIconComponent, FocusableDirective],
 })
-export class TabsComponent implements AfterContentInit {
-  @ContentChildren(TabComponent)
-  tabsChildren?: QueryList<TabComponent>;
+export class TabsComponent {
+  readonly tabsChildrenSignal = contentChildren(TabComponent);
+  readonly tabListItemsSignal = viewChildren(FocusableDirective);
 
-  @ViewChildren(FocusableDirective)
-  tabsListItems!: QueryList<FocusableDirective>;
-
-  keyManager?: FocusKeyManager<unknown>;
+  readonly keyManager: Signal<FocusKeyManager<unknown> | undefined> = signal<
+    FocusKeyManager<unknown> | undefined
+  >(undefined);
 
   @Input()
   set tabIndex(selectedTabIndex: number) {
@@ -110,31 +112,26 @@ export class TabsComponent implements AfterContentInit {
     new EventEmitter<TabChangeEvent>();
 
   readonly selectedTabIndex = signal<number>(0);
-  readonly tabs = signal<TabComponent[]>([]);
+
+  readonly tabs: Signal<ReadonlyArray<TabComponent>> = signal<
+    ReadonlyArray<TabComponent>
+  >([]);
+
   readonly selectedTab = computed(() => {
     const tabs = this.tabs();
     const selectedTabIndex = this.selectedTabIndex();
     return tabs[selectedTabIndex];
   });
 
-  public ngAfterContentInit(): void {
-    if (this.tabsChildren) {
-      merge(of(this.tabsChildren), this.tabsChildren?.changes)
-        .pipe(
-          tap((tabs) => {
-            this.tabs.set(tabs.toArray());
-          }),
-          debounceTime(0),
-          switchMap(() =>
-            merge(of(this.tabsListItems), this.tabsListItems?.changes),
-          ),
-        )
-        .subscribe((items) => {
-          this.keyManager = new FocusKeyManager(items)
-            .withWrap(true)
-            .withHorizontalOrientation('ltr');
-        });
-    }
+  public constructor() {
+    this.tabs = computed(() => this.tabsChildrenSignal());
+    this.keyManager = computed(() => {
+      return new FocusKeyManager(
+        this.tabListItemsSignal() as FocusableDirective[],
+      )
+        .withWrap(true)
+        .withHorizontalOrientation('ltr');
+    });
   }
 
   public selectTab(i: number): void {
@@ -144,7 +141,11 @@ export class TabsComponent implements AfterContentInit {
   }
 
   onKeydown(event: KeyboardEvent) {
-    this.keyManager?.onKeydown(event);
+    this.keyManager()?.onKeydown(event);
+  }
+
+  public setFocusedAsActiveInKeyManager(i: number): void {
+    this.keyManager()?.updateActiveItem(i);
   }
 }
 
