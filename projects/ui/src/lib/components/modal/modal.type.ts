@@ -15,6 +15,7 @@ export interface ConfirmationModalConfig<TemplateContextData = unknown> {
   confirmButtonVariant?: ButtonVariant;
   cancelButtonText?: string;
   size?: ModalSize;
+  dataType?: ModalDataType;
 }
 
 export const enum ModalSize {

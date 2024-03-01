@@ -30,6 +30,16 @@ export class FeatureService {
   #environmentService = inject(EnvironmentsService);
   #projectsService = inject(ProjectsService);
 
+  getAllFeaturesForCurrentProjectAndEnvironment() {
+    return this.#http.get<Feature[]>(`${environment.api}/features`, {
+      params: {
+        projectId: environment.projectId,
+        environmentId: environment.environmentId,
+      },
+      withCredentials: true,
+    });
+  }
+
   getFeatures({
     sort,
     search,
@@ -87,9 +97,11 @@ export class FeatureService {
       .pipe(tap(() => this.#refreshSubject.next()));
   }
 
-  public deleteFeature(id: string): Observable<void> {
-    return this.#http.delete<void>(`${environment.api}/features/${id}`, {
-      withCredentials: true,
-    });
+  deleteFeature(id: string): Observable<void> {
+    return this.#http
+      .delete<void>(`${environment.api}/features/${id}`, {
+        withCredentials: true,
+      })
+      .pipe(tap(() => this.#refreshSubject.next()));
   }
 }

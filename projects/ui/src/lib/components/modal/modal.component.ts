@@ -20,11 +20,11 @@ import {
       class="flex flex-col h-full text-gray-600"
       [cdkTrapFocus]="true"
     >
-      <header class="flex flex-none border-b items-center justify-between p-4">
-        <div class="flex items-center gap-2">
+      <header class="flex flex-none items-center justify-center p-4 pt-8">
+        <div class="flex flex-col items-center gap-2">
           @if (this.modalIcon; as modalIcon) {
             <rmx-icon
-              [class]="this.modalIconColor"
+              [class]="[this.modalIconColor, '!w-12', '!h-12']"
               [name]="modalIcon"
             ></rmx-icon>
           }
@@ -33,7 +33,7 @@ import {
           </div>
         </div>
         <button
-          class="w-6 h-6 rounded-md text-gray-700 hover:bg-gray-200 focus:ring-2 focus:ring-primary-500"
+          class="hidden w-6 h-6 rounded-md text-gray-700 hover:bg-gray-200 focus:ring-2 focus:ring-primary-500"
           (click)="this.close()"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

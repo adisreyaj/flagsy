@@ -13,11 +13,14 @@ import {
   ButtonComponent,
   DropdownComponent,
   DropdownOption,
+  PopoverPosition,
+  TooltipDirective,
 } from '@ui/components';
 import { AngularRemixIconComponent } from 'angular-remix-icon';
 import { switchMap } from 'rxjs';
 import { NAVIGATION_DATA } from '../../../config/navigation-definition.data';
 import { AppRoutes } from '../../../config/routes/app.routes';
+import { ProjectEnvironmentSelectorComponent } from '../project-environment-selector/project-environment-selector.component';
 import { ProjectSelectorComponent } from '../project-selector/project-selector.component';
 
 @Component({
@@ -25,7 +28,7 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
   template: `
     <div class="group flex flex-col bg-white rounded-xl h-full relative">
       <button
-        class="transform-gpu transition-all duration-300 group-hover:opacity-100 focus:opacity-100 flex top-6 bg-primary-500 opacity-0 absolute -right-3 cursor-pointer rounded-full w-6 h-6 shadow-md hover:bg-primary-600 items-center justify-center text-white focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:outline-none"
+        class="transform-gpu transition-all duration-300 group-hover:opacity-100 focus-visible:opacity-100 flex top-6 bg-primary-500 opacity-0 absolute -right-3 cursor-pointer rounded-full w-6 h-6 shadow-md hover:bg-primary-600 items-center justify-center text-white focus-visible-outline"
         (click)="this.toggleSidebar()"
         [class.rotate-180]="this.isSidebarOpen()"
       >
@@ -52,9 +55,12 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
       </header>
       <section class="p-4 flex-auto">
         <ul class="flex flex-col gap-4">
-          <li>
+          <li
+            [uiTooltip]="this.isSidebarOpen() ? undefined : 'Home'"
+            uiTooltipPosition="${PopoverPosition.RightCentered}"
+          >
             <a
-              class="item"
+              class="item focus-visible-outline"
               [routerLink]="['/']"
               routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: true }"
@@ -71,9 +77,12 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
             </a>
           </li>
           @for (item of NAVIGATION_ITEMS; track item.id) {
-            <li>
+            <li
+              [uiTooltip]="this.isSidebarOpen() ? undefined : item.title"
+              uiTooltipPosition="${PopoverPosition.RightCentered}"
+            >
               <a
-                class="item"
+                class="item focus-visible-outline"
                 [routerLink]="item.route"
                 routerLinkActive="active"
                 [routerLinkActiveOptions]="routerLinkActiveOptions"
@@ -92,15 +101,21 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
           }
         </ul>
       </section>
-      <footer class="p-2">
+      <footer class="flex gap-4 flex-col p-2">
+        @if (this.isSidebarOpen()) {
+          <app-project-environment-selector
+            @logoEnter
+          ></app-project-environment-selector>
+        }
+        <hr />
         @if (this.currentLoggedInAccount(); as account) {
           <ui-dropdown
             class="block w-full"
             [options]="this.menuOptions"
             (optionClick)="this.handleOptionClick($event)"
           >
-            <div
-              class="w-full flex cursor-pointer items-center gap-2 hover:bg-slate-100 rounded-xl p-2"
+            <button
+              class="w-full flex cursor-pointer items-center gap-2 hover:bg-slate-100 rounded-xl p-2 focus-visible-outline"
               [class.justify-center]="!this.isSidebarOpen()"
             >
               <img
@@ -115,7 +130,7 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
                   <p class="text-xs">{{ account.email }}</p>
                 </div>
               }
-            </div>
+            </button>
           </ui-dropdown>
         }
       </footer>
@@ -124,7 +139,6 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
   styles: `
     .item {
       @apply cursor-pointer flex gap-2 items-center px-4 py-2 rounded-xl w-full relative transition-all duration-300;
-      @apply focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:outline-none;
       @apply hover:bg-gray-100;
       min-height:40px;
       
@@ -146,6 +160,8 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
     AngularRemixIconComponent,
     ButtonComponent,
     DropdownComponent,
+    ProjectEnvironmentSelectorComponent,
+    TooltipDirective,
   ],
   animations: [
     trigger('fadeSlideInOut', [

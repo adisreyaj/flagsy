@@ -2,6 +2,7 @@ import {
   RiAddLine,
   RiArchiveDrawerFill,
   RiArchiveDrawerLine,
+  RiArrowDownLine,
   RiArrowDownSLine,
   RiArrowRightLine,
   RiArrowRightSLine,
@@ -18,6 +19,7 @@ import {
   RiHome2Fill,
   RiHome2Line,
   RiInformationFill,
+  RiInformationLine,
   RiKey2Line,
   RiLockPasswordLine,
   RiLogoutCircleLine,
@@ -60,4 +62,6 @@ export const ICONS = {
   RiKey2Line,
   RiTerminalBoxLine,
   RiClipboardLine,
+  RiArrowDownLine,
+  RiInformationLine,
 };

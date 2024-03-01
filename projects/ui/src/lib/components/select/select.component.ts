@@ -9,9 +9,8 @@ import {
   AfterContentInit,
   booleanAttribute,
   Component,
-  ContentChildren,
+  contentChildren,
   Input,
-  QueryList,
   signal,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -46,17 +45,13 @@ import { SelectOptionComponent } from './select-option.component';
       </div>
     </button>
     <ng-template #menu>
-      @if (this.options && this.options.length > 0) {
+      @if (this.options().length > 0) {
         <ul
           class="border shadow-sm w-full min-w-[200px]"
           cdkMenu
           [cdkTrapFocus]="true"
         >
-          @for (
-            item of options?.toArray();
-            track item.value;
-            let index = $index
-          ) {
+          @for (item of this.options(); track item.value; let index = $index) {
             <button
               class="flex items-center gap-2 justify-between cursor-pointer px-4 pr-2 py-2 hover:bg-gray-100 rounded-md focus:ring-2 focus:ring-primary-500"
               cdkMenuItemRadio
@@ -102,8 +97,9 @@ import { SelectOptionComponent } from './select-option.component';
 export class SelectComponent<Value = unknown>
   implements ControlValueAccessor, AfterContentInit
 {
-  @ContentChildren(SelectOptionComponent)
-  protected options?: QueryList<SelectOptionComponent<Value>>;
+  protected options = contentChildren<SelectOptionComponent<Value>>(
+    SelectOptionComponent,
+  );
 
   @Input({ transform: booleanAttribute })
   public set disabled(isDisabled: boolean) {
@@ -126,12 +122,12 @@ export class SelectComponent<Value = unknown>
 
   public ngAfterContentInit(): void {
     if (this.selectedItemValue() === undefined) {
-      this.selectedItemValue.set(this.options?.first?.value);
-      this.selectedItemLabel.set(this.options?.first?.label);
+      this.selectedItemValue.set(this.options()?.[0]?.value);
+      this.selectedItemLabel.set(this.options()?.[0]?.label);
     } else {
       if (this.selectedItemLabel() === undefined) {
         this.selectedItemLabel.set(
-          this.options?.find((o) => o.value === this.selectedItemValue())
+          this.options()?.find((o) => o.value === this.selectedItemValue())
             ?.label,
         );
       }
@@ -142,7 +138,7 @@ export class SelectComponent<Value = unknown>
     this.selectedItemValue.set(value);
     if (this.options) {
       this.selectedItemLabel.set(
-        this.options.find((o) => o.value === value)?.label,
+        this.options().find((o) => o.value === value)?.label,
       );
     }
   }

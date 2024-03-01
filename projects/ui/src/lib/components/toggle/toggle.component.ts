@@ -10,7 +10,7 @@ import {
   template: `
     <label
       [class.disabled]="this.isDisabled()"
-      class="toggle rounded-full relative block h-6 w-12 cursor-pointer [-webkit-tap-highlight-color:_transparent]"
+      class="toggle rounded-full relative block h-6 w-11 cursor-pointer [-webkit-tap-highlight-color:_transparent]"
     >
       <input
         type="checkbox"
@@ -26,7 +26,7 @@ import {
       </span>
 
       <span
-        class="absolute inset-y-0 start-0 m-1 h-4 w-4 rounded-full bg-white transition-all peer-checked:start-6"
+        class="absolute inset-y-0 start-0 m-1 h-4 w-4 rounded-full bg-white transition-all peer-checked:start-5"
       >
       </span>
     </label>

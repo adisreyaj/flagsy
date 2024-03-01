@@ -15,6 +15,12 @@
 }
 
 @layer components {
+
+  .focus-visible-outline {
+    @apply focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none;
+  }
+
+  
   .link {
     @apply decoration-1 decoration-wavy underline-offset-2;
 

@@ -26,21 +26,19 @@ import { ButtonComponent, ButtonVariant } from '../button/button.component';
       </div>
       <ng-template #menu>
         <div
-          #cdkMenu
-          [cdkTrapFocus]="true"
-          class="w-full rounded-xl shadow-xl border border-gray-200 min-w-[150px]"
           cdkMenu
+          class="rounded-xl shadow-xl border border-gray-200 min-w-[150px]"
         >
           @for (option of this.options(); track option) {
             <ui-button
+              cdkMenuItem
+              size="sm"
               contentAlignment="left"
               [label]="option.label"
               [variant]="option.variant ?? 'plain'"
               [trailingIcon]="option.trailingIcon"
               [prefixIcon]="option.prefixIcon"
-              (click)="this.optionClick.emit(option)"
-              (keyup.space)="this.optionClick.emit(option)"
-              cdkMenuItem
+              (cdkMenuItemTriggered)="this.optionClick.emit(option)"
             ></ui-button>
           }
         </div>
@@ -49,7 +47,7 @@ import { ButtonComponent, ButtonVariant } from '../button/button.component';
   `,
   styles: `
   :host {
-    display: block;
+    display: flex;
   }
   `,
   standalone: true,
@@ -77,6 +75,7 @@ export class DropdownComponent {
 
   @ViewChildren(FocusableDirective)
   protected focusableItems!: QueryList<FocusableDirective>;
+  protected readonly console = console;
 }
 
 export interface DropdownOption {

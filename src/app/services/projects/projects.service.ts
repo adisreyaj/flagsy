@@ -21,6 +21,7 @@ import {
 } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SelectOption } from '../../shared/components/select.type';
+import { PreferenceService } from '../preference/preference.service';
 
 @Injectable({
   providedIn: 'root',
@@ -29,6 +30,9 @@ export class ProjectsService {
   readonly #activeProjectSubject = new BehaviorSubject<Project | undefined>(
     undefined,
   );
+
+  readonly #preferenceService = inject(PreferenceService);
+
   readonly activeProject$: Observable<Project> = this.#activeProjectSubject
     .asObservable()
     .pipe(filter(isNotUndefined));
@@ -53,8 +57,12 @@ export class ProjectsService {
       .pipe(
         tap((projects) => {
           this.projects.set(projects);
+          const savedProjectId = this.#preferenceService.getActiveProjectId();
+          const savedProject = this.projects().find(
+            (proj) => proj.id === savedProjectId,
+          );
           if (!this.#activeProjectSubject.value) {
-            this.#activeProjectSubject.next(projects?.[0]);
+            this.#activeProjectSubject.next(savedProject ?? projects?.[0]);
           }
         }),
       )
@@ -101,8 +109,10 @@ export class ProjectsService {
   };
 
   setActiveProject = (projectId: string) => {
-    this.#activeProjectSubject.next(
-      this.projects().find((p) => p.id === projectId),
-    );
+    const project = this.projects().find((p) => p.id === projectId);
+    if (project) {
+      this.#activeProjectSubject.next(project);
+      this.#preferenceService.saveActiveProjectId(projectId);
+    }
   };
 }

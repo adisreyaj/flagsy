@@ -16,3 +16,5 @@ export * from './sheet';
 export * from './modal';
 
 export * from './tabs';
+
+export * from './tooltip';

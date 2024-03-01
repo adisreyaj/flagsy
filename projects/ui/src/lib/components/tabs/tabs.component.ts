@@ -68,7 +68,7 @@ import { TabComponent } from './tab.component';
       .item {
         &:not(.disabled) {
           @apply hover:text-gray-600;
-          @apply focus:ring-inset focus:ring-2 focus:ring-inset focus:ring-primary-500 focus:outline-none;
+          @apply focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500 focus-visible:outline-none;
         }
 
         &.disabled {
@@ -94,7 +94,7 @@ import { TabComponent } from './tab.component';
   imports: [NgTemplateOutlet, AngularRemixIconComponent, FocusableDirective],
 })
 export class TabsComponent {
-  readonly tabsChildrenSignal = contentChildren(TabComponent);
+  readonly tabs = contentChildren(TabComponent);
   readonly tabListItemsSignal = viewChildren(FocusableDirective);
 
   readonly keyManager: Signal<FocusKeyManager<unknown> | undefined> = signal<
@@ -113,18 +113,13 @@ export class TabsComponent {
 
   readonly selectedTabIndex = signal<number>(0);
 
-  readonly tabs: Signal<ReadonlyArray<TabComponent>> = signal<
-    ReadonlyArray<TabComponent>
-  >([]);
-
-  readonly selectedTab = computed(() => {
+  readonly selectedTab: Signal<TabComponent | undefined> = computed(() => {
     const tabs = this.tabs();
     const selectedTabIndex = this.selectedTabIndex();
-    return tabs[selectedTabIndex];
+    return tabs?.[selectedTabIndex];
   });
 
   public constructor() {
-    this.tabs = computed(() => this.tabsChildrenSignal());
     this.keyManager = computed(() => {
       return new FocusKeyManager(
         this.tabListItemsSignal() as FocusableDirective[],

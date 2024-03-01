@@ -9,7 +9,9 @@ import { ConfirmationModalConfig } from './modal.type';
 @Component({
   selector: 'ui-confirmation-modal',
   template: ` <div class="flex flex-col h-full gap-8">
-    <section class="w-full flex-auto g min-h-0 overflow-y-auto h-full p-4">
+    <section
+      class="w-full flex-auto text-center min-h-0 overflow-y-auto h-full p-4"
+    >
       @if (this.message) {
         <div>{{ this.message }}</div>
       } @else if (this.template) {
@@ -18,7 +20,7 @@ import { ConfirmationModalConfig } from './modal.type';
         ></ng-container>
       }
     </section>
-    <footer class="flex justify-end gap-4 border-t p-4">
+    <footer class="flex justify-end gap-4 p-4">
       <ui-button
         cdkFocusinitial
         variant="neutral"

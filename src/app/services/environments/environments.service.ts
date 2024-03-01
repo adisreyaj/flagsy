@@ -27,6 +27,7 @@ import {
 } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SelectOption } from '../../shared/components/select.type';
+import { PreferenceService } from '../preference/preference.service';
 import { ProjectsService } from '../projects/projects.service';
 
 @Injectable({
@@ -55,6 +56,7 @@ export class EnvironmentsService {
 
   readonly #http = inject(HttpClient);
   readonly #projectService = inject(ProjectsService);
+  readonly #preferenceService = inject(PreferenceService);
 
   constructor() {
     this.#projectService.activeProject$
@@ -67,7 +69,14 @@ export class EnvironmentsService {
       )
       .subscribe((environments) => {
         this.environments.set(environments);
-        this.#activeEnvironmentSubject.next(environments[0]);
+        const savedEnvironmentId =
+          this.#preferenceService.getActiveEnvironmentId();
+        const savedEnvironment = this.environments().find(
+          (env) => env.id === savedEnvironmentId,
+        );
+        this.#activeEnvironmentSubject.next(
+          savedEnvironment ?? environments[0],
+        );
       });
   }
 
@@ -141,8 +150,14 @@ export class EnvironmentsService {
   };
 
   setActiveEnvironment = (environmentId: string) => {
-    this.#activeEnvironmentSubject.next(
-      this.environments().find((env) => env.id === environmentId),
+    const environment = this.environments().find(
+      (env) => env.id === environmentId,
     );
+    if (environment) {
+      this.#activeEnvironmentSubject.next(
+        this.environments().find((env) => env.id === environmentId),
+      );
+      this.#preferenceService.saveActiveEnvironmentId(environmentId);
+    }
   };
 }

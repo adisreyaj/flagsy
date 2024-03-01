@@ -45,7 +45,6 @@
     "@types/lodash-es": "^4.17.11",
     "@typescript-eslint/eslint-plugin": "6.10.0",
     "@typescript-eslint/parser": "6.10.0",
-    "daisyui": "^4.0.3",
     "eslint": "^8.53.0",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",

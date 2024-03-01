@@ -11,7 +11,7 @@ export class SidebarService {
 
   constructor() {
     this.isSidebarOpen.set(
-      localStorage.getItem(this.SIDEBAR_OPEN_KEY) === 'true' ?? true,
+      localStorage.getItem(this.SIDEBAR_OPEN_KEY) === 'true',
     );
   }
 

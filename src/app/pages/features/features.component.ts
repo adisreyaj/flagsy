@@ -35,7 +35,6 @@ import {
   FeatureConfigSheetMode,
 } from '../../shared/components/feature-config-sheet/feature-config-sheet.component';
 import { PageHeaderComponent } from '../../shared/components/header/page-header.component';
-import { ProjectEnvironmentSelectorComponent } from '../../shared/components/project-environment-selector/project-environment-selector.component';
 import { SelectOption } from '../../shared/components/select.type';
 import { NonNullPipe } from '../../shared/pipes/non-null.pipe';
 import { FeaturesListComponent } from './features-list.component';
@@ -46,7 +45,6 @@ import { FeaturesListComponent } from './features-list.component';
     <div class="flex flex-col h-full">
       <app-page-header title="Features">
         <div class="flex gap-2 items-center">
-          <app-project-environment-selector></app-project-environment-selector>
           <ui-button
             label="Create Flag"
             trailingIcon="add-line"
@@ -87,7 +85,6 @@ import { FeaturesListComponent } from './features-list.component';
     ReactiveFormsModule,
     FeaturesListComponent,
     NonNullPipe,
-    ProjectEnvironmentSelectorComponent,
   ],
 })
 export class FeaturesComponent {

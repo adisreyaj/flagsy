@@ -3,12 +3,14 @@ import {
   Component,
   inject,
   Input,
+  Signal,
   TemplateRef,
-  ViewChild,
+  viewChild,
 } from '@angular/core';
 import { EnvironmentsService } from '@app/services/environments/environments.service';
 import { FeatureService } from '@app/services/features/feature.service';
 import {
+  BooleanFeature,
   Feature,
   FeatureSortBy,
   FeatureValueType,
@@ -166,10 +168,15 @@ export class FeaturesListComponent {
   @Input()
   features?: Feature[] = [];
 
-  @ViewChild('toggleFeatureValueTemplate', { static: true })
-  public readonly toggleFeatureValueTemplate!: TemplateRef<{
-    $implicit: Feature;
-  }>;
+  public readonly toggleFeatureValueTemplate: Signal<
+    TemplateRef<{
+      $implicit: Feature;
+    }>
+  > = viewChild.required<
+    TemplateRef<{
+      $implicit: Feature;
+    }>
+  >('toggleFeatureValueTemplate');
 
   readonly activeEnvironment$ = inject(EnvironmentsService).activeEnvironment$;
 
@@ -229,24 +236,18 @@ export class FeaturesListComponent {
     );
   }
 
-  public toggleFeatureState(feature: Feature): void {
-    const isBooleanFeature = feature.type === FeatureValueType.Boolean;
-    const title = isBooleanFeature
-      ? `${feature.value ? 'Disable' : 'Enable'} feature?`
-      : 'Edit Feature Value';
-    const confirmButtonText = isBooleanFeature
-      ? feature.value
-        ? 'Disable'
-        : 'Enable'
-      : 'Confirm';
+  public toggleFeatureState(feature: BooleanFeature): void {
+    const title = `${feature.value ? 'Disable' : 'Enable'} feature?`;
+    const confirmButtonText = feature.value ? 'Disable' : 'Enable';
+    const confirmButtonVariant = feature.value ? 'destructive' : 'primary';
 
     this.#modalService
       .openConfirmation({
         title: title,
-        content: this.toggleFeatureValueTemplate,
+        content: this.toggleFeatureValueTemplate(),
         context: { $implicit: feature },
         confirmButtonText: confirmButtonText,
-        confirmButtonVariant: 'primary',
+        confirmButtonVariant: confirmButtonVariant,
         cancelButtonText: 'Cancel',
         size: ModalSize.Small,
       })

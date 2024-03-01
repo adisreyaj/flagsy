@@ -1,4 +1,4 @@
-export type Feature = {
+interface FeatureBase {
   id: string;
   key: string;
   description: string;
@@ -8,7 +8,35 @@ export type Feature = {
   archived: boolean;
   updatedAt?: Date;
   lastUpdatedBy?: FeatureUser;
-} & FeatureValue;
+}
+export type Feature =
+  | BooleanFeature
+  | StringFeature
+  | NumberFeature
+  | JsonFeature;
+
+export interface BooleanFeature extends FeatureBase {
+  type: FeatureValueType.Boolean;
+  value: boolean;
+  environmentOverrides: EnvironmentOverride[];
+}
+
+export interface StringFeature extends FeatureBase {
+  type: FeatureValueType.String;
+  value: string;
+  environmentOverrides: EnvironmentOverride[];
+}
+
+export interface NumberFeature extends FeatureBase {
+  type: FeatureValueType.Number;
+  value: number;
+  environmentOverrides: EnvironmentOverride[];
+}
+export interface JsonFeature extends FeatureBase {
+  type: FeatureValueType.Boolean;
+  value: boolean;
+  environmentOverrides: EnvironmentOverride[];
+}
 
 export interface FeatureCreateData {
   key: string;

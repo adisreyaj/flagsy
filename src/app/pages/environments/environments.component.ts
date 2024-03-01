@@ -1,16 +1,14 @@
 import { FocusKeyManager } from '@angular/cdk/a11y';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, NgIf } from '@angular/common';
 import {
-  AfterViewInit,
   Component,
   computed,
   effect,
   inject,
   Input,
-  QueryList,
   Signal,
   signal,
-  ViewChildren,
+  viewChildren,
 } from '@angular/core';
 import {
   FormsModule,
@@ -35,10 +33,13 @@ import {
 import { AngularRemixIconComponent } from 'angular-remix-icon';
 import { isNil, lowerCase } from 'lodash-es';
 import { SheetSize } from '../../../../projects/ui/src/lib/components/sheet/sheet.type';
+import { FeatureFlag } from '../../config/feature.config';
 import { AppRoutes } from '../../config/routes/app.routes';
 import { EnvironmentSectionRoute } from '../../config/routes/environment.routes';
 import { EnvironmentConfigSheetComponent } from '../../shared/components/environment-config-sheet/environment-config-sheet.component';
 import { PageHeaderComponent } from '../../shared/components/header/page-header.component';
+import { FfAccessDirective } from '../../shared/directives/ff-access.directive';
+import { HasFFAccessPipe } from '../../shared/pipes/has-ff-access.pipe';
 
 @Component({
   selector: 'app-environments',
@@ -66,15 +67,17 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
             ) {
               <li
                 focusable
-                tabindex="0"
+                [attr.tabindex]="
+                  this.selectedEnvironment()?.id === environment.id ? 0 : -1
+                "
                 class="item justify-between"
                 [class.active]="
                   this.selectedEnvironment()?.id === environment.id
                 "
                 (keydown.enter)="this.selectEnvironment(environment)"
                 (keydown.space)="this.selectEnvironment(environment)"
+                (focus)="this.keyManager().updateActiveItem(index)"
                 (click)="this.selectEnvironment(environment)"
-                (focus)="keyManager?.setActiveItem(index)"
               >
                 <a>
                   {{ environment.name }}
@@ -127,7 +130,11 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
                   </footer>
                 </div>
               </ui-tab>
-              <ui-tab title="Keys" icon="key-2-line">
+              <ui-tab
+                *ffAccess="'${FeatureFlag.EnvironmentKeys}'"
+                title="Keys"
+                icon="key-2-line"
+              >
                 <div class="p-6 max-w-md flex flex-col gap-8">
                   <section>
                     <ui-form-field label="Environment Key">
@@ -163,7 +170,11 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
                   </section>
                 </div>
               </ui-tab>
-              <ui-tab title="Webhooks" icon="terminal-box-line">
+              <ui-tab
+                *ffAccess="'${FeatureFlag.Webhooks}'"
+                title="Webhooks"
+                icon="terminal-box-line"
+              >
                 Webhooks
               </ui-tab>
             </ui-tabs>
@@ -175,7 +186,7 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
   styles: `
     .item {
       @apply cursor-pointer flex gap-2 items-center px-2 py-2 rounded-xl w-full relative transition-all duration-300;
-      @apply focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:outline-none;
+      @apply focus-visible:ring-2 ring-primary-500 ring-offset-2 focus-visible:outline-none;
       @apply hover:bg-gray-100;
       
       min-height:40px;
@@ -208,11 +219,14 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
     TextareaComponent,
     FocusableDirective,
     ReactiveFormsModule,
+    NgIf,
+    HasFFAccessPipe,
+    FfAccessDirective,
   ],
 })
-export class EnvironmentsComponent implements AfterViewInit {
-  @ViewChildren(FocusableDirective)
-  environmentListItems!: QueryList<FocusableDirective>;
+export class EnvironmentsComponent {
+  environmentListItems: Signal<ReadonlyArray<FocusableDirective>> =
+    viewChildren(FocusableDirective);
 
   @Input()
   set environmentId(environmentId: string) {
@@ -221,7 +235,6 @@ export class EnvironmentsComponent implements AfterViewInit {
 
   @Input()
   set section(section: EnvironmentSectionRoute) {
-    console.log('section', section);
     this.activeSectionRoute.set(section ?? EnvironmentSectionRoute.General);
   }
 
@@ -249,7 +262,12 @@ export class EnvironmentsComponent implements AfterViewInit {
 
   protected readonly detailForm;
 
-  keyManager?: FocusKeyManager<unknown>;
+  keyManager = computed(() => {
+    return new FocusKeyManager(
+      this.environmentListItems() as FocusableDirective[],
+    ).withWrap(true);
+  });
+
   readonly #sheetService = inject(SheetService);
   readonly #environmentsService = inject(EnvironmentsService);
   readonly #router = inject(Router);
@@ -283,7 +301,6 @@ export class EnvironmentsComponent implements AfterViewInit {
     effect(
       () => {
         const selectedEnvironment = this.selectedEnvironment();
-        console.log(selectedEnvironment);
         if (!isNil(selectedEnvironment)) {
           this.detailForm.patchValue({
             name: selectedEnvironment.name,
@@ -297,14 +314,6 @@ export class EnvironmentsComponent implements AfterViewInit {
     );
   }
 
-  public ngAfterViewInit(): void {
-    this.environmentListItems.changes.subscribe(() => {
-      this.keyManager = new FocusKeyManager(this.environmentListItems).withWrap(
-        true,
-      );
-    });
-  }
-
   public search(searchText: string): void {
     this.searchText.set(searchText);
   }
@@ -316,16 +325,17 @@ export class EnvironmentsComponent implements AfterViewInit {
     });
   }
 
-  public selectEnvironment(environment: Environment): void {
+  public selectEnvironment(environment: Environment) {
     if (!isNil(environment)) {
       this.selectedEnvironmentId.set(environment.id);
-      this.#router.navigate([
+      return this.#router.navigate([
         '/',
         AppRoutes.Environments,
         environment.id,
         EnvironmentSectionRoute.General,
       ]);
     }
+    return;
   }
 
   public updateSelectedTab(event: TabChangeEvent): void {
@@ -343,7 +353,7 @@ export class EnvironmentsComponent implements AfterViewInit {
   }
 
   onKeydown(event: KeyboardEvent) {
-    this.keyManager?.onKeydown(event);
+    this.keyManager()?.onKeydown(event);
   }
 
   public updateEnvironment(id?: string): void {

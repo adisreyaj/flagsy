@@ -32,7 +32,9 @@ import {
   SheetRef,
   TextareaComponent,
   ToggleComponent,
+  TooltipDirective,
 } from '@ui/components';
+import { AngularRemixIconComponent } from 'angular-remix-icon';
 import { Subject, switchMap, take, takeUntil } from 'rxjs';
 import { SHEET_DATA } from '../../../../../projects/ui/src/lib/components/sheet/sheet.type';
 import { FormUtil } from '../../../utils/form.util';
@@ -106,8 +108,18 @@ import { EnvironmentSelectorComponent } from '../environment-selector/environmen
         @if (this.isCreateMode()) {
           <section class="flex flex-col gap-2" formArrayName="overrides">
             <header>
-              <div class="mb-1 font-semibold text-sm text-gray-600">
-                Environment Overrides
+              <div class="flex items-center gap-1">
+                <div class="font-semibold text-sm text-gray-600">
+                  Environment Overrides
+                </div>
+                <div
+                  uiTooltip="Override value for other environments if needed"
+                >
+                  <rmx-icon
+                    class="!w-5 !h-5 text-gray-500"
+                    name="information-line"
+                  ></rmx-icon>
+                </div>
               </div>
             </header>
             <div>
@@ -196,6 +208,8 @@ import { EnvironmentSelectorComponent } from '../environment-selector/environmen
     AsyncPipe,
     JsonPipe,
     CheckboxComponent,
+    AngularRemixIconComponent,
+    TooltipDirective,
   ],
 })
 export class FeatureConfigSheetComponent implements OnDestroy {
@@ -251,7 +265,7 @@ export class FeatureConfigSheetComponent implements OnDestroy {
     this.#destroyed.complete();
   }
 
-  hasErrors(control: AbstractControl): boolean {
+  protected hasErrors(control: AbstractControl): boolean {
     return FormUtil.hasErrors(control, this.submitted());
   }
 
@@ -259,11 +273,11 @@ export class FeatureConfigSheetComponent implements OnDestroy {
     return this.#sheetData.type === FeatureConfigSheetMode.Create;
   }
 
-  closeSheet() {
+  protected closeSheet() {
     this.#sheetRef.close();
   }
 
-  saveOrUpdate(): void {
+  protected saveOrUpdate(): void {
     if (this.#sheetData.type === FeatureConfigSheetMode.Create) {
       this.#saveFlag();
     } else {

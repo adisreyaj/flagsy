@@ -12,12 +12,11 @@ import { AngularRemixIconComponent } from 'angular-remix-icon';
 
 @Component({
   selector: 'app-project-environment-selector',
-  template: `<fieldset
-    class="grid gap-2 items-center grid-cols-[1fr,16px,1fr] w-96"
-  >
+  template: `<fieldset class="flex flex-col gap-2 items-center">
     <ui-select
       class="block bg-white w-full"
       prefixIcon="briefcase-line"
+      placeholder="Select project"
       [ngModel]="this.activeProject()?.id"
       (ngModelChange)="this.updateActiveProject($event)"
     >
@@ -32,12 +31,13 @@ import { AngularRemixIconComponent } from 'angular-remix-icon';
       <div>
         <rmx-icon
           class="!w-4 !h-4 text-gray-500"
-          name="arrow-right-line"
+          name="arrow-down-line"
         ></rmx-icon>
       </div>
       <ui-select
         class="block bg-white w-full"
         prefixIcon="archive-drawer-line"
+        placeholder="Select environment"
         [ngModel]="this.activeEnvironment()?.id"
         (ngModelChange)="this.updateActiveEnvironment($event)"
       >
