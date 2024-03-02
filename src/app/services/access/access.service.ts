@@ -25,7 +25,17 @@ export class AccessService {
       );
   }
 
-  hasAccess(featureKey: FeatureFlag | string): boolean {
+  hasAccess(
+    featureKey?: FeatureFlag | string | FeatureFlag[] | string[],
+  ): boolean {
+    if (!featureKey) {
+      return true;
+    }
+
+    if (Array.isArray(featureKey)) {
+      return featureKey.every((key) => this.hasAccess(key));
+    }
+
     const featureData = this.#features.get(featureKey);
 
     return featureData?.value === true;

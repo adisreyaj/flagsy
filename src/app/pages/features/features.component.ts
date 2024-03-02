@@ -43,7 +43,7 @@ import { FeaturesListComponent } from './features-list.component';
   selector: 'app-features',
   template: `
     <div class="flex flex-col h-full">
-      <app-page-header title="Features">
+      <app-page-header>
         <div class="flex gap-2 items-center">
           <ui-button
             label="Create Flag"

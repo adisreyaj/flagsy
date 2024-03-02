@@ -58,7 +58,7 @@ export class ModalService {
     >(ConfirmationModalComponent, {
       size: config.size,
       title: config.title,
-      dataType: config.dataType ?? ModalDataType.None,
+      dataType: config.dataType ?? ModalDataType.Warning,
       data: config,
     });
 

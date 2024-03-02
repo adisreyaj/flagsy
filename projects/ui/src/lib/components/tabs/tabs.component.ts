@@ -103,7 +103,6 @@ export class TabsComponent {
 
   @Input()
   set tabIndex(selectedTabIndex: number) {
-    console.log('selectedTabIndex', selectedTabIndex);
     this.selectedTabIndex.set(selectedTabIndex);
   }
 

@@ -45,7 +45,7 @@ import { HasFFAccessPipe } from '../../shared/pipes/has-ff-access.pipe';
   selector: 'app-environments',
   template: `
     <div class="flex flex-col h-full">
-      <app-page-header title="Environments"></app-page-header>
+      <app-page-header></app-page-header>
       <section class="page-content grid grid-cols-[250px,1fr] p-0">
         <aside class="border-r p-4 flex flex-col gap-4">
           <header>

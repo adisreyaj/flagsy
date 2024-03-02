@@ -21,14 +21,16 @@ import {
       [cdkTrapFocus]="true"
     >
       <header class="flex flex-none items-center justify-center p-4 pt-8">
-        <div class="flex flex-col items-center gap-2">
+        <div class="flex flex-col items-center gap-4">
           @if (this.modalIcon; as modalIcon) {
-            <rmx-icon
-              [class]="[this.modalIconColor, '!w-12', '!h-12']"
-              [name]="modalIcon"
-            ></rmx-icon>
+            <div class="rounded-xl p-2" [class]="this.modalIconBgColor">
+              <rmx-icon
+                [class]="[this.modalIconColor, '!w-8', '!h-8']"
+                [name]="modalIcon"
+              ></rmx-icon>
+            </div>
           }
-          <div class="font-semibold text-lg text-gray-600">
+          <div class="font-bold text-xl text-gray-700">
             {{ this.title }}
           </div>
         </div>
@@ -67,10 +69,13 @@ export class ModalComponent {
   get modalIcon(): IconName | undefined {
     switch (this.#modalConfig?.dataType) {
       case ModalDataType.Info:
-        return 'information-fill';
+        return 'information-line';
 
       case ModalDataType.Warning:
-        return 'error-warning-fill';
+        return 'error-warning-line';
+
+      case ModalDataType.Danger:
+        return 'delete-bin-6-line';
 
       default:
         return undefined;
@@ -84,6 +89,25 @@ export class ModalComponent {
 
       case ModalDataType.Warning:
         return 'text-amber-500';
+
+      case ModalDataType.Danger:
+        return 'text-red-600';
+
+      default:
+        return undefined;
+    }
+  }
+
+  get modalIconBgColor(): string | undefined {
+    switch (this.#modalConfig?.dataType) {
+      case ModalDataType.Info:
+        return 'bg-blue-100';
+
+      case ModalDataType.Warning:
+        return 'bg-amber-100';
+
+      case ModalDataType.Danger:
+        return 'bg-red-100';
 
       default:
         return undefined;

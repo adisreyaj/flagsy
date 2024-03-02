@@ -13,7 +13,7 @@ import { ProjectConfigSheetComponent } from '../../shared/components/project-con
   selector: 'app-projects',
   template: `
     <div class="flex flex-col h-full">
-      <app-page-header title="Projects">
+      <app-page-header>
         <div class="flex gap-2 items-center">
           <ui-button
             label="Create"

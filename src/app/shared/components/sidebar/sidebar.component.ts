@@ -7,6 +7,7 @@ import {
   RouterLink,
   RouterLinkActive,
 } from '@angular/router';
+import { AccessService } from '@app/services/access/access.service';
 import { AuthService } from '@app/services/auth/auth.service';
 import { SidebarService } from '@app/services/sidebar/sidebar.service';
 import {
@@ -18,7 +19,10 @@ import {
 } from '@ui/components';
 import { AngularRemixIconComponent } from 'angular-remix-icon';
 import { switchMap } from 'rxjs';
-import { NAVIGATION_DATA } from '../../../config/navigation-definition.data';
+import {
+  NAVIGATION_DATA,
+  NavigationEntry,
+} from '../../../config/navigation-definition.data';
 import { AppRoutes } from '../../../config/routes/app.routes';
 import { ProjectEnvironmentSelectorComponent } from '../project-environment-selector/project-environment-selector.component';
 import { ProjectSelectorComponent } from '../project-selector/project-selector.component';
@@ -76,16 +80,17 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
               }
             </a>
           </li>
-          @for (item of NAVIGATION_ITEMS; track item.id) {
+          @for (item of this.navigationEntriesEnriched; track item.path) {
             <li
               [uiTooltip]="this.isSidebarOpen() ? undefined : item.title"
               uiTooltipPosition="${PopoverPosition.RightCentered}"
             >
               <a
                 class="item focus-visible-outline"
-                [routerLink]="item.route"
                 routerLinkActive="active"
+                [routerLink]="item.route"
                 [routerLinkActiveOptions]="routerLinkActiveOptions"
+                [attr.aria-label]="item.title"
                 ariaCurrentWhenActive="page"
                 #router="routerLinkActive"
               >
@@ -125,7 +130,7 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
                 [alt]="account.firstName"
               />
               @if (this.isSidebarOpen()) {
-                <div @logoEnter>
+                <div class="flex flex-col items-start" @logoEnter>
                   <p class="text-sm font-medium">{{ account.firstName }}</p>
                   <p class="text-xs">{{ account.email }}</p>
                 </div>
@@ -191,7 +196,7 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
   ],
 })
 export class SidebarComponent {
-  protected readonly NAVIGATION_ITEMS = NAVIGATION_DATA;
+  protected readonly navigationEntriesEnriched: NavigationEntryEnriched[];
   protected readonly routerLinkActiveOptions: IsActiveMatchOptions = {
     paths: 'subset',
     fragment: 'ignored',
@@ -217,12 +222,23 @@ export class SidebarComponent {
 
   readonly #router = inject(Router);
   readonly #authService = inject(AuthService);
+  readonly #accessService = inject(AccessService);
 
-  toggleSidebar(): void {
+  constructor() {
+    this.navigationEntriesEnriched = NAVIGATION_DATA.map((item) => {
+      return {
+        ...item,
+        route: ['/', item.path],
+        featureEnabled: this.#accessService.hasAccess(item.featureFlags),
+      };
+    }).filter((item) => item.featureEnabled);
+  }
+
+  protected toggleSidebar(): void {
     this.sidebarService.toggleSidebar();
   }
 
-  public handleOptionClick(event: DropdownOption) {
+  protected handleOptionClick(event: DropdownOption) {
     if (event.label === this.menuOptions[0].label) {
       return this.#router.navigate([AppRoutes.Profile]);
     }
@@ -234,4 +250,9 @@ export class SidebarComponent {
     }
     return;
   }
+}
+
+interface NavigationEntryEnriched extends NavigationEntry {
+  featureEnabled: boolean;
+  route: string[];
 }

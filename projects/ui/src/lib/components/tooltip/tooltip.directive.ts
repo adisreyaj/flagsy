@@ -7,6 +7,7 @@ import {
 } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import {
+  ComponentRef,
   Directive,
   effect,
   ElementRef,
@@ -14,6 +15,7 @@ import {
   inject,
   input,
 } from '@angular/core';
+import { delay, Subject, takeUntil, tap } from 'rxjs';
 import { TooltipComponent } from './tooltip.component';
 
 @Directive({ selector: '[uiTooltip]', standalone: true })
@@ -35,10 +37,15 @@ export class TooltipDirective {
   });
 
   #overlayRef?: OverlayRef;
-  #overlay = inject(Overlay);
-  #overlayPositionBuilder = inject(OverlayPositionBuilder);
-  #elementRef = inject(ElementRef);
-  #positionStrategy?: FlexibleConnectedPositionStrategy;
+  #tooltipRef?: ComponentRef<TooltipComponent>;
+
+  readonly mouseEnter$: Subject<void> = new Subject();
+  readonly mouseLeave$: Subject<void> = new Subject();
+
+  readonly #overlay = inject(Overlay);
+  readonly #overlayPositionBuilder = inject(OverlayPositionBuilder);
+  readonly #elementRef = inject(ElementRef);
+  readonly #positionStrategy: FlexibleConnectedPositionStrategy;
 
   constructor() {
     this.#positionStrategy = this.#overlayPositionBuilder
@@ -78,18 +85,25 @@ export class TooltipDirective {
   @HostListener('mouseenter')
   @HostListener('focusin')
   show() {
-    const tooltipRef = this.#overlayRef?.attach(
-      new ComponentPortal(TooltipComponent),
-    );
-    if (tooltipRef !== undefined) {
-      tooltipRef.instance.text.set(this.text());
-    }
+    this.mouseEnter$
+      .pipe(
+        delay(200),
+        takeUntil(this.mouseLeave$),
+        tap({
+          complete: () => this.removeTooltip(),
+        }),
+      )
+      .subscribe(() => {
+        this.showTooltip();
+      });
+
+    this.mouseEnter$.next();
   }
 
   @HostListener('mouseleave')
   @HostListener('focusout')
   hide() {
-    this.#overlayRef?.detach();
+    this.mouseLeave$.next();
   }
 
   private getPositionPairForLocation(
@@ -178,6 +192,19 @@ export class TooltipDirective {
           offsetY ?? -5,
         );
     }
+  }
+
+  private showTooltip(): void {
+    this.#overlayRef?.detach();
+    this.#tooltipRef = this.#overlayRef?.attach(
+      new ComponentPortal(TooltipComponent),
+    );
+    this.#tooltipRef?.instance.text.set(this.text());
+  }
+
+  private removeTooltip(): void {
+    this.#overlayRef?.detach();
+    this.#tooltipRef?.destroy();
   }
 }
 

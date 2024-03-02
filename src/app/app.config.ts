@@ -5,7 +5,11 @@ import {
   importProvidersFrom,
 } from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideRouter, withComponentInputBinding } from '@angular/router';
+import {
+  provideRouter,
+  TitleStrategy,
+  withComponentInputBinding,
+} from '@angular/router';
 import { AccessService } from '@app/services/access/access.service';
 import { AuthService } from '@app/services/auth/auth.service';
 import { provideHotToastConfig } from '@ngneat/hot-toast';
@@ -14,6 +18,7 @@ import { provideRemixIcon } from 'angular-remix-icon';
 import { switchMap } from 'rxjs';
 
 import { APP_ROUTES } from './config/routes/app.routes';
+import { FlagsyTitleStrategy } from './config/routes/flagsy-title.strategy';
 import { ICONS } from './icon.config';
 
 export function initializeApp(
@@ -43,6 +48,10 @@ export const APP_CONFIG: ApplicationConfig = {
       useFactory: initializeApp,
       multi: true,
       deps: [AuthService, AccessService],
+    },
+    {
+      provide: TitleStrategy,
+      useClass: FlagsyTitleStrategy,
     },
   ],
 };

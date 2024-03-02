@@ -21,6 +21,7 @@ import {
   CheckboxComponent,
   DropdownComponent,
   DropdownOption,
+  ModalDataType,
   ModalService,
   ModalSize,
   SheetService,
@@ -285,6 +286,7 @@ export class FeaturesListComponent {
         confirmButtonVariant: 'destructive',
         cancelButtonText: 'Cancel',
         size: ModalSize.Small,
+        dataType: ModalDataType.Danger,
       })
       .pipe(
         filter((result) => result === true),
