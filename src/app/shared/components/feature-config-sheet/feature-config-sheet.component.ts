@@ -69,20 +69,25 @@ import { EnvironmentSelectorComponent } from '../environment-selector/environmen
           ></ui-textarea>
         </ui-form-field>
 
-        <ui-form-field label="Type">
-          <ui-select
-            class="block"
-            style="width: 200px"
-            formControlName="valueType"
-          >
-            @for (option of this.featureTypeSelectOptions; track option.value) {
-              <ui-select-option
-                [label]="option.label | titlecase"
-                [value]="option.value"
-              ></ui-select-option>
-            }
-          </ui-select>
-        </ui-form-field>
+        @if (this.isCreateMode()) {
+          <ui-form-field label="Type">
+            <ui-select
+              class="block"
+              style="width: 200px"
+              formControlName="valueType"
+            >
+              @for (
+                option of this.featureTypeSelectOptions;
+                track option.value
+              ) {
+                <ui-select-option
+                  [label]="option.label | titlecase"
+                  [value]="option.value"
+                ></ui-select-option>
+              }
+            </ui-select>
+          </ui-form-field>
+        }
 
         <div>
           @switch (this.form.controls.valueType.value) {
@@ -335,12 +340,8 @@ export class FeatureConfigSheetComponent implements OnDestroy {
         valueType,
         description,
         projectId: activeProject.id,
-        environmentOverrides: [
-          {
-            environmentId: activeEnvironmentId,
-            value,
-          },
-        ],
+        environmentId: activeEnvironmentId,
+        value,
       });
 
       this.#environmentService.activeEnvironment$

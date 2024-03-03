@@ -257,12 +257,8 @@ export class FeaturesListComponent {
         withLatestFrom(this.activeEnvironment$),
         switchMap(([, activeEnvironment]) =>
           this.#featuresService.updateFeature(feature.id, {
-            environmentOverrides: [
-              {
-                environmentId: activeEnvironment!.id,
-                value: !feature.value,
-              },
-            ],
+            environmentId: activeEnvironment!.id,
+            value: !feature.value,
           }),
         ),
         this.#toast.observe({

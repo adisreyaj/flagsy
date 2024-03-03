@@ -50,11 +50,11 @@ export interface FeatureCreateData {
   }[];
 }
 
-export type FeatureUpdateData = Omit<FeatureCreateData, 'value'> & {
-  environmentOverrides: {
-    environmentId: string;
-    value: SupportedFeatureValueTypes;
-  }[];
+export type FeatureUpdateData = Omit<
+  FeatureCreateData,
+  'environmentOverrides'
+> & {
+  environmentId: string;
 };
 
 export interface FeatureUser {
