@@ -59,7 +59,11 @@ import { HasFFAccessPipe } from '../../shared/pipes/has-ff-access.pipe';
               (ngModelChange)="this.search($event)"
             ></ui-input>
           </header>
-          <ul class="flex flex-col gap-4" (keydown)="this.onKeydown($event)">
+          <ul
+            class="flex flex-col gap-4"
+            focusableList
+            (keydown)="this.onKeydown($event)"
+          >
             @for (
               environment of this.environments();
               track environment.id;
@@ -67,7 +71,7 @@ import { HasFFAccessPipe } from '../../shared/pipes/has-ff-access.pipe';
             ) {
               <li
                 focusable
-                [attr.tabindex]="
+                [customTabIndex]="
                   this.selectedEnvironment()?.id === environment.id ? 0 : -1
                 "
                 class="item justify-between"

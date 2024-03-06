@@ -12,8 +12,8 @@ import { AuthService } from '@app/services/auth/auth.service';
 import { SidebarService } from '@app/services/sidebar/sidebar.service';
 import {
   ButtonComponent,
-  DropdownComponent,
-  DropdownOption,
+  DropdownMenuComponent,
+  DropdownMenuOption,
   PopoverPosition,
   TooltipDirective,
 } from '@ui/components';
@@ -114,7 +114,7 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
         }
         <hr />
         @if (this.currentLoggedInAccount(); as account) {
-          <ui-dropdown
+          <ui-dropdown-menu
             class="block w-full"
             [options]="this.menuOptions"
             (optionClick)="this.handleOptionClick($event)"
@@ -136,7 +136,7 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
                 </div>
               }
             </button>
-          </ui-dropdown>
+          </ui-dropdown-menu>
         }
       </footer>
     </div>
@@ -164,7 +164,7 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
     ProjectSelectorComponent,
     AngularRemixIconComponent,
     ButtonComponent,
-    DropdownComponent,
+    DropdownMenuComponent,
     ProjectEnvironmentSelectorComponent,
     TooltipDirective,
   ],
@@ -204,7 +204,7 @@ export class SidebarComponent {
     matrixParams: 'subset',
   };
 
-  protected readonly menuOptions: DropdownOption[] = [
+  protected readonly menuOptions: DropdownMenuOption[] = [
     {
       label: 'My Profile',
       prefixIcon: 'user-3-line',
@@ -238,7 +238,7 @@ export class SidebarComponent {
     this.sidebarService.toggleSidebar();
   }
 
-  protected handleOptionClick(event: DropdownOption) {
+  protected handleOptionClick(event: DropdownMenuOption) {
     if (event.label === this.menuOptions[0].label) {
       return this.#router.navigate([AppRoutes.Profile]);
     }

@@ -48,10 +48,6 @@ svg {
 
 }
 
-.cdk-menu {
-  @apply flex flex-col gap-2 shadow-md rounded-xl mt-2 p-2 z-50 bg-white;
-}
-
 .sheet {
   @apply bg-white rounded-tl-xl rounded-bl-xl border-l border-gray-200;
   box-shadow: -9px 0px 32px -6px rgba(0, 0, 0, 0.1);

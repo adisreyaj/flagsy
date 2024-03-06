@@ -1,4 +1,12 @@
-import { booleanAttribute, Component, Input, signal } from '@angular/core';
+import {
+  booleanAttribute,
+  Component,
+  ElementRef,
+  HostBinding,
+  Input,
+  signal,
+  viewChild,
+} from '@angular/core';
 import {
   ControlValueAccessor,
   FormsModule,
@@ -11,6 +19,7 @@ import {
   template: ` <div class="text-sm font-normal">
     <label [for]="this.label" class="flex items-center gap-2 cursor-pointer">
       <input
+        #input
         [id]="this.label"
         type="checkbox"
         class="h-5 w-5 cursor-pointer"
@@ -40,6 +49,13 @@ export class CheckboxComponent implements ControlValueAccessor {
   public set disabled(isDisabled: boolean) {
     this.isDisabled.set(isDisabled);
   }
+
+  public inputTpl = viewChild('input', { read: ElementRef });
+
+  @HostBinding('focus')
+  public focusCheckBox = () => {
+    this.inputTpl()?.nativeElement.focus();
+  };
 
   protected readonly value = signal(false);
   protected readonly isDisabled = signal(false);

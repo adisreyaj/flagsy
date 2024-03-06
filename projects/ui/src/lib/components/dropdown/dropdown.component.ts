@@ -1,86 +1,81 @@
-import { A11yModule } from '@angular/cdk/a11y';
-import {
-  CdkMenu,
-  CdkMenuItem,
-  CdkMenuTrigger,
-  CdkTargetMenuAim,
-} from '@angular/cdk/menu';
+import { CdkTrapFocus } from '@angular/cdk/a11y';
+import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
+import { NgTemplateOutlet } from '@angular/common';
 import {
   Component,
-  EventEmitter,
-  input,
-  Output,
-  QueryList,
-  ViewChildren,
+  computed,
+  contentChild,
+  Directive,
+  Signal,
+  signal,
+  TemplateRef,
 } from '@angular/core';
-import { FocusableDirective } from '@ui/a11y';
-import { IconName } from 'angular-remix-icon/lib/icon-names';
-import { ButtonComponent, ButtonVariant } from '../button/button.component';
 
 @Component({
   selector: 'ui-dropdown',
-  template: `
-    <div class="w-full">
-      <div [cdkMenuTriggerFor]="menu">
-        <ng-content></ng-content>
+  template: ` <div
+    #trigger="cdkOverlayOrigin"
+    cdkOverlayOrigin
+    (click)="this.toggleVisibility()"
+    (keydown)="this.toggleVisibilityOnKeyDown($event)"
+  >
+    <ng-content></ng-content>
+
+    <ng-template
+      cdkConnectedOverlay
+      [cdkConnectedOverlayOrigin]="trigger"
+      [cdkConnectedOverlayOffsetY]="10"
+      [cdkConnectedOverlayOpen]="this.isOpen()"
+      (overlayOutsideClick)="this.isOpen.set(false)"
+      (overlayKeydown)="this.closeOnEscape($event)"
+    >
+      <div
+        cdkTrapFocus
+        cdkTrapFocusAutoCapture
+        class="rounded-xl bg-white shadow-xl border border-gray-200 min-w-[150px] p-2"
+      >
+        <ng-container *ngTemplateOutlet="this.contentTemplate()"></ng-container>
       </div>
-      <ng-template #menu>
-        <div
-          cdkMenu
-          class="rounded-xl shadow-xl border border-gray-200 min-w-[150px]"
-        >
-          @for (option of this.options(); track option) {
-            <ui-button
-              cdkMenuItem
-              size="sm"
-              contentAlignment="left"
-              [label]="option.label"
-              [variant]="option.variant ?? 'plain'"
-              [trailingIcon]="option.trailingIcon"
-              [prefixIcon]="option.prefixIcon"
-              (cdkMenuItemTriggered)="this.optionClick.emit(option)"
-            ></ui-button>
-          }
-        </div>
-      </ng-template>
-    </div>
-  `,
-  styles: `
-  :host {
-    display: flex;
-  }
-  `,
+    </ng-template>
+  </div>`,
   standalone: true,
   imports: [
-    CdkMenu,
-    CdkMenuItem,
-    CdkMenuTrigger,
-    ButtonComponent,
-    A11yModule,
-    FocusableDirective,
-    CdkTargetMenuAim,
+    CdkOverlayOrigin,
+    CdkConnectedOverlay,
+    NgTemplateOutlet,
+    CdkTrapFocus,
   ],
 })
 export class DropdownComponent {
-  public options = input.required<DropdownOption[]>();
+  isOpen = signal(false);
 
-  @Output()
-  public optionClick: EventEmitter<DropdownOption> = new EventEmitter();
+  content = contentChild(DropdownContentDirective);
 
-  @Output()
-  public dropdownOpen = new EventEmitter<void>();
+  contentTemplate: Signal<TemplateRef<unknown> | null> = computed(
+    () => this.content()?.template ?? null,
+  );
 
-  @Output()
-  public dropdownClose = new EventEmitter<void>();
+  public toggleVisibility(): void {
+    if (!this.isOpen()) this.isOpen.set(!this.isOpen());
+  }
 
-  @ViewChildren(FocusableDirective)
-  protected focusableItems!: QueryList<FocusableDirective>;
-  protected readonly console = console;
+  public closeOnEscape(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      this.isOpen.set(false);
+    }
+  }
+
+  public toggleVisibilityOnKeyDown(event: KeyboardEvent): void {
+    if (['Enter', 'Space', 'ArrowDown', 'ArrowUp'].includes(event.key)) {
+      this.toggleVisibility();
+    }
+  }
 }
 
-export interface DropdownOption {
-  label: string;
-  trailingIcon?: IconName;
-  prefixIcon?: IconName;
-  variant?: ButtonVariant;
+@Directive({
+  selector: '[uiDropdownContent]',
+  standalone: true,
+})
+export class DropdownContentDirective {
+  constructor(public template?: TemplateRef<unknown>) {}
 }

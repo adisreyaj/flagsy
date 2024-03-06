@@ -32,7 +32,7 @@ import { FormFieldComponent } from '../form-field/form-field.component';
         </div>
       }
       <input
-        class="absolute w-full py-2 px-4 block border border-gray-200 rounded-xl focus:ring-1 focus:border-primary-500 focus:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none transition-all duration-300"
+        class="absolute w-full py-2 px-4 block border border-gray-200 focus-visible-outline rounded-xl disabled:opacity-50 disabled:pointer-events-none transition-all duration-300"
         [class.pl-10]="this.prefixIcon"
         [class.form-field-input]="this.isWithinFormField"
         [class.error]="this.hasError"
@@ -45,11 +45,12 @@ import { FormFieldComponent } from '../form-field/form-field.component';
       />
     </div>
   `,
-  styles: `
- 
-    .disabled {
-     @apply cursor-not-allowed opacity-70;
-    }
+  styles: [
+    //language=scss
+    `
+      .disabled {
+        @apply cursor-not-allowed opacity-70;
+      }
       @mixin errorBorder() {
         @apply border-red-500 ring-red-500;
       }
@@ -61,15 +62,15 @@ import { FormFieldComponent } from '../form-field/form-field.component';
           }
         }
       }
-      
+
       .icon {
         @apply w-5 h-5;
         &:not(.error) {
-            @apply group-focus-within:text-primary-600;
+          @apply group-focus-within:text-primary-600;
         }
-        
+
         &.error {
-            @apply text-red-500;
+          @apply text-red-500;
         }
       }
 
@@ -77,6 +78,7 @@ import { FormFieldComponent } from '../form-field/form-field.component';
         @include errorBorder;
       }
     `,
+  ],
   standalone: true,
   imports: [FormsModule, AngularRemixIconComponent],
   providers: [

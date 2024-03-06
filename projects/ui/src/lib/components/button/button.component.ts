@@ -77,4 +77,4 @@ export type ButtonVariant =
   | 'icon'
   | 'plain'
   | 'destructive';
-export type ButtonSize = 'sm' | 'md' | 'lg';
+export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';

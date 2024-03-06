@@ -19,8 +19,8 @@ import { HotToastService } from '@ngneat/hot-toast';
 import {
   ButtonComponent,
   CheckboxComponent,
-  DropdownComponent,
-  DropdownOption,
+  DropdownMenuComponent,
+  DropdownMenuOption,
   ModalDataType,
   ModalService,
   ModalSize,
@@ -105,7 +105,7 @@ import { SelectOption } from '../../shared/components/select.type';
               {{ feature.updatedAt | timeAgo }}
             </div>
             <div>
-              <ui-dropdown
+              <ui-dropdown-menu
                 [options]="this.menuOptions"
                 (optionClick)="this.handleOptionClick($event, feature)"
               >
@@ -114,7 +114,7 @@ import { SelectOption } from '../../shared/components/select.type';
                   size="sm"
                   trailingIcon="more-fill"
                 ></ui-button>
-              </ui-dropdown>
+              </ui-dropdown-menu>
             </div>
           </li>
         }
@@ -157,7 +157,7 @@ import { SelectOption } from '../../shared/components/select.type';
   `,
   standalone: true,
   imports: [
-    DropdownComponent,
+    DropdownMenuComponent,
     CheckboxComponent,
     AsyncPipe,
     ToggleComponent,
@@ -181,7 +181,7 @@ export class FeaturesListComponent {
 
   readonly activeEnvironment$ = inject(EnvironmentsService).activeEnvironment$;
 
-  readonly menuOptions: DropdownOption[] = [
+  readonly menuOptions: DropdownMenuOption[] = [
     {
       label: 'Edit',
       prefixIcon: 'pencil-line',
@@ -215,7 +215,7 @@ export class FeaturesListComponent {
   readonly #modalService = inject(ModalService);
   readonly #toast = inject(HotToastService);
 
-  public handleOptionClick(option: DropdownOption, feature: Feature): void {
+  public handleOptionClick(option: DropdownMenuOption, feature: Feature): void {
     if (option.label === 'Edit') {
       this.editFeature(feature);
     } else if (option.label === 'Delete') {

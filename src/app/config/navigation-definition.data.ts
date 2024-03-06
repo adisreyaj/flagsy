@@ -28,6 +28,12 @@ export const NAVIGATION_DATA: NavigationEntry[] = [
     icon: 'flag-line',
     activeIcon: 'flag-fill',
   },
+  {
+    path: AppRoutes.ChangeLog,
+    title: 'Changelog',
+    icon: 'lock-line',
+    activeIcon: 'lock-fill',
+  },
 ];
 
 export const NAVIGATION_DATA_MAP = new Map<string, NavigationEntry>(
@@ -40,4 +46,5 @@ export interface NavigationEntry {
   icon: IconName;
   activeIcon: IconName;
   featureFlags?: string | string[];
+  visible?: boolean;
 }

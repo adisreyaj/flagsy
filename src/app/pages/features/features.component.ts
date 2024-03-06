@@ -11,7 +11,7 @@ import {
 import {
   ButtonComponent,
   CheckboxComponent,
-  DropdownComponent,
+  DropdownMenuComponent,
   InputComponent,
   SelectComponent,
   SelectOptionComponent,
@@ -77,7 +77,7 @@ import { FeaturesListComponent } from './features-list.component';
     PageHeaderComponent,
     AsyncPipe,
     ToggleComponent,
-    DropdownComponent,
+    DropdownMenuComponent,
     CheckboxComponent,
     SelectComponent,
     SelectOptionComponent,

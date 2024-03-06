@@ -68,6 +68,15 @@ export const APP_ROUTES: Routes = [
             loadChildren: () =>
               import('./feature.routes').then((m) => m.FEATURE_ROUTES),
           },
+          {
+            path: AppRoutes.ChangeLog,
+            title: 'Changelog',
+            data: {
+              ...NAVIGATION_DATA_MAP.get(AppRoutes.ChangeLog),
+            },
+            loadChildren: () =>
+              import('./changelog.routes').then((m) => m.CHANGELOG_ROUTES),
+          },
         ],
       },
     ],
@@ -82,4 +91,5 @@ export const enum AppRoutes {
   Environments = 'environments',
   Features = 'features',
   Profile = 'profile',
+  ChangeLog = 'changelog',
 }

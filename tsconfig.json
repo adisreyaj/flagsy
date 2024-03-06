@@ -24,6 +24,7 @@
       "@ui/components": ["./projects/ui/src/lib/components/index.ts"],
       "@ui/a11y": ["./projects/ui/src/lib/a11y/index.ts"],
       "@ui/pipes": ["./projects/ui/src/lib/pipes/index.ts"],
+      "@ui/types": ["./projects/ui/src/lib/types/index.ts"],
       "@app/services/*": ["./src/app/services/*"],
       "@app/types/*": ["./src/app/types/*"]
     },
