@@ -47,13 +47,13 @@ import { SelectOptionComponent } from './select-option.component';
     <ng-template #menu>
       @if (this.options().length > 0) {
         <ul
-          class="border shadow-sm w-full min-w-[200px]"
+          class="border shadow-sm bg-white z-10 w-full min-w-[200px] p-2 flex flex-col gap-2  border-gray-200 rounded-xl"
           cdkMenu
           [cdkTrapFocus]="true"
         >
           @for (item of this.options(); track item.value; let index = $index) {
             <button
-              class="flex items-center gap-2 justify-between cursor-pointer px-4 pr-2 py-2 hover:bg-gray-100 rounded-md focus:ring-2 focus:ring-primary-500"
+              class="flex w-full items-center gap-2 justify-between cursor-pointer  px-4 pr-2 py-2 hover:bg-gray-100 rounded-md focus:ring-2 focus:ring-primary-500"
               cdkMenuItemRadio
               [class.bg-gray-100]="this.selectedItemValue() === item.value"
               [cdkMenuItemChecked]="this.selectedItemValue() === item.value"
