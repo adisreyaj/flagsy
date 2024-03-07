@@ -54,7 +54,7 @@ export enum TableSortDirection {
           <ng-container [cdkColumnDef]="column.id">
             <cdk-header-cell
               *cdkHeaderCellDef
-              class="flex px-2 py-1 justify-between items-center group"
+              class="flex px-2 py-1 bg-gray-100 border-b border-gray-200 justify-between items-center group"
               [class.cursor-pointer]="column.sortable"
               (click)="column.sortable && this.sort(column)"
             >
@@ -92,7 +92,7 @@ export enum TableSortDirection {
         }
 
         <cdk-header-row
-          class="grid text-sm font-semibold text-gray-500 h-10 w-full bg-gray-100 border-b border-gray-200"
+          class="grid text-sm font-semibold text-gray-500 h-10 w-full"
           [style.grid-template-columns]="this.rowGridStyles()"
           *cdkHeaderRowDef="this.displayedColumns()"
         ></cdk-header-row>
@@ -158,7 +158,7 @@ export class TableComponent implements OnInit {
           return [
             ...acc,
             col.minWidthInPx
-              ? `minmax(${col.minWidthInPx}, ${col.width})`
+              ? `minmax(${col.minWidthInPx}px, ${col.width}%)`
               : `${col.width}%`,
           ];
         }

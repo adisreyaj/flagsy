@@ -1,9 +1,14 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { isBoolean, isEmpty, isNumber, isString } from 'lodash-es';
 
 @Pipe({ name: 'textDisplay', standalone: true })
 export class TextDisplayPipe implements PipeTransform {
-  transform(value?: string): string {
-    const textTrimmed = value?.trim();
-    return textTrimmed ? textTrimmed : '-';
+  transform(value?: string | number | boolean): string {
+    if (isNumber(value)) return value?.toString() ?? '-';
+    if (isBoolean(value)) return value ? 'true' : 'false';
+    if (isString(value)) {
+      return !isEmpty(value?.trim()) ? value?.trim() : '-';
+    }
+    return '-';
   }
 }

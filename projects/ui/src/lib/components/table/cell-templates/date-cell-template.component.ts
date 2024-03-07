@@ -6,9 +6,18 @@ import { CellData } from './cell.type';
   selector: 'ui-date-cell-template',
   template: `
     <div class="flex items-center w-full h-full text-sm px-2">
-      {{ this.cellData | date: 'dd-MMM-yy hh:mm a' }}
+      <div class="line-clamp-1 min-w-0">
+        {{ this.cellData | date: 'dd-MMM-yy hh:mm a' }}
+      </div>
     </div>
   `,
+  styles: [
+    `
+      :host {
+        width: 100%;
+      }
+    `,
+  ],
   standalone: true,
   imports: [DatePipe],
 })

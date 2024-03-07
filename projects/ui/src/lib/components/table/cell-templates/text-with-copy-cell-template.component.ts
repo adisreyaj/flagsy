@@ -10,7 +10,7 @@ import { CellData } from './cell.type';
     <div
       class="flex items-center justify-between w-full h-full text-sm group px-2"
     >
-      <div>
+      <div class="line-clamp-1 min-w-0">
         {{ this.cellData | textDisplay }}
       </div>
 

@@ -12,6 +12,7 @@ import { CellData } from './cell.type';
 import { DateCellTemplateComponent } from './date-cell-template.component';
 import { TextCellTemplateComponent } from './text-cell-template.component';
 import { TextWithCopyCellTemplateComponent } from './text-with-copy-cell-template.component';
+import { UserCellTemplateComponent } from './user-cell-template.component';
 
 @Directive({
   selector: '[uiCellTemplate]',
@@ -27,7 +28,7 @@ export class CellTemplateDirective implements OnInit {
 
   ngOnInit() {
     this.#vcr.clear();
-    if (!this.column() || !this.data()) return;
+    if (!this.column() || this.data() === undefined) return;
 
     const componentOrTemplateRef = this.getColumnComponent(this.column());
     if (componentOrTemplateRef instanceof TemplateRef) {
@@ -49,6 +50,9 @@ export class CellTemplateDirective implements OnInit {
 
       case TableDefaultCellType.TextWithCopy:
         return TextWithCopyCellTemplateComponent;
+
+      case TableDefaultCellType.User:
+        return UserCellTemplateComponent;
 
       default:
         return TextCellTemplateComponent;

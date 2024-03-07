@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { FeatureChangelogSortBy } from '@app/types/changelog.type';
+import { FeatureChangelogSortKey } from '@app/types/changelog.type';
+import { SortBy } from '@app/types/common.type';
 import { environment } from '../../../environments/environment';
+import { SortUtil } from '../../utils/sort.util';
 
 @Injectable({
   providedIn: 'root',
@@ -9,11 +11,10 @@ import { environment } from '../../../environments/environment';
 export class ChangelogService {
   #http = inject(HttpClient);
 
-  getChangelogs(args?: { sort?: FeatureChangelogSortBy }) {
+  getChangelogs(args?: { sort?: SortBy<FeatureChangelogSortKey> }) {
     return this.#http.get(`${environment.api}/changelog`, {
       params: {
-        ...(args?.sort?.key && { sortBy: args.sort.key }),
-        ...(args?.sort?.direction && { direction: args.sort.direction }),
+        ...SortUtil.buildSortParam(args?.sort),
       },
       withCredentials: true,
     });

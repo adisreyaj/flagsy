@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { SortBy } from '@app/types/common.type';
 import {
   Feature,
   FeatureCreateData,
@@ -7,7 +8,7 @@ import {
   FeatureUpdateData,
   FeatureValueType,
 } from '@app/types/feature.type';
-import { isEmpty, startCase } from 'lodash-es';
+import { startCase } from 'lodash-es';
 import {
   combineLatest,
   Observable,
@@ -18,6 +19,7 @@ import {
 } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SelectOption } from '../../shared/components/select.type';
+import { SortUtil } from '../../utils/sort.util';
 import { EnvironmentsService } from '../environments/environments.service';
 import { ProjectsService } from '../projects/projects.service';
 
@@ -40,11 +42,8 @@ export class FeatureService {
     });
   }
 
-  getFeatures({
-    sort,
-    search,
-  }: {
-    sort?: FeatureSortBy;
+  getFeatures(args?: {
+    sort?: SortBy<FeatureSortBy>;
     search?: string;
   }): Observable<Feature[]> {
     return this.#refreshSubject.pipe(
@@ -60,8 +59,7 @@ export class FeatureService {
           params: {
             projectId: activeProject.id,
             environmentId: activeEnvironment.id,
-            sortBy: sort ?? FeatureSortBy.Key,
-            ...(!isEmpty(search?.trim()) ? { search } : {}),
+            ...SortUtil.buildSortParam(args?.sort),
           },
           withCredentials: true,
         }),

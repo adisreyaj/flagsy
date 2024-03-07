@@ -2,7 +2,6 @@ import { AsyncPipe } from '@angular/common';
 import {
   Component,
   inject,
-  Input,
   Signal,
   TemplateRef,
   viewChild,
@@ -13,7 +12,6 @@ import {
   BooleanFeature,
   Feature,
   FeatureSortBy,
-  FeatureValueType,
 } from '@app/types/feature.type';
 import { HotToastService } from '@ngneat/hot-toast';
 import {
@@ -25,103 +23,31 @@ import {
   ModalService,
   ModalSize,
   SheetService,
+  TableColumnConfig,
+  TableComponent,
+  TableDefaultCellType,
   ToggleComponent,
 } from '@ui/components';
-import { BehaviorSubject, filter, switchMap, withLatestFrom } from 'rxjs';
+import { filter, map, switchMap, withLatestFrom } from 'rxjs';
 import { SheetSize } from '../../../../projects/ui/src/lib/components/sheet/sheet.type';
+import { TableDataSource } from '../../../../projects/ui/src/lib/components/table/table-data-source';
 import { TimeAgoPipe } from '../../../../projects/ui/src/lib/pipes';
 import {
   FeatureConfigSheetComponent,
   FeatureConfigSheetData,
   FeatureConfigSheetMode,
 } from '../../shared/components/feature-config-sheet/feature-config-sheet.component';
-import { SelectOption } from '../../shared/components/select.type';
 
 @Component({
   selector: 'app-features-list',
   template: `
-    @if (this.features && this.features.length > 0) {
-      <ul class="flex flex-col border rounded-xl">
-        <li
-          class="list-item px-4 py-2 border-b bg-gray-100 border-gray-200 rounded-tl-xl rounded-tr-xl"
-        >
-          <div class="flex items-center">
-            <ui-checkbox></ui-checkbox>
-          </div>
-          <div>Key</div>
-          <div>Value</div>
-          <div>Last Updated</div>
-        </li>
-        @for (feature of this.features; track feature.id; let index = $index) {
-          <li class="list-item w-full justify-between items-center p-4">
-            <div class="flex items-center">
-              <ui-checkbox></ui-checkbox>
-            </div>
-            <div
-              (keyup.enter)="this.editFeature(feature)"
-              (click)="this.editFeature(feature)"
-              tabindex="0"
-              class="cursor-pointer w-full group rounded-md"
-            >
-              <p
-                class="font-medium group-focus:text-primary-500 group-focus:underline decoration-1 decoration-wavy underline-offset-2"
-              >
-                {{ feature.key }}
-              </p>
-
-              @if (feature.description) {
-                <p class="text-gray-500 text-sm line-clamp-1">
-                  {{ feature.description }}
-                </p>
-              }
-            </div>
-            @switch (feature.type) {
-              @case (FeatureValueType.Boolean) {
-                <div>
-                  <ui-toggle
-                    (click)="
-                      $event.preventDefault(); this.toggleFeatureState(feature)
-                    "
-                    [checked]="feature.value"
-                  ></ui-toggle>
-                </div>
-              }
-              @case (FeatureValueType.Number) {
-                <div>
-                  <span class="p-1 bg-gray-100 rounded-xl">
-                    {{ feature.value }}
-                  </span>
-                </div>
-              }
-              @default {
-                <div>
-                  <span class="p-1 bg-gray-100 rounded-xl">
-                    "{{ feature.value }}"
-                  </span>
-                </div>
-              }
-            }
-            <div>
-              {{ feature.updatedAt | timeAgo }}
-            </div>
-            <div>
-              <ui-dropdown-menu
-                [options]="this.menuOptions"
-                (optionClick)="this.handleOptionClick($event, feature)"
-              >
-                <ui-button
-                  variant="icon"
-                  size="sm"
-                  trailingIcon="more-fill"
-                ></ui-button>
-              </ui-dropdown-menu>
-            </div>
-          </li>
-        }
-      </ul>
-    } @else if (this.features && this.features.length === 0) {
-      <div class="p-4">No features found.</div>
-    }
+    <div>
+      <ui-table
+        class="h-full min-h-0 block"
+        [columns]="this.columns"
+        [dataSource]="this.dataSource"
+      ></ui-table>
+    </div>
 
     <ng-template #toggleFeatureValueTemplate let-feature>
       <div class="text-gray-500">
@@ -163,11 +89,46 @@ import { SelectOption } from '../../shared/components/select.type';
     ToggleComponent,
     ButtonComponent,
     TimeAgoPipe,
+    TableComponent,
   ],
 })
 export class FeaturesListComponent {
-  @Input()
-  features?: Feature[] = [];
+  protected readonly columns: TableColumnConfig[] = [
+    {
+      id: 'key',
+      label: 'Feature',
+      sortable: true,
+      width: 20,
+      type: TableDefaultCellType.TextWithCopy,
+    },
+    {
+      id: 'description',
+      label: 'Description',
+      width: 35,
+    },
+    {
+      id: 'value',
+      label: 'Value',
+      width: 15,
+    },
+    {
+      id: 'createdBy',
+      label: 'User',
+      width: 15,
+      minWidthInPx: 200,
+      type: TableDefaultCellType.User,
+    },
+    {
+      id: 'updatedAt',
+      label: 'Update At',
+      width: 15,
+      sortable: true,
+      sortDirection: 'desc',
+      minWidthInPx: 200,
+      type: TableDefaultCellType.Date,
+    },
+  ];
+  protected readonly dataSource;
 
   public readonly toggleFeatureValueTemplate: Signal<
     TemplateRef<{
@@ -193,27 +154,30 @@ export class FeaturesListComponent {
     },
   ];
 
-  readonly sortByOptions: SelectOption<FeatureSortBy>[] = [
-    {
-      label: 'Key',
-      value: FeatureSortBy.Key,
-    },
-    {
-      label: 'Last Updated',
-      value: FeatureSortBy.LastUpdated,
-    },
-  ];
-
-  readonly selectedSortOptionSubject = new BehaviorSubject<FeatureSortBy>(
-    this.sortByOptions[0].value,
-  );
-
-  protected readonly FeatureValueType = FeatureValueType;
-
   readonly #sheetService = inject(SheetService);
   readonly #featuresService = inject(FeatureService);
   readonly #modalService = inject(ModalService);
   readonly #toast = inject(HotToastService);
+
+  constructor() {
+    this.dataSource = new TableDataSource<Feature>(({ sort }) => {
+      return this.#featuresService
+        .getFeatures({
+          sort: {
+            key: sort?.column?.id as FeatureSortBy,
+            direction: sort?.direction,
+          },
+        })
+        .pipe(
+          map((data) => {
+            return {
+              data: data,
+              total: data.length,
+            };
+          }),
+        );
+    });
+  }
 
   public handleOptionClick(option: DropdownMenuOption, feature: Feature): void {
     if (option.label === 'Edit') {
@@ -269,10 +233,6 @@ export class FeaturesListComponent {
       .subscribe();
   }
 
-  public sortData(sortBy: FeatureSortBy): void {
-    this.selectedSortOptionSubject.next(sortBy);
-  }
-
   public deleteFeature(feature: Feature): void {
     this.#modalService
       .openConfirmation({
@@ -294,6 +254,4 @@ export class FeaturesListComponent {
       )
       .subscribe();
   }
-
-  protected readonly console = console;
 }

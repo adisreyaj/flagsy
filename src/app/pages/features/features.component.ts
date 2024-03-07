@@ -1,13 +1,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { EnvironmentsService } from '@app/services/environments/environments.service';
-import { FeatureService } from '@app/services/features/feature.service';
-import {
-  Feature,
-  FeatureSortBy,
-  FeatureValueType,
-} from '@app/types/feature.type';
+import { FeatureSortBy, FeatureValueType } from '@app/types/feature.type';
 import {
   ButtonComponent,
   CheckboxComponent,
@@ -18,16 +12,7 @@ import {
   SheetService,
   ToggleComponent,
 } from '@ui/components';
-import {
-  BehaviorSubject,
-  combineLatest,
-  debounceTime,
-  distinctUntilChanged,
-  map,
-  Observable,
-  startWith,
-  switchMap,
-} from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { SheetSize } from '../../../../projects/ui/src/lib/components/sheet/sheet.type';
 import {
   FeatureConfigSheetComponent,
@@ -63,9 +48,7 @@ import { FeaturesListComponent } from './features-list.component';
 
           <div></div>
         </header>
-        <app-features-list
-          [features]="this.features$ | async | nonNull"
-        ></app-features-list>
+        <app-features-list></app-features-list>
       </section>
     </div>
   `,
@@ -103,33 +86,9 @@ export class FeaturesComponent {
   );
 
   readonly searchControl = new FormControl<string>('');
-
-  readonly activeEnvironment$ = inject(EnvironmentsService).activeEnvironment$;
-  readonly features$: Observable<Feature[]>;
-
   readonly #sheetService = inject(SheetService);
-  readonly #featuresService = inject(FeatureService);
 
-  constructor() {
-    this.features$ = combineLatest([
-      this.selectedSortOptionSubject,
-      this.searchControl.valueChanges.pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        startWith(''),
-        map((val) => {
-          return val?.trim();
-        }),
-      ),
-    ]).pipe(
-      switchMap(([sortBy, search]) =>
-        this.#featuresService.getFeatures({
-          sort: sortBy,
-          search,
-        }),
-      ),
-    );
-  }
+  constructor() {}
 
   public openCreateFeatureSheet(): void {
     this.#sheetService.open<FeatureConfigSheetData>(

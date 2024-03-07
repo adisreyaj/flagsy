@@ -8,7 +8,7 @@ export type TableColumnConfig = {
   sortDirection?: 'asc' | 'desc';
   width?: number;
   visible?: boolean;
-  minWidthInPx?: `${number}px`;
+  minWidthInPx?: number;
   content?: Type<unknown> | TemplateRef<unknown>;
   type?: TableDefaultCellType;
 } & (
@@ -22,6 +22,7 @@ export enum TableDefaultCellType {
   Text = 'text',
   TextWithCopy = 'text-with-copy',
   Date = 'date',
+  User = 'user',
 }
 
 export interface TableSortState {
