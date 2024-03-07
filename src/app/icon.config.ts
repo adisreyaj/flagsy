@@ -18,6 +18,7 @@ import {
   RiErrorWarningLine,
   RiFlagFill,
   RiFlagLine,
+  RiFolderOpenLine,
   RiHome2Fill,
   RiHome2Line,
   RiInformationFill,
@@ -72,4 +73,5 @@ export const ICONS = {
   RiLockLine,
   RiLockFill,
   RiArrowDownSFill,
+  RiFolderOpenLine,
 };

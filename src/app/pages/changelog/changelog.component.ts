@@ -19,12 +19,13 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
     <div class="flex flex-col h-full">
       <app-page-header></app-page-header>
 
-      <section>
-        <header class="p-4">
+      <section class="flex-1 flex flex-col p-4 gap-4">
+        <header class="">
           <ui-filter-bar [filters]="this.filters"></ui-filter-bar>
         </header>
-        <div class="p-4">
+        <div class=" flex-1">
           <ui-table
+            class="h-full min-h-0 block"
             [columns]="this.columns"
             [dataSource]="this.dataSource"
           ></ui-table>
