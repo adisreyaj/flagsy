@@ -11,6 +11,7 @@ import {
 import { Filter } from '@ui/types';
 import { map } from 'rxjs';
 import { TableDataSource } from '../../../../projects/ui/src/lib/components/table/table-data-source';
+import { FeatureChangeCellTemplateComponent } from '../../shared/components/feature-change-cell-template/feature-change-cell-template.component';
 import { PageHeaderComponent } from '../../shared/components/header/page-header.component';
 
 @Component({
@@ -46,6 +47,7 @@ export class ChangelogComponent {
       label: 'Feature',
       sortable: true,
       width: 20,
+      type: TableDefaultCellType.TextWithCopy,
     },
     {
       id: 'environment',
@@ -56,6 +58,7 @@ export class ChangelogComponent {
       id: 'change',
       label: 'Change',
       width: 35,
+      content: FeatureChangeCellTemplateComponent,
     },
     {
       id: 'owner',
@@ -101,7 +104,7 @@ export class ChangelogComponent {
               data: (data as any[]).map((item) => ({
                 feature: item.feature.key,
                 environment: item.environment.name,
-                change: `${item.change.old.value} -> ${item.change.new.value}`,
+                change: item.change,
                 owner: `${item.owner.firstName} ${item.owner.lastName}`,
                 date: item.createdAt,
               })),

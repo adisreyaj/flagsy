@@ -32,13 +32,13 @@ export enum TableSortDirection {
     >
       @if (this.isLoading()) {
         <div
-          class="flex justify-center w-full h-full absolute z-10 bg-white bg-opacity-50 items-center pt-[44px]"
+          class="flex justify-center w-full h-full absolute z-10 bg-white bg-opacity-50 items-center pt-[44px] transition-all duration-300"
         >
           <ui-spinner></ui-spinner>
         </div>
       } @else if (this.isEmpty()) {
         <div
-          class="flex justify-center w-full h-full absolute pointer-events-none items-center  pt-[44px]"
+          class="flex justify-center w-full h-full absolute pointer-events-none items-center pt-[44px]"
         >
           <div class="flex items-center gap-2 text-gray-600">
             <rmx-icon name="folder-open-line"></rmx-icon>
@@ -82,7 +82,7 @@ export enum TableSortDirection {
                 ></rmx-icon>
               </div>
             </cdk-header-cell>
-            <cdk-cell class="flex px-2 py-1" *cdkCellDef="let rowData">
+            <cdk-cell class="flex" *cdkCellDef="let rowData">
               <ng-container
                 [uiCellTemplate]="column"
                 [data]="rowData[column.id]"

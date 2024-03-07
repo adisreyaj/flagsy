@@ -55,7 +55,7 @@
 }
 
 .btn {
-  @apply flex items-center gap-x-2 text-base rounded-xl border border-transparent text-white disabled:opacity-50;
+  @apply flex w-full h-full items-center gap-x-2 text-base rounded-xl border border-transparent text-white disabled:opacity-50;
   @apply focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
   // Icon only button will be a square
   &:not(.icon) {
@@ -79,7 +79,7 @@
   }
 
   &.xs {
-    @apply text-xs;
+    @apply text-sm;
     &:not(.has-trailing-icon) {
       @include xs;
     }
@@ -93,7 +93,7 @@
     }
 
     .button-icon {
-      @apply w-2 h-2;
+      @apply w-4 h-4;
     }
   }
 

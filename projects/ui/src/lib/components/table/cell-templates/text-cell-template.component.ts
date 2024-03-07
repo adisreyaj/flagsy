@@ -5,7 +5,7 @@ import { CellData } from './cell.type';
 @Component({
   selector: 'ui-text-cell-template',
   template: `
-    <div class="flex items-center w-full h-full text-sm">
+    <div class="flex items-center w-full h-full text-sm px-2">
       {{ this.cellData | textDisplay }}
     </div>
   `,

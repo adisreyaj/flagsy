@@ -20,6 +20,7 @@ export type TableColumnConfig = {
 
 export enum TableDefaultCellType {
   Text = 'text',
+  TextWithCopy = 'text-with-copy',
   Date = 'date',
 }
 

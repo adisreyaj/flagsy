@@ -5,7 +5,7 @@ import { CellData } from './cell.type';
 @Component({
   selector: 'ui-date-cell-template',
   template: `
-    <div class="flex items-center w-full h-full text-sm">
+    <div class="flex items-center w-full h-full text-sm px-2">
       {{ this.cellData | date: 'MMM-dd-yyyy hh:mm a' }}
     </div>
   `,

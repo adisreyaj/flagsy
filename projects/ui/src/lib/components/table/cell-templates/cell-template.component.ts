@@ -11,6 +11,7 @@ import { TableColumnConfig, TableDefaultCellType } from '../table.types';
 import { CellData } from './cell.type';
 import { DateCellTemplateComponent } from './date-cell-template.component';
 import { TextCellTemplateComponent } from './text-cell-template.component';
+import { TextWithCopyCellTemplateComponent } from './text-with-copy-cell-template.component';
 
 @Directive({
   selector: '[uiCellTemplate]',
@@ -45,6 +46,10 @@ export class CellTemplateDirective implements OnInit {
     switch (columnConfig.type) {
       case TableDefaultCellType.Date:
         return DateCellTemplateComponent;
+
+      case TableDefaultCellType.TextWithCopy:
+        return TextWithCopyCellTemplateComponent;
+
       default:
         return TextCellTemplateComponent;
     }

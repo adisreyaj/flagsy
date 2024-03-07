@@ -16,6 +16,7 @@ import {
   RiDeleteBin6Line,
   RiErrorWarningFill,
   RiErrorWarningLine,
+  RiFileCopyLine,
   RiFlagFill,
   RiFlagLine,
   RiFolderOpenLine,
@@ -74,4 +75,5 @@ export const ICONS = {
   RiLockFill,
   RiArrowDownSFill,
   RiFolderOpenLine,
+  RiFileCopyLine,
 };
