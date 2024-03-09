@@ -8,17 +8,12 @@ import {
 } from '@angular/core';
 import { EnvironmentsService } from '@app/services/environments/environments.service';
 import { FeatureService } from '@app/services/features/feature.service';
-import {
-  BooleanFeature,
-  Feature,
-  FeatureSortBy,
-} from '@app/types/feature.type';
+import { Feature, FeatureSortBy } from '@app/types/feature.type';
 import { HotToastService } from '@ngneat/hot-toast';
 import {
   ButtonComponent,
   CheckboxComponent,
   DropdownMenuComponent,
-  DropdownMenuOption,
   ModalDataType,
   ModalService,
   ModalSize,
@@ -28,10 +23,12 @@ import {
   TableDefaultCellType,
   ToggleComponent,
 } from '@ui/components';
-import { filter, map, switchMap, withLatestFrom } from 'rxjs';
+import { filter, switchMap } from 'rxjs';
 import { SheetSize } from '../../../../projects/ui/src/lib/components/sheet/sheet.type';
+import { ActionCellTemplateContext } from '../../../../projects/ui/src/lib/components/table/cell-templates/actions-cell-template.component';
 import { TableDataSource } from '../../../../projects/ui/src/lib/components/table/table-data-source';
 import { TimeAgoPipe } from '../../../../projects/ui/src/lib/pipes';
+import { FeatureCellTemplateComponent } from '../../shared/components/feature-cell-template/feature-cell-template.component';
 import {
   FeatureConfigSheetComponent,
   FeatureConfigSheetData,
@@ -98,18 +95,18 @@ export class FeaturesListComponent {
       id: 'key',
       label: 'Feature',
       sortable: true,
-      width: 20,
+      width: 15,
       type: TableDefaultCellType.TextWithCopy,
     },
     {
       id: 'description',
       label: 'Description',
-      width: 35,
     },
     {
       id: 'value',
       label: 'Value',
-      width: 15,
+      width: 20,
+      content: FeatureCellTemplateComponent,
     },
     {
       id: 'createdBy',
@@ -127,6 +124,24 @@ export class FeaturesListComponent {
       minWidthInPx: 200,
       type: TableDefaultCellType.Date,
     },
+    {
+      id: 'actions',
+      width: '50px',
+      type: TableDefaultCellType.Actions,
+      context: [
+        {
+          label: 'Edit',
+          prefixIcon: 'pencil-line',
+          onClick: (option, rowData) => this.editFeature(rowData as Feature),
+        },
+        {
+          label: 'Delete',
+          variant: 'destructive',
+          prefixIcon: 'delete-bin-6-line',
+          onClick: (option, rowData) => this.deleteFeature(rowData as Feature),
+        },
+      ] as ActionCellTemplateContext[],
+    },
   ];
   protected readonly dataSource;
 
@@ -142,18 +157,6 @@ export class FeaturesListComponent {
 
   readonly activeEnvironment$ = inject(EnvironmentsService).activeEnvironment$;
 
-  readonly menuOptions: DropdownMenuOption[] = [
-    {
-      label: 'Edit',
-      prefixIcon: 'pencil-line',
-    },
-    {
-      label: 'Delete',
-      variant: 'destructive',
-      prefixIcon: 'delete-bin-6-line',
-    },
-  ];
-
   readonly #sheetService = inject(SheetService);
   readonly #featuresService = inject(FeatureService);
   readonly #modalService = inject(ModalService);
@@ -161,30 +164,13 @@ export class FeaturesListComponent {
 
   constructor() {
     this.dataSource = new TableDataSource<Feature>(({ sort }) => {
-      return this.#featuresService
-        .getFeatures({
-          sort: {
-            key: sort?.column?.id as FeatureSortBy,
-            direction: sort?.direction,
-          },
-        })
-        .pipe(
-          map((data) => {
-            return {
-              data: data,
-              total: data.length,
-            };
-          }),
-        );
+      return this.#featuresService.getFeatures({
+        sort: {
+          key: sort?.column?.id as FeatureSortBy,
+          direction: sort?.direction,
+        },
+      });
     });
-  }
-
-  public handleOptionClick(option: DropdownMenuOption, feature: Feature): void {
-    if (option.label === 'Edit') {
-      this.editFeature(feature);
-    } else if (option.label === 'Delete') {
-      this.deleteFeature(feature);
-    }
   }
 
   protected editFeature(feature: Feature): void {
@@ -199,38 +185,6 @@ export class FeaturesListComponent {
         },
       },
     );
-  }
-
-  public toggleFeatureState(feature: BooleanFeature): void {
-    const title = `${feature.value ? 'Disable' : 'Enable'} feature?`;
-    const confirmButtonText = feature.value ? 'Disable' : 'Enable';
-    const confirmButtonVariant = feature.value ? 'destructive' : 'primary';
-
-    this.#modalService
-      .openConfirmation({
-        title: title,
-        content: this.toggleFeatureValueTemplate(),
-        context: { $implicit: feature },
-        confirmButtonText: confirmButtonText,
-        confirmButtonVariant: confirmButtonVariant,
-        cancelButtonText: 'Cancel',
-        size: ModalSize.Small,
-      })
-      .pipe(
-        filter((result) => result === true),
-        withLatestFrom(this.activeEnvironment$),
-        switchMap(([, activeEnvironment]) =>
-          this.#featuresService.updateFeature(feature.id, {
-            environmentId: activeEnvironment!.id,
-            value: !feature.value,
-          }),
-        ),
-        this.#toast.observe({
-          success: () => 'Feature flag updated successfully!',
-          error: () => 'Failed to update feature flag!',
-        }),
-      )
-      .subscribe();
   }
 
   public deleteFeature(feature: Feature): void {

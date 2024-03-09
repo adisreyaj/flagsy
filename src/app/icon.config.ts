@@ -20,6 +20,7 @@ import {
   RiFlagFill,
   RiFlagLine,
   RiFolderOpenLine,
+  RiHashtag,
   RiHome2Fill,
   RiHome2Line,
   RiInformationFill,
@@ -35,6 +36,8 @@ import {
   RiSearchLine,
   RiSettings3Line,
   RiTerminalBoxLine,
+  RiText,
+  RiToggleLine,
   RiUser3Line,
 } from 'angular-remix-icon';
 
@@ -76,4 +79,7 @@ export const ICONS = {
   RiArrowDownSFill,
   RiFolderOpenLine,
   RiFileCopyLine,
+  RiText,
+  RiToggleLine,
+  RiHashtag,
 };

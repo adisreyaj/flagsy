@@ -3,13 +3,14 @@ import { TableSortDirection } from './table.component';
 
 export type TableColumnConfig = {
   id: string;
-  label: string;
+  label?: string;
   sortable?: boolean;
   sortDirection?: 'asc' | 'desc';
-  width?: number;
+  width?: number | `${number}px`;
   visible?: boolean;
   minWidthInPx?: number;
   content?: Type<unknown> | TemplateRef<unknown>;
+  context?: unknown;
   type?: TableDefaultCellType;
 } & (
   | {
@@ -23,6 +24,7 @@ export enum TableDefaultCellType {
   TextWithCopy = 'text-with-copy',
   Date = 'date',
   User = 'user',
+  Actions = 'actions',
 }
 
 export interface TableSortState {

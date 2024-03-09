@@ -8,7 +8,8 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import { TableColumnConfig, TableDefaultCellType } from '../table.types';
-import { CellData } from './cell.type';
+import { ActionsCellTemplateComponent } from './actions-cell-template.component';
+import { CELL_CONTEXT, CELL_DATA, ROW_DATA } from './cell.type';
 import { DateCellTemplateComponent } from './date-cell-template.component';
 import { TextCellTemplateComponent } from './text-cell-template.component';
 import { TextWithCopyCellTemplateComponent } from './text-with-copy-cell-template.component';
@@ -24,18 +25,20 @@ export class CellTemplateDirective implements OnInit {
   });
   data = input.required<unknown>();
 
+  rowData = input.required<unknown>();
+
   #vcr = inject(ViewContainerRef);
 
   ngOnInit() {
     this.#vcr.clear();
-    if (!this.column() || this.data() === undefined) return;
+    if (!this.column()) return;
 
     const componentOrTemplateRef = this.getColumnComponent(this.column());
     if (componentOrTemplateRef instanceof TemplateRef) {
       this.#vcr.createEmbeddedView(componentOrTemplateRef);
     } else if (componentOrTemplateRef) {
       this.#vcr.createComponent(componentOrTemplateRef, {
-        injector: this.getInjector(this.data()),
+        injector: this.getInjector(),
       });
     }
   }
@@ -54,17 +57,28 @@ export class CellTemplateDirective implements OnInit {
       case TableDefaultCellType.User:
         return UserCellTemplateComponent;
 
+      case TableDefaultCellType.Actions:
+        return ActionsCellTemplateComponent;
+
       default:
         return TextCellTemplateComponent;
     }
   }
 
-  private getInjector(data: unknown) {
+  private getInjector() {
     return Injector.create({
       providers: [
         {
-          provide: CellData,
-          useValue: data,
+          provide: CELL_DATA,
+          useValue: this.data(),
+        },
+        {
+          provide: ROW_DATA,
+          useValue: this.rowData(),
+        },
+        {
+          provide: CELL_CONTEXT,
+          useValue: this.column().context,
         },
       ],
     });

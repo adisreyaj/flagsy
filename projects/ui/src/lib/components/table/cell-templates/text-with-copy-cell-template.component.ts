@@ -1,8 +1,9 @@
+import { CdkCopyToClipboard } from '@angular/cdk/clipboard';
 import { Component, inject } from '@angular/core';
 import { TextDisplayPipe } from '../../../pipes/text-display.pipe';
 import { ButtonComponent } from '../../button/button.component';
 import { TooltipDirective } from '../../tooltip';
-import { CellData } from './cell.type';
+import { CELL_DATA } from './cell.type';
 
 @Component({
   selector: 'ui-text-with-copy-cell-template',
@@ -20,6 +21,7 @@ import { CellData } from './cell.type';
         variant="plain"
         size="xs"
         prefixIcon="clipboard-line"
+        [cdkCopyToClipboard]="this.cellData"
       >
       </ui-button>
     </div>
@@ -32,8 +34,13 @@ import { CellData } from './cell.type';
       }
     `,
   ],
-  imports: [TextDisplayPipe, ButtonComponent, TooltipDirective],
+  imports: [
+    TextDisplayPipe,
+    ButtonComponent,
+    TooltipDirective,
+    CdkCopyToClipboard,
+  ],
 })
 export class TextWithCopyCellTemplateComponent {
-  protected cellData = inject<string>(CellData);
+  protected cellData = inject<string>(CELL_DATA);
 }

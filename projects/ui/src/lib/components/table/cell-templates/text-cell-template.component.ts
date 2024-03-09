@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { TextDisplayPipe } from '../../../pipes/text-display.pipe';
-import { CellData } from './cell.type';
+import { CELL_DATA } from './cell.type';
 
 @Component({
   selector: 'ui-text-cell-template',
@@ -24,5 +24,5 @@ import { CellData } from './cell.type';
   imports: [TextDisplayPipe],
 })
 export class TextCellTemplateComponent {
-  protected cellData = inject<string>(CellData);
+  protected cellData = inject<string>(CELL_DATA);
 }

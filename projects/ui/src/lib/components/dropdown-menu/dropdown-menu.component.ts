@@ -1,10 +1,5 @@
 import { A11yModule } from '@angular/cdk/a11y';
-import {
-  CdkMenu,
-  CdkMenuItem,
-  CdkMenuTrigger,
-  CdkTargetMenuAim,
-} from '@angular/cdk/menu';
+import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
 import { Component, EventEmitter, input, Output } from '@angular/core';
 import { FocusableDirective } from '@ui/a11y';
 import { IconName } from 'angular-remix-icon/lib/icon-names';
@@ -51,7 +46,6 @@ import { ButtonComponent, ButtonVariant } from '../button/button.component';
     ButtonComponent,
     A11yModule,
     FocusableDirective,
-    CdkTargetMenuAim,
   ],
 })
 export class DropdownMenuComponent {

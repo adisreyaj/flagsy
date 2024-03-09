@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Feature } from '@app/types/feature.type';
-import { tap } from 'rxjs';
+import { map, tap } from 'rxjs';
 import { FeatureFlag } from '../../config/feature.config';
 import { FeatureService } from '../features/feature.service';
 
@@ -19,6 +19,7 @@ export class AccessService {
     return this.#featureService
       .getAllFeaturesForCurrentProjectAndEnvironment()
       .pipe(
+        map((features) => features?.data ?? []),
         tap((features) => {
           this.#features = new Map(features.map((f) => [f.key, f]));
         }),

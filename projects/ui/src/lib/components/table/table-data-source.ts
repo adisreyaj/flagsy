@@ -44,9 +44,9 @@ export class TableDataSource<DataType = unknown> extends DataSource<DataType> {
           this.#isLoadingSignal.set(false);
         },
       }),
-      map((result) => result.data),
+      map((result) => result?.data),
       tap((data) => {
-        this.#isEmptySignal.set(data.length === 0);
+        this.#isEmptySignal.set(data?.length === 0);
       }),
       catchError((err) => {
         this.#isLoadingSignal.set(false);

@@ -4,6 +4,7 @@ import { SortBy } from '@app/types/common.type';
 import {
   Feature,
   FeatureCreateData,
+  FeatureResponse,
   FeatureSortBy,
   FeatureUpdateData,
   FeatureValueType,
@@ -33,7 +34,7 @@ export class FeatureService {
   #projectsService = inject(ProjectsService);
 
   getAllFeaturesForCurrentProjectAndEnvironment() {
-    return this.#http.get<Feature[]>(`${environment.api}/features`, {
+    return this.#http.get<FeatureResponse>(`${environment.api}/features`, {
       params: {
         projectId: environment.projectId,
         environmentId: environment.environmentId,
@@ -45,7 +46,7 @@ export class FeatureService {
   getFeatures(args?: {
     sort?: SortBy<FeatureSortBy>;
     search?: string;
-  }): Observable<Feature[]> {
+  }): Observable<FeatureResponse> {
     return this.#refreshSubject.pipe(
       startWith(undefined),
       switchMap(() =>
@@ -55,7 +56,7 @@ export class FeatureService {
         ]),
       ),
       switchMap(([activeProject, activeEnvironment]) =>
-        this.#http.get<Feature[]>(`${environment.api}/features`, {
+        this.#http.get<FeatureResponse>(`${environment.api}/features`, {
           params: {
             projectId: activeProject.id,
             environmentId: activeEnvironment.id,

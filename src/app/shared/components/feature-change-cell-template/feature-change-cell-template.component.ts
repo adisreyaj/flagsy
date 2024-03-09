@@ -1,32 +1,48 @@
 import { Component, inject } from '@angular/core';
+import {
+  FeatureChangelog,
+  FeatureChangelogChangeData,
+  FeatureChangeLogType,
+} from '@app/types/changelog.type';
 import { AngularRemixIconComponent } from 'angular-remix-icon';
-import { CellData } from '../../../../../projects/ui/src/lib/components/table/cell-templates/cell.type';
+import {
+  CELL_DATA,
+  ROW_DATA,
+} from '../../../../../projects/ui/src/lib/components/table/cell-templates/cell.type';
 
 @Component({
   selector: 'app-feature-change-cell-template',
   template: ` <div class="flex items-center gap-1 text-sm h-full px-2">
-    <div class="bg-red-50 py-1 px-2 rounded-md text-red-700">
-      {{ cellData.old.value }}
-    </div>
-    <div>
-      <rmx-icon class="!w-4 !h-4" name="arrow-right-s-line"></rmx-icon>
-    </div>
-    <div class="bg-green-50 py-1 px-2 rounded-md text-green-700">
-      {{ cellData.new.value }}
-    </div>
+    @switch (this.type) {
+      @case ('${FeatureChangeLogType.ValueChange}') {
+        <div class="flex items-center gap-1 text-sm h-full">
+          <div class="bg-red-50 py-1 px-2 rounded-md text-red-700">
+            {{ this.cellData?.old?.value }}
+          </div>
+          <div>
+            <rmx-icon class="!w-4 !h-4" name="arrow-right-s-line"></rmx-icon>
+          </div>
+          <div class="bg-green-50 py-1 px-2 rounded-md text-green-700">
+            {{ this.cellData?.new?.value }}
+          </div>
+        </div>
+      }
+      @case ('${FeatureChangeLogType.Create}') {
+        <div class="bg-green-50 py-1 px-2 rounded-md text-green-700">
+          Created
+        </div>
+      }
+      @case ('${FeatureChangeLogType.Delete}') {
+        <div class="bg-red-50 py-1 px-2 rounded-md text-red-700">Deleted</div>
+      }
+    }
   </div>`,
   standalone: true,
   imports: [AngularRemixIconComponent],
 })
 export class FeatureChangeCellTemplateComponent {
-  protected cellData = inject<FeatureChangeCellTemplateData>(CellData);
-}
-
-export interface FeatureChangeCellTemplateData {
-  old: {
-    value: string;
-  };
-  new: {
-    value: string;
-  };
+  protected cellData = inject<FeatureChangelogChangeData | undefined>(
+    CELL_DATA,
+  );
+  protected type = inject<FeatureChangelog>(ROW_DATA)?.type;
 }

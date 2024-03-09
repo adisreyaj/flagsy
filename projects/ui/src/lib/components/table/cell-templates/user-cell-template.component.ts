@@ -1,6 +1,6 @@
 import { NgOptimizedImage } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { CellData } from './cell.type';
+import { CELL_DATA } from './cell.type';
 
 @Component({
   selector: 'ui-user-cell-template',
@@ -36,7 +36,7 @@ import { CellData } from './cell.type';
   imports: [NgOptimizedImage],
 })
 export class UserCellTemplateComponent {
-  protected cellData = inject<UserCellTemplateData>(CellData);
+  protected cellData = inject<UserCellTemplateData>(CELL_DATA);
 }
 
 export interface UserCellTemplateData {

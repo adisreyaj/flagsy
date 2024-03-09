@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { CellData } from './cell.type';
+import { CELL_DATA } from './cell.type';
 
 @Component({
   selector: 'ui-date-cell-template',
@@ -22,5 +22,5 @@ import { CellData } from './cell.type';
   imports: [DatePipe],
 })
 export class DateCellTemplateComponent {
-  protected cellData = inject<Date>(CellData);
+  protected cellData = inject<Date>(CELL_DATA);
 }

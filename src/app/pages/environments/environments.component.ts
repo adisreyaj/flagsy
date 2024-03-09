@@ -1,4 +1,5 @@
 import { FocusKeyManager } from '@angular/cdk/a11y';
+import { CdkCopyToClipboard } from '@angular/cdk/clipboard';
 import { AsyncPipe, NgIf } from '@angular/common';
 import {
   Component,
@@ -148,7 +149,12 @@ import { HasFFAccessPipe } from '../../shared/pipes/has-ff-access.pipe';
                           [ngModel]="this.selectedEnvironmentId()"
                           disabled
                         ></ui-input>
-                        <ui-button prefixIcon="clipboard-line"></ui-button>
+                        <ui-button
+                          prefixIcon="clipboard-line"
+                          [cdkCopyToClipboard]="
+                            this.selectedEnvironmentId() ?? ''
+                          "
+                        ></ui-button>
                       </div>
                     </ui-form-field>
                     <div class="text-sm text-gray-500">
@@ -226,6 +232,7 @@ import { HasFFAccessPipe } from '../../shared/pipes/has-ff-access.pipe';
     NgIf,
     HasFFAccessPipe,
     FfAccessDirective,
+    CdkCopyToClipboard,
   ],
 })
 export class EnvironmentsComponent {

@@ -14,6 +14,7 @@ import { NgIf } from '@angular/common';
 import { Component, computed, input, OnInit, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { AngularRemixIconComponent } from 'angular-remix-icon';
+import { isString } from 'lodash-es';
 import { SpinnerComponent } from '../spinner/spinner.component';
 import { CellTemplateDirective } from './cell-templates/cell-template.component';
 import { TableDataSource } from './table-data-source';
@@ -28,7 +29,8 @@ export enum TableSortDirection {
   selector: 'ui-table',
   template: `
     <div
-      class="relative min-h-[200px] border border-gray-200 rounded-xl overflow-hidden"
+      class="relative border border-gray-200 rounded-xl overflow-hidden"
+      [class.min-h-[200px]]="this.isLoading() || this.isEmpty()"
     >
       @if (this.isLoading()) {
         <div
@@ -58,7 +60,9 @@ export enum TableSortDirection {
               [class.cursor-pointer]="column.sortable"
               (click)="column.sortable && this.sort(column)"
             >
-              <div class="flex items-center">{{ column.label }}</div>
+              @if (column.label) {
+                <div class="flex items-center">{{ column.label }}</div>
+              }
               <div class="focus-visible-outline cursor-pointer">
                 <!-- Icon shown on hover -->
                 <rmx-icon
@@ -86,6 +90,7 @@ export enum TableSortDirection {
               <ng-container
                 [uiCellTemplate]="column"
                 [data]="rowData[column.id]"
+                [rowData]="rowData"
               ></ng-container>
             </cdk-cell>
           </ng-container>
@@ -157,9 +162,11 @@ export class TableComponent implements OnInit {
         if (col.width !== undefined) {
           return [
             ...acc,
-            col.minWidthInPx
-              ? `minmax(${col.minWidthInPx}px, ${col.width}%)`
-              : `${col.width}%`,
+            isString(col.width)
+              ? col.width
+              : col.minWidthInPx
+                ? `minmax(${col.minWidthInPx}px, ${col.width}%)`
+                : `minmax(auto, ${col.width}%)`,
           ];
         }
         return [...acc, '1fr'];

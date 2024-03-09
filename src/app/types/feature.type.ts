@@ -15,6 +15,11 @@ export type Feature =
   | NumberFeature
   | JsonFeature;
 
+export interface FeatureResponse {
+  total: number;
+  data: Feature[];
+}
+
 export interface BooleanFeature extends FeatureBase {
   type: FeatureValueType.Boolean;
   value: boolean;

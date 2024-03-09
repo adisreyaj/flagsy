@@ -1,7 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ChangelogService } from '@app/services/changelog/changelog.service';
 import { EnvironmentsService } from '@app/services/environments/environments.service';
-import { FeatureChangelogSortKey } from '@app/types/changelog.type';
+import {
+  FeatureChangelogChangeData,
+  FeatureChangelogSortKey,
+  FeatureChangeLogType,
+} from '@app/types/changelog.type';
+import { UserMeta } from '@app/types/user.type';
 import {
   FilterBarComponent,
   TableColumnConfig,
@@ -64,6 +69,7 @@ export class ChangelogComponent {
       id: 'owner',
       label: 'User',
       width: 15,
+      type: TableDefaultCellType.User,
     },
     {
       id: 'date',
@@ -89,29 +95,44 @@ export class ChangelogComponent {
       },
     ];
 
-    this.dataSource = new TableDataSource(({ sort }) => {
-      return this.#changelogService
-        .getChangelogs({
-          sort: {
-            key: sort?.column?.id as FeatureChangelogSortKey,
-            direction: sort?.direction,
-          },
-        })
-        .pipe(
-          map((data) => {
-            return {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              data: (data as any[]).map((item) => ({
-                feature: item.feature.key,
-                environment: item.environment.name,
-                change: item.change,
-                owner: `${item.owner.firstName} ${item.owner.lastName}`,
-                date: item.createdAt,
-              })),
-              total: 1,
-            };
-          }),
-        );
-    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.dataSource = new TableDataSource<FeatureChangelogTableData>(
+      ({ sort }) => {
+        return this.#changelogService
+          .getChangelogs({
+            sort: {
+              key: sort?.column?.id as FeatureChangelogSortKey,
+              direction: sort?.direction,
+            },
+          })
+          .pipe(
+            map((res) => {
+              return {
+                data: res.data.map((item) => {
+                  const data: FeatureChangelogTableData = {
+                    feature: item.feature.key,
+                    environment: item.environment?.name,
+                    change: item.change,
+                    owner: item.owner,
+                    date: item.createdAt,
+                    type: item.type,
+                  };
+                  return data;
+                }),
+                total: res.total,
+              };
+            }),
+          );
+      },
+    );
   }
+}
+
+export interface FeatureChangelogTableData {
+  feature: string;
+  environment?: string;
+  change?: FeatureChangelogChangeData;
+  owner: UserMeta;
+  date: Date;
+  type: FeatureChangeLogType;
 }
