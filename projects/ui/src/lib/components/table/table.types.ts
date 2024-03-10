@@ -1,4 +1,5 @@
 import { TemplateRef, Type } from '@angular/core';
+import { Observable } from 'rxjs';
 import { TableSortDirection } from './table.component';
 
 export type TableColumnConfig = {
@@ -31,3 +32,16 @@ export interface TableSortState {
   column?: TableColumnConfig;
   direction?: TableSortDirection;
 }
+
+export interface TablePaginationState {
+  offset: number;
+  limit: number;
+}
+
+export type TableDataFetcher<TableData> = (req: {
+  sort?: TableSortState;
+  pagination?: TablePaginationState;
+}) => Observable<{
+  data: TableData[];
+  total: number;
+}>;

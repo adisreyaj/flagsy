@@ -31,7 +31,7 @@ import { IconName } from 'angular-remix-icon/lib/icon-names';
   imports: [AngularRemixIconComponent],
 })
 export class ButtonComponent {
-  public label = input<string>('');
+  public label = input<string | number>('');
 
   public variant = input<ButtonVariant>('primary');
 

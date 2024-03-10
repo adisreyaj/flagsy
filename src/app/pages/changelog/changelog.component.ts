@@ -11,11 +11,11 @@ import {
   FilterBarComponent,
   TableColumnConfig,
   TableComponent,
+  TableDataFetcher,
   TableDefaultCellType,
 } from '@ui/components';
 import { Filter } from '@ui/types';
 import { map } from 'rxjs';
-import { TableDataSource } from '../../../../projects/ui/src/lib/components/table/table-data-source';
 import { FeatureChangeCellTemplateComponent } from '../../shared/components/feature-change-cell-template/feature-change-cell-template.component';
 import { PageHeaderComponent } from '../../shared/components/header/page-header.component';
 
@@ -33,7 +33,8 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
           <ui-table
             class="h-full min-h-0 block"
             [columns]="this.columns"
-            [dataSource]="this.dataSource"
+            [data]="this.dataFetcher"
+            [pageable]="true"
           ></ui-table>
         </div>
       </section>
@@ -80,7 +81,8 @@ export class ChangelogComponent {
       type: TableDefaultCellType.Date,
     },
   ];
-  protected readonly dataSource;
+  protected readonly dataFetcher: TableDataFetcher<FeatureChangelogTableData>;
+
   readonly #environmentService = inject(EnvironmentsService);
   readonly #changelogService = inject(ChangelogService);
   constructor() {
@@ -96,35 +98,34 @@ export class ChangelogComponent {
     ];
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.dataSource = new TableDataSource<FeatureChangelogTableData>(
-      ({ sort }) => {
-        return this.#changelogService
-          .getChangelogs({
-            sort: {
-              key: sort?.column?.id as FeatureChangelogSortKey,
-              direction: sort?.direction,
-            },
-          })
-          .pipe(
-            map((res) => {
-              return {
-                data: res.data.map((item) => {
-                  const data: FeatureChangelogTableData = {
-                    feature: item.feature.key,
-                    environment: item.environment?.name,
-                    change: item.change,
-                    owner: item.owner,
-                    date: item.createdAt,
-                    type: item.type,
-                  };
-                  return data;
-                }),
-                total: res.total,
-              };
-            }),
-          );
-      },
-    );
+    this.dataFetcher = ({ sort, pagination }) => {
+      return this.#changelogService
+        .getChangelogs({
+          sort: {
+            key: sort?.column?.id as FeatureChangelogSortKey,
+            direction: sort?.direction,
+          },
+          pagination,
+        })
+        .pipe(
+          map((res) => {
+            return {
+              data: res.data.map((item) => {
+                const data: FeatureChangelogTableData = {
+                  feature: item.feature.key,
+                  environment: item.environment?.name,
+                  change: item.change,
+                  owner: item.owner,
+                  date: item.createdAt,
+                  type: item.type,
+                };
+                return data;
+              }),
+              total: res.total,
+            };
+          }),
+        );
+    };
   }
 }
 

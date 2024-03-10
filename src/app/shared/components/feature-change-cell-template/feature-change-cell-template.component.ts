@@ -16,15 +16,19 @@ import {
     @switch (this.type) {
       @case ('${FeatureChangeLogType.ValueChange}') {
         <div class="flex items-center gap-1 text-sm h-full">
-          <div class="bg-red-50 py-1 px-2 rounded-md text-red-700">
-            {{ this.cellData?.old?.value }}
-          </div>
+          @if (this.cellData?.old?.value !== undefined) {
+            <div class="bg-red-50 py-1 px-2 rounded-md text-red-700">
+              {{ this.cellData!.old.value }}
+            </div>
+          }
           <div>
             <rmx-icon class="!w-4 !h-4" name="arrow-right-s-line"></rmx-icon>
           </div>
-          <div class="bg-green-50 py-1 px-2 rounded-md text-green-700">
-            {{ this.cellData?.new?.value }}
-          </div>
+          @if (this.cellData?.new?.value !== undefined) {
+            <div class="bg-green-50 py-1 px-2 rounded-md text-green-700">
+              {{ this.cellData!.new.value }}
+            </div>
+          }
         </div>
       }
       @case ('${FeatureChangeLogType.Create}') {

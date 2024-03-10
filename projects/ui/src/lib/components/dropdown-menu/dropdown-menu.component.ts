@@ -48,11 +48,12 @@ import { ButtonComponent, ButtonVariant } from '../button/button.component';
     FocusableDirective,
   ],
 })
-export class DropdownMenuComponent {
-  public options = input.required<DropdownMenuOption[]>();
+export class DropdownMenuComponent<ValueType = unknown> {
+  public options = input.required<DropdownMenuOption<ValueType>[]>();
 
   @Output()
-  public optionClick: EventEmitter<DropdownMenuOption> = new EventEmitter();
+  public optionClick: EventEmitter<DropdownMenuOption<ValueType>> =
+    new EventEmitter();
 
   @Output()
   public dropdownOpen = new EventEmitter<void>();
@@ -61,9 +62,10 @@ export class DropdownMenuComponent {
   public dropdownClose = new EventEmitter<void>();
 }
 
-export interface DropdownMenuOption {
+export interface DropdownMenuOption<ValueType = unknown> {
   label: string;
   trailingIcon?: IconName;
   prefixIcon?: IconName;
   variant?: ButtonVariant;
+  value?: ValueType;
 }

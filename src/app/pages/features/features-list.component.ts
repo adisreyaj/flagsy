@@ -20,13 +20,13 @@ import {
   SheetService,
   TableColumnConfig,
   TableComponent,
+  TableDataFetcher,
   TableDefaultCellType,
   ToggleComponent,
 } from '@ui/components';
 import { filter, switchMap } from 'rxjs';
 import { SheetSize } from '../../../../projects/ui/src/lib/components/sheet/sheet.type';
 import { ActionCellTemplateContext } from '../../../../projects/ui/src/lib/components/table/cell-templates/actions-cell-template.component';
-import { TableDataSource } from '../../../../projects/ui/src/lib/components/table/table-data-source';
 import { TimeAgoPipe } from '../../../../projects/ui/src/lib/pipes';
 import { FeatureCellTemplateComponent } from '../../shared/components/feature-cell-template/feature-cell-template.component';
 import {
@@ -42,7 +42,8 @@ import {
       <ui-table
         class="h-full min-h-0 block"
         [columns]="this.columns"
-        [dataSource]="this.dataSource"
+        [data]="this.dataSource"
+        [pageable]="true"
       ></ui-table>
     </div>
 
@@ -143,7 +144,7 @@ export class FeaturesListComponent {
       ] as ActionCellTemplateContext[],
     },
   ];
-  protected readonly dataSource;
+  protected readonly dataSource: TableDataFetcher<Feature>;
 
   public readonly toggleFeatureValueTemplate: Signal<
     TemplateRef<{
@@ -163,14 +164,14 @@ export class FeaturesListComponent {
   readonly #toast = inject(HotToastService);
 
   constructor() {
-    this.dataSource = new TableDataSource<Feature>(({ sort }) => {
+    this.dataSource = ({ sort }) => {
       return this.#featuresService.getFeatures({
         sort: {
           key: sort?.column?.id as FeatureSortBy,
           direction: sort?.direction,
         },
       });
-    });
+    };
   }
 
   protected editFeature(feature: Feature): void {

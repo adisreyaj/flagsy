@@ -32,15 +32,26 @@
 }
 
 @mixin primary() {
-  @apply bg-primary-600 hover:bg-primary-700 text-white;
+  @apply bg-primary-600 text-white;
+  &:not(:disabled) {
+    @apply hover:bg-primary-700;
+  }
 }
 
 @mixin neutral() {
-  @apply bg-gray-100 border border-gray-200 hover:bg-gray-200 text-inherit;
+  @apply bg-gray-100 border border-gray-200 text-inherit;
+
+    &:not(:disabled) {
+        @apply hover:bg-gray-200;
+    }
 }
 
 @mixin plain() {
-  @apply bg-transparent hover:bg-gray-100 text-inherit;
+  @apply bg-transparent text-inherit;
+
+    &:not(:disabled) {
+        @apply hover:bg-gray-100;
+    }
 }
 
 

@@ -4,10 +4,10 @@ import {
   FeatureChangelogResponse,
   FeatureChangelogSortKey,
 } from '@app/types/changelog.type';
-import { SortBy } from '@app/types/common.type';
+import { Pagination, SortBy } from '@app/types/common.type';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { SortUtil } from '../../utils/sort.util';
+import { QueryParamUtil } from '../../utils/query-param.util';
 
 @Injectable({
   providedIn: 'root',
@@ -17,12 +17,14 @@ export class ChangelogService {
 
   getChangelogs(args?: {
     sort?: SortBy<FeatureChangelogSortKey>;
+    pagination?: Pagination;
   }): Observable<FeatureChangelogResponse> {
     return this.#http.get<FeatureChangelogResponse>(
       `${environment.api}/changelog`,
       {
         params: {
-          ...SortUtil.buildSortParam(args?.sort),
+          ...QueryParamUtil.buildSortParam(args?.sort),
+          ...QueryParamUtil.buildPaginationParam(args?.pagination),
         },
         withCredentials: true,
       },

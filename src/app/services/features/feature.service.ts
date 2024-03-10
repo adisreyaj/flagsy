@@ -20,7 +20,7 @@ import {
 } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SelectOption } from '../../shared/components/select.type';
-import { SortUtil } from '../../utils/sort.util';
+import { QueryParamUtil } from '../../utils/query-param.util';
 import { EnvironmentsService } from '../environments/environments.service';
 import { ProjectsService } from '../projects/projects.service';
 
@@ -60,7 +60,7 @@ export class FeatureService {
           params: {
             projectId: activeProject.id,
             environmentId: activeEnvironment.id,
-            ...SortUtil.buildSortParam(args?.sort),
+            ...QueryParamUtil.buildSortParam(args?.sort),
           },
           withCredentials: true,
         }),

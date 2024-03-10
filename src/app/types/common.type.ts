@@ -9,3 +9,8 @@ export interface SortBy<KeyType = string> {
   key?: KeyType;
   direction?: TableSortDirection;
 }
+
+export interface Pagination {
+  offset: number;
+  limit: number;
+}

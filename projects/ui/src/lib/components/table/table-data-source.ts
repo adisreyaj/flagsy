@@ -1,9 +1,8 @@
 import { DataSource } from '@angular/cdk/collections';
 import { signal } from '@angular/core';
 import {
-  BehaviorSubject,
   catchError,
-  isObservable,
+  combineLatest,
   map,
   Observable,
   of,
@@ -11,37 +10,51 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
-import { TableSortState } from './table.types';
+import {
+  TableDataFetcher,
+  TablePaginationState,
+  TableSortState,
+} from './table.types';
 
 export class TableDataSource<DataType = unknown> extends DataSource<DataType> {
   protected dataFetcher: TableDataFetcher<DataType>;
-  protected sortChangeSubject = new BehaviorSubject<TableSortState | undefined>(
-    undefined,
-  );
+  protected sortChange$;
+  protected pageChange$;
+
   readonly #isLoadingSignal = signal<boolean>(false);
   readonly isLoading = this.#isLoadingSignal.asReadonly();
 
   readonly #isEmptySignal = signal<boolean>(true);
   readonly isEmpty = this.#isEmptySignal.asReadonly();
 
+  readonly #totalCountSignal = signal<number>(0);
+  readonly totalCount = this.#totalCountSignal.asReadonly();
+
   readonly #subs = new Subscription();
 
-  constructor(dataFetcher: TableDataFetcher<DataType>) {
+  constructor(
+    dataFetcher: TableDataFetcher<DataType>,
+    sortChange?: Observable<TableSortState | undefined>,
+    pageChange?: Observable<TablePaginationState | undefined>,
+  ) {
     super();
     this.dataFetcher = dataFetcher;
+    this.sortChange$ = sortChange ?? of(undefined);
+    this.pageChange$ = pageChange ?? of(undefined);
   }
 
   connect() {
-    return this.sortChangeSubject.pipe(
+    return combineLatest([this.sortChange$, this.pageChange$]).pipe(
       tap({
         next: () => {
           this.#isLoadingSignal.set(true);
         },
       }),
-      switchMap((sort) => this.dataFetcher({ sort })),
+      switchMap(([sort, pagination]) => this.dataFetcher({ sort, pagination })),
       tap({
-        next: () => {
+        next: (res) => {
           this.#isLoadingSignal.set(false);
+          this.#totalCountSignal.set(res.total);
         },
       }),
       map((result) => result?.data),
@@ -55,21 +68,7 @@ export class TableDataSource<DataType = unknown> extends DataSource<DataType> {
     );
   }
 
-  setSortChangeListener(sortChange?: Observable<TableSortState | undefined>) {
-    if (isObservable(sortChange))
-      this.#subs.add(
-        sortChange.subscribe((sort) => this.sortChangeSubject.next(sort)),
-      );
-  }
-
   disconnect() {
     this.#subs.unsubscribe();
   }
 }
-
-export type TableDataFetcher<TableData> = (req: {
-  sort?: TableSortState;
-}) => Observable<{
-  data: TableData[];
-  total: number;
-}>;
