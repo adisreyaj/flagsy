@@ -14,7 +14,7 @@ import { SidebarComponent } from './shared/components/sidebar/sidebar.component'
         ></app-sidebar>
       </aside>
       <main
-        class="content transition-all duration-500 flex-auto p-2 rounded-xl"
+        class="content transition-all duration-500 flex-auto p-2 rounded-xl min-w-0"
       >
         <div class="h-full bg-white rounded-xl">
           <router-outlet></router-outlet>

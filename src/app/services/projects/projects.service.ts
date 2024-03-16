@@ -62,7 +62,7 @@ export class ProjectsService {
             (proj) => proj.id === savedProjectId,
           );
           if (!this.#activeProjectSubject.value) {
-            this.#activeProjectSubject.next(savedProject ?? projects?.[0]);
+            this.setActiveProject(savedProject?.id ?? projects?.[0]?.id);
           }
         }),
       )

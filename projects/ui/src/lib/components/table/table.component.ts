@@ -11,11 +11,26 @@ import {
   CdkTable,
 } from '@angular/cdk/table';
 import { NgIf } from '@angular/common';
-import { Component, computed, input, OnInit, signal } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
+import {
+  Component,
+  computed,
+  ElementRef,
+  input,
+  OnInit,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AngularRemixIconComponent } from 'angular-remix-icon';
-import { isEmpty, isString } from 'lodash-es';
-import { combineLatest, filter, Observable, switchMap } from 'rxjs';
+import { isEmpty } from 'lodash-es';
+import {
+  combineLatest,
+  filter,
+  fromEvent,
+  Observable,
+  switchMap,
+  throttleTime,
+} from 'rxjs';
 import {
   PageChangeEvent,
   PaginatorComponent,
@@ -29,6 +44,7 @@ import {
   TablePaginationState,
   TableSortState,
 } from './table.types';
+import { TableUtil } from './table.util';
 
 export enum TableSortDirection {
   Asc = 'asc',
@@ -62,8 +78,9 @@ export enum TableSortDirection {
           </div>
         }
         <cdk-table
-          class="flex flex-col overflow-y-auto w-full"
+          class="flex flex-col overflow-auto w-full"
           [dataSource]="this.dataSource()"
+          #table
         >
           @for (column of this.columns(); track column.id) {
             <ng-container [cdkColumnDef]="column.id">
@@ -121,7 +138,7 @@ export enum TableSortDirection {
           ></cdk-row>
         </cdk-table>
       </div>
-      @if (this.pageable() && !this.isLoading()) {
+      @if (this.pageable()) {
         <div class="py-2">
           <ui-paginator
             [totalCount]="this.totalCount()"
@@ -178,7 +195,9 @@ export class TableComponent implements OnInit {
   availablePageLimits = input<number[]>([10, 25, 50, 100]);
 
   // External Triggers
-  externalTriggers = input<Record<string, Observable<unknown>>>();
+  externalTriggers = input<Record<string, Observable<unknown>> | undefined>(
+    undefined,
+  );
 
   // Pagination state is managed by the table itself
   activePageIndex = signal<number>(0);
@@ -196,7 +215,7 @@ export class TableComponent implements OnInit {
       this.data(),
       hasSortableColumn ? this.#sortState$ : undefined,
       this.pageable() ? this.#paginationState$ : undefined,
-      this.#externalTriggers$,
+      !isEmpty(this.externalTriggers()) ? this.#externalTriggers$ : undefined,
     );
   });
 
@@ -214,27 +233,24 @@ export class TableComponent implements OnInit {
   protected dataFetched = computed(() => this.dataSource().dataFetched());
 
   protected rowGridStyles = computed(() => {
-    return this.columns()
-      .reduce((acc, col) => {
-        if (col.width !== undefined) {
-          return [
-            ...acc,
-            isString(col.width)
-              ? col.width
-              : col.minWidthInPx
-                ? `minmax(${col.minWidthInPx}px, ${col.width}%)`
-                : `${col.width}%`,
-          ];
-        }
-        return [...acc, '1fr'];
-      }, [] as string[])
-      .join(' ');
+    this.#resizeEventSignal(); // Trigger resize event to recalculate grid styles
+    return TableUtil.getGridTemplateColumns(
+      this.columns(),
+      this.tableElement().offsetWidth,
+    );
   });
 
   protected activeSortColumn = computed(() => this.sortState()?.column?.id);
   protected activeSortDirection = computed(() => this.sortState()?.direction);
   protected totalCount = computed(() => this.dataSource().totalCount() ?? 0);
 
+  private tableElementRef = viewChild('table', { read: ElementRef });
+  private readonly tableElement = computed<HTMLDivElement>(
+    () => this.tableElementRef()?.nativeElement,
+  );
+
+  #resizeEvent$ = fromEvent(window, 'resize').pipe(throttleTime(10));
+  #resizeEventSignal = toSignal(this.#resizeEvent$);
   #sortState$ = toObservable(this.sortState);
   #paginationState$ = toObservable(this.paginationState);
   #externalTriggers$ = toObservable(this.externalTriggers).pipe(

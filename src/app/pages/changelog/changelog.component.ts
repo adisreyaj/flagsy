@@ -66,11 +66,11 @@ export class ChangelogComponent {
       id: 'environment',
       label: 'Environment',
       width: 15,
+      minWidthInPx: 200,
     },
     {
       id: 'change',
       label: 'Change',
-      width: 35,
       minWidthInPx: 200,
       content: FeatureChangeCellTemplateComponent,
     },

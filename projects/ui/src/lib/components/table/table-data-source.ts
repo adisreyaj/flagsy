@@ -26,7 +26,7 @@ export class TableDataSource<DataType = unknown> extends DataSource<DataType> {
   readonly #isLoadingSignal = signal<boolean>(false);
   readonly isLoading = this.#isLoadingSignal.asReadonly();
 
-  readonly #isEmptySignal = signal<boolean>(true);
+  readonly #isEmptySignal = signal<boolean>(false);
   readonly isEmpty = this.#isEmptySignal.asReadonly();
 
   readonly #totalCountSignal = signal<number>(0);

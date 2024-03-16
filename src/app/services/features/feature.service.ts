@@ -10,14 +10,7 @@ import {
   FeatureValueType,
 } from '@app/types/feature.type';
 import { startCase } from 'lodash-es';
-import {
-  combineLatest,
-  Observable,
-  startWith,
-  Subject,
-  switchMap,
-  tap,
-} from 'rxjs';
+import { combineLatest, Observable, Subject, switchMap, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SelectOption } from '../../shared/components/select.type';
 import { QueryParamUtil } from '../../utils/query-param.util';
@@ -47,14 +40,10 @@ export class FeatureService {
     sort?: SortBy<FeatureSortBy>;
     search?: string;
   }): Observable<FeatureResponse> {
-    return this.#refreshSubject.pipe(
-      startWith(undefined),
-      switchMap(() =>
-        combineLatest([
-          this.#projectsService.activeProject$,
-          this.#environmentService.activeEnvironment$,
-        ]),
-      ),
+    return combineLatest([
+      this.#projectsService.activeProject$,
+      this.#environmentService.activeEnvironment$,
+    ]).pipe(
       switchMap(([activeProject, activeEnvironment]) =>
         this.#http.get<FeatureResponse>(`${environment.api}/features`, {
           params: {

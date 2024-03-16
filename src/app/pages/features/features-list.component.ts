@@ -1,12 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import {
-  Component,
-  inject,
-  Signal,
-  TemplateRef,
-  viewChild,
-} from '@angular/core';
-import { EnvironmentsService } from '@app/services/environments/environments.service';
+import { Component, inject } from '@angular/core';
 import { FeatureService } from '@app/services/features/feature.service';
 import { Feature, FeatureSortBy } from '@app/types/feature.type';
 import { HotToastService } from '@ngneat/hot-toast';
@@ -14,6 +7,7 @@ import {
   ButtonComponent,
   CheckboxComponent,
   DropdownMenuComponent,
+  InputComponent,
   ModalDataType,
   ModalService,
   ModalSize,
@@ -38,37 +32,21 @@ import {
 @Component({
   selector: 'app-features-list',
   template: `
-    <div>
+    <div class="flex flex-col gap-4">
+      <header class="flex justify-between gap-4">
+        <ui-input
+          class="w-96 block"
+          prefixIcon="search-line"
+          placeholder="Search by key"
+        ></ui-input>
+      </header>
       <ui-table
         class="h-full min-h-0 block"
         [columns]="this.columns"
-        [data]="this.dataSource"
+        [data]="this.dataFetcher"
         [pageable]="true"
       ></ui-table>
     </div>
-
-    <ng-template #toggleFeatureValueTemplate let-feature>
-      <div class="text-gray-500">
-        <div>
-          <span class="text-gray-800 font-medium">
-            {{ feature?.key }}
-          </span>
-          will be
-          <span
-            class="font-medium"
-            [class.text-red-500]="feature?.value"
-            [class.text-green-600]="!feature?.value"
-          >
-            {{ feature?.value ? 'Disabled' : 'Enabled' }}
-          </span>
-          for
-          <span class="text-gray-800 font-medium">
-            {{ (this.activeEnvironment$ | async)?.name }}
-          </span>
-          environment.
-        </div>
-      </div>
-    </ng-template>
   `,
   styles: `
     .list-item {
@@ -88,6 +66,7 @@ import {
     ButtonComponent,
     TimeAgoPipe,
     TableComponent,
+    InputComponent,
   ],
 })
 export class FeaturesListComponent {
@@ -144,19 +123,7 @@ export class FeaturesListComponent {
       ] as ActionCellTemplateContext[],
     },
   ];
-  protected readonly dataSource: TableDataFetcher<Feature>;
-
-  public readonly toggleFeatureValueTemplate: Signal<
-    TemplateRef<{
-      $implicit: Feature;
-    }>
-  > = viewChild.required<
-    TemplateRef<{
-      $implicit: Feature;
-    }>
-  >('toggleFeatureValueTemplate');
-
-  readonly activeEnvironment$ = inject(EnvironmentsService).activeEnvironment$;
+  protected readonly dataFetcher: TableDataFetcher<Feature>;
 
   readonly #sheetService = inject(SheetService);
   readonly #featuresService = inject(FeatureService);
@@ -164,7 +131,7 @@ export class FeaturesListComponent {
   readonly #toast = inject(HotToastService);
 
   constructor() {
-    this.dataSource = ({ sort }) => {
+    this.dataFetcher = ({ sort }) => {
       return this.#featuresService.getFeatures({
         sort: {
           key: sort?.column?.id as FeatureSortBy,
