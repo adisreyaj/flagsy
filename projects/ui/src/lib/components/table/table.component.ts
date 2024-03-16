@@ -58,7 +58,8 @@ export enum TableSortDirection {
       <div
         class="relative border border-gray-200 rounded-xl overflow-hidden"
         [class.min-h-[200px]]="
-          !this.dataFetched() && (this.isLoading() || this.isEmpty())
+          (!this.dataFetched() && (this.isLoading() || this.isEmpty())) ||
+          (this.dataFetched() && this.isEmpty())
         "
       >
         @if (this.isLoading()) {

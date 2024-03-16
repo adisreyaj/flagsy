@@ -3,6 +3,9 @@ import {
   Component,
   inject,
   Input,
+  input,
+  numberAttribute,
+  output,
   signal,
 } from '@angular/core';
 import {
@@ -22,7 +25,7 @@ import { FormFieldComponent } from '../form-field/form-field.component';
       class="flex gap-2 items-center relative group h-[42px]"
       [class.disabled]="this.isDisabled()"
     >
-      @if (this.prefixIcon; as prefixIcon) {
+      @if (this.prefixIcon(); as prefixIcon) {
         <div class="absolute h-full top-0 left-3 flex items-center z-10">
           <rmx-icon
             class="icon text-gray-500"
@@ -36,9 +39,9 @@ import { FormFieldComponent } from '../form-field/form-field.component';
         [class.pl-10]="this.prefixIcon"
         [class.form-field-input]="this.isWithinFormField"
         [class.error]="this.hasError"
-        [type]="this.type"
+        [type]="this.type()"
         [disabled]="this.isDisabled()"
-        [placeholder]="this.placeholder"
+        [placeholder]="this.placeholder()"
         [ngModel]="this.value()"
         (ngModelChange)="this.updateValue($event)"
         [spellcheck]="false"
@@ -90,17 +93,17 @@ import { FormFieldComponent } from '../form-field/form-field.component';
   ],
 })
 export class InputComponent implements ControlValueAccessor {
-  @Input()
-  public type: string = 'text';
+  public type = input<string>('text');
 
-  @Input()
-  public placeholder: string = '';
+  public placeholder = input<string>('');
 
-  @Input()
-  public prefixIcon?: IconName;
+  public prefixIcon = input<IconName | undefined>();
 
-  @Input()
-  public debounceTime: number = 0;
+  public debounceTime = input<number, string | number>(400, {
+    transform: numberAttribute,
+  });
+
+  public inputChange = output<string>();
 
   @Input({ transform: booleanAttribute })
   public set disabled(isDisabled: boolean) {
@@ -150,6 +153,7 @@ export class InputComponent implements ControlValueAccessor {
     return debounce(() => {
       this.propagateValueChange?.(value);
       this.propagateTouch?.();
-    }, this.debounceTime);
+      this.inputChange.emit(value);
+    }, this.debounceTime());
   }
 }

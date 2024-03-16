@@ -50,6 +50,7 @@ export class FeatureService {
             projectId: activeProject.id,
             environmentId: activeEnvironment.id,
             ...QueryParamUtil.buildSortParam(args?.sort),
+            ...QueryParamUtil.buildSearchParam(args?.search),
           },
           withCredentials: true,
         }),

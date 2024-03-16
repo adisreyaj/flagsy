@@ -18,7 +18,8 @@ import {
   TableDefaultCellType,
   ToggleComponent,
 } from '@ui/components';
-import { filter, switchMap } from 'rxjs';
+import { isEmpty } from 'lodash-es';
+import { BehaviorSubject, filter, map, switchMap } from 'rxjs';
 import { SheetSize } from '../../../../projects/ui/src/lib/components/sheet/sheet.type';
 import { ActionCellTemplateContext } from '../../../../projects/ui/src/lib/components/table/cell-templates/actions-cell-template.component';
 import { TimeAgoPipe } from '../../../../projects/ui/src/lib/pipes';
@@ -38,10 +39,13 @@ import {
           class="w-96 block"
           prefixIcon="search-line"
           placeholder="Search by key"
+          debounceTime="700"
+          (inputChange)="this.search($event)"
         ></ui-input>
       </header>
       <ui-table
         class="h-full min-h-0 block"
+        [externalTriggers]="this.externalTriggers"
         [columns]="this.columns"
         [data]="this.dataFetcher"
         [pageable]="true"
@@ -123,20 +127,34 @@ export class FeaturesListComponent {
       ] as ActionCellTemplateContext[],
     },
   ];
-  protected readonly dataFetcher: TableDataFetcher<Feature>;
+  protected readonly dataFetcher: TableDataFetcher<
+    Feature,
+    FeatureTableExternalTriggers
+  >;
+  readonly #searchSubject = new BehaviorSubject<string>('');
 
   readonly #sheetService = inject(SheetService);
   readonly #featuresService = inject(FeatureService);
   readonly #modalService = inject(ModalService);
   readonly #toast = inject(HotToastService);
+  public externalTriggers = {
+    search: this.#searchSubject.asObservable().pipe(
+      map((searchText) => {
+        return !isEmpty(searchText)
+          ? searchText?.trim()?.toLowerCase()
+          : undefined;
+      }),
+    ),
+  };
 
   constructor() {
-    this.dataFetcher = ({ sort }) => {
+    this.dataFetcher = ({ sort, externalTriggers }) => {
       return this.#featuresService.getFeatures({
         sort: {
           key: sort?.column?.id as FeatureSortBy,
           direction: sort?.direction,
         },
+        search: externalTriggers?.search,
       });
     };
   }
@@ -176,4 +194,12 @@ export class FeaturesListComponent {
       )
       .subscribe();
   }
+
+  public search(searchText: string): void {
+    this.#searchSubject.next(searchText);
+  }
+}
+
+interface FeatureTableExternalTriggers {
+  search?: string;
 }

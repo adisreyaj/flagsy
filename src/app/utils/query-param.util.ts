@@ -15,6 +15,16 @@ export abstract class QueryParamUtil {
     return {};
   };
 
+  static buildSearchParam = (search?: string): Record<string, string> => {
+    if (search) {
+      return {
+        search,
+      };
+    }
+
+    return {};
+  };
+
   static buildPaginationParam = (pagination?: {
     offset: number;
     limit: number;
