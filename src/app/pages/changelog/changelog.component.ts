@@ -9,15 +9,18 @@ import {
 import { UserMeta } from '@app/types/user.type';
 import {
   FilterBarComponent,
+  FilterWithSelection,
   TableColumnConfig,
   TableComponent,
   TableDataFetcher,
   TableDefaultCellType,
 } from '@ui/components';
 import { Filter } from '@ui/types';
-import { map } from 'rxjs';
+import { lowerCase, startCase } from 'lodash-es';
+import { BehaviorSubject, map } from 'rxjs';
 import { FeatureChangeCellTemplateComponent } from '../../shared/components/feature-change-cell-template/feature-change-cell-template.component';
 import { PageHeaderComponent } from '../../shared/components/header/page-header.component';
+import { FilterUtil } from '../../utils/filter.util';
 
 @Component({
   selector: `app-changelog`,
@@ -27,11 +30,15 @@ import { PageHeaderComponent } from '../../shared/components/header/page-header.
 
       <section class="flex-1 flex flex-col p-4 gap-4">
         <header class="">
-          <ui-filter-bar [filters]="this.filters"></ui-filter-bar>
+          <ui-filter-bar
+            [filters]="this.filters"
+            (filterChange)="this.updateTable($event)"
+          ></ui-filter-bar>
         </header>
         <div class=" flex-1">
           <ui-table
             class="h-full min-h-0 block"
+            [externalTriggers]="this.externalTriggers"
             [columns]="this.columns"
             [data]="this.dataFetcher"
             [pageable]="true"
@@ -64,41 +71,60 @@ export class ChangelogComponent {
       id: 'change',
       label: 'Change',
       width: 35,
+      minWidthInPx: 200,
       content: FeatureChangeCellTemplateComponent,
     },
     {
       id: 'owner',
       label: 'User',
       width: 15,
+      minWidthInPx: 150,
       type: TableDefaultCellType.User,
     },
     {
       id: 'date',
       label: 'Date',
       width: 15,
+      minWidthInPx: 200,
       sortable: true,
       sortDirection: 'desc',
       type: TableDefaultCellType.Date,
     },
   ];
-  protected readonly dataFetcher: TableDataFetcher<FeatureChangelogTableData>;
+  protected readonly dataFetcher: TableDataFetcher<
+    FeatureChangelogTableData,
+    ChangelogTableExternalTriggers
+  >;
+
+  protected filtersSubject = new BehaviorSubject<FilterWithSelection[]>([]);
+  protected externalTriggers = {
+    filters: this.filtersSubject.asObservable(),
+  };
 
   readonly #environmentService = inject(EnvironmentsService);
   readonly #changelogService = inject(ChangelogService);
   constructor() {
     this.filters = [
       {
-        field: 'Environment',
+        field: 'environment',
         label: 'Environment',
         values: this.#environmentService.environments().map((env) => ({
           value: env.id,
           label: env.name,
         })),
       },
+
+      {
+        field: 'type',
+        label: 'Type',
+        values: Object.values(FeatureChangeLogType).map((type) => ({
+          value: type,
+          label: startCase(lowerCase(type)),
+        })),
+      },
     ];
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.dataFetcher = ({ sort, pagination }) => {
+    this.dataFetcher = ({ sort, pagination, externalTriggers }) => {
       return this.#changelogService
         .getChangelogs({
           sort: {
@@ -106,6 +132,7 @@ export class ChangelogComponent {
             direction: sort?.direction,
           },
           pagination,
+          filters: FilterUtil.convertToFlatFilter(externalTriggers?.filters),
         })
         .pipe(
           map((res) => {
@@ -127,6 +154,10 @@ export class ChangelogComponent {
         );
     };
   }
+
+  public updateTable(filters: FilterWithSelection[]): void {
+    this.filtersSubject.next(filters ?? []);
+  }
 }
 
 export interface FeatureChangelogTableData {
@@ -137,3 +168,7 @@ export interface FeatureChangelogTableData {
   date: Date;
   type: FeatureChangeLogType;
 }
+
+type ChangelogTableExternalTriggers = {
+  filters: FilterWithSelection[];
+};

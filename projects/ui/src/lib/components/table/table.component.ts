@@ -14,7 +14,8 @@ import { NgIf } from '@angular/common';
 import { Component, computed, input, OnInit, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { AngularRemixIconComponent } from 'angular-remix-icon';
-import { isString } from 'lodash-es';
+import { isEmpty, isString } from 'lodash-es';
+import { combineLatest, filter, Observable, switchMap } from 'rxjs';
 import {
   PageChangeEvent,
   PaginatorComponent,
@@ -37,10 +38,12 @@ export enum TableSortDirection {
 @Component({
   selector: 'ui-table',
   template: `
-    <div class="flex flex-col">
+    <div class="flex flex-col gap-2">
       <div
         class="relative border border-gray-200 rounded-xl overflow-hidden"
-        [class.min-h-[200px]]="this.isLoading() || this.isEmpty()"
+        [class.min-h-[200px]]="
+          !this.dataFetched() && (this.isLoading() || this.isEmpty())
+        "
       >
         @if (this.isLoading()) {
           <div
@@ -122,8 +125,8 @@ export enum TableSortDirection {
         <div class="py-2">
           <ui-paginator
             [totalCount]="this.totalCount()"
-            [initialPageIndex]="this.initialPageIndex()"
-            [initialPageLimit]="this.initialPageLimit()"
+            [initialPageIndex]="this.activePageIndex()"
+            [initialPageLimit]="this.activePageLimit()"
             [availablePageLimits]="this.availablePageLimits()"
             (pageChange)="this.pageChange($event)"
           ></ui-paginator>
@@ -166,12 +169,20 @@ export enum TableSortDirection {
 })
 export class TableComponent implements OnInit {
   columns = input.required<TableColumnConfig[]>();
-  data = input.required<TableDataFetcher<unknown>>();
+  data = input.required<TableDataFetcher>();
 
+  // Pagination
   pageable = input<boolean>(false);
   initialPageIndex = input<number>(0);
   initialPageLimit = input<number>(10);
   availablePageLimits = input<number[]>([10, 25, 50, 100]);
+
+  // External Triggers
+  externalTriggers = input<Record<string, Observable<unknown>>>();
+
+  // Pagination state is managed by the table itself
+  activePageIndex = signal<number>(0);
+  activePageLimit = signal<number>(this.availablePageLimits()[0]);
 
   protected sortState = signal<TableSortState | undefined>(undefined);
   protected paginationState = signal<TablePaginationState>({
@@ -185,6 +196,7 @@ export class TableComponent implements OnInit {
       this.data(),
       hasSortableColumn ? this.#sortState$ : undefined,
       this.pageable() ? this.#paginationState$ : undefined,
+      this.#externalTriggers$,
     );
   });
 
@@ -199,6 +211,7 @@ export class TableComponent implements OnInit {
 
   protected isLoading = computed(() => this.dataSource().isLoading());
   protected isEmpty = computed(() => this.dataSource().isEmpty());
+  protected dataFetched = computed(() => this.dataSource().dataFetched());
 
   protected rowGridStyles = computed(() => {
     return this.columns()
@@ -210,7 +223,7 @@ export class TableComponent implements OnInit {
               ? col.width
               : col.minWidthInPx
                 ? `minmax(${col.minWidthInPx}px, ${col.width}%)`
-                : `minmax(auto, ${col.width}%)`,
+                : `${col.width}%`,
           ];
         }
         return [...acc, '1fr'];
@@ -224,8 +237,13 @@ export class TableComponent implements OnInit {
 
   #sortState$ = toObservable(this.sortState);
   #paginationState$ = toObservable(this.paginationState);
-
-  constructor() {}
+  #externalTriggers$ = toObservable(this.externalTriggers).pipe(
+    filter(
+      (triggers): triggers is Record<string, Observable<unknown>> =>
+        !isEmpty(triggers),
+    ),
+    switchMap((triggers) => combineLatest(triggers)),
+  );
 
   ngOnInit() {
     const colWithDefaultSortApplied = this.columns().find(
@@ -257,6 +275,8 @@ export class TableComponent implements OnInit {
       offset: event.offset,
       limit: event.limit,
     });
+    this.activePageIndex.set(event.index);
+    this.activePageLimit.set(event.limit);
   }
 
   private getNextSortDirection(

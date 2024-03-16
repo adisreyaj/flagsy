@@ -18,8 +18,10 @@ import {
 
 export class TableDataSource<DataType = unknown> extends DataSource<DataType> {
   protected dataFetcher: TableDataFetcher<DataType>;
+
   protected sortChange$;
   protected pageChange$;
+  protected externalTriggers$;
 
   readonly #isLoadingSignal = signal<boolean>(false);
   readonly isLoading = this.#isLoadingSignal.asReadonly();
@@ -30,29 +32,41 @@ export class TableDataSource<DataType = unknown> extends DataSource<DataType> {
   readonly #totalCountSignal = signal<number>(0);
   readonly totalCount = this.#totalCountSignal.asReadonly();
 
+  readonly #dataFetchedSignal = signal<boolean>(false);
+  readonly dataFetched = this.#dataFetchedSignal.asReadonly();
+
   readonly #subs = new Subscription();
 
   constructor(
     dataFetcher: TableDataFetcher<DataType>,
     sortChange?: Observable<TableSortState | undefined>,
     pageChange?: Observable<TablePaginationState | undefined>,
+    externalTriggers?: Observable<Record<string, unknown>>,
   ) {
     super();
     this.dataFetcher = dataFetcher;
     this.sortChange$ = sortChange ?? of(undefined);
     this.pageChange$ = pageChange ?? of(undefined);
+    this.externalTriggers$ = externalTriggers ?? of(undefined);
   }
 
   connect() {
-    return combineLatest([this.sortChange$, this.pageChange$]).pipe(
+    return combineLatest([
+      this.sortChange$,
+      this.pageChange$,
+      this.externalTriggers$,
+    ]).pipe(
       tap({
         next: () => {
           this.#isLoadingSignal.set(true);
         },
       }),
-      switchMap(([sort, pagination]) => this.dataFetcher({ sort, pagination })),
+      switchMap(([sort, pagination, externalTriggers]) =>
+        this.dataFetcher({ sort, pagination, externalTriggers }),
+      ),
       tap({
         next: (res) => {
+          this.#dataFetchedSignal.set(true);
           this.#isLoadingSignal.set(false);
           this.#totalCountSignal.set(res.total);
         },

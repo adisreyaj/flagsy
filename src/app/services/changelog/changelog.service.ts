@@ -5,6 +5,7 @@ import {
   FeatureChangelogSortKey,
 } from '@app/types/changelog.type';
 import { Pagination, SortBy } from '@app/types/common.type';
+import { FlatFilter } from '@ui/types';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { QueryParamUtil } from '../../utils/query-param.util';
@@ -18,6 +19,7 @@ export class ChangelogService {
   getChangelogs(args?: {
     sort?: SortBy<FeatureChangelogSortKey>;
     pagination?: Pagination;
+    filters?: FlatFilter;
   }): Observable<FeatureChangelogResponse> {
     return this.#http.get<FeatureChangelogResponse>(
       `${environment.api}/changelog`,
@@ -25,6 +27,7 @@ export class ChangelogService {
         params: {
           ...QueryParamUtil.buildSortParam(args?.sort),
           ...QueryParamUtil.buildPaginationParam(args?.pagination),
+          ...QueryParamUtil.buildFilterParam(args?.filters),
         },
         withCredentials: true,
       },

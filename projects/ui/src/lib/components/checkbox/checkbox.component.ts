@@ -2,8 +2,10 @@ import {
   booleanAttribute,
   Component,
   ElementRef,
+  EventEmitter,
   HostBinding,
   Input,
+  Output,
   signal,
   viewChild,
 } from '@angular/core';
@@ -46,6 +48,14 @@ export class CheckboxComponent implements ControlValueAccessor {
   label: string = '';
 
   @Input({ transform: booleanAttribute })
+  public set checked(isChecked: boolean) {
+    this.value.set(isChecked);
+  }
+
+  @Output()
+  public readonly checkedChange = new EventEmitter<boolean>();
+
+  @Input({ transform: booleanAttribute })
   public set disabled(isDisabled: boolean) {
     this.isDisabled.set(isDisabled);
   }
@@ -81,6 +91,7 @@ export class CheckboxComponent implements ControlValueAccessor {
 
   updateValue(value: boolean): void {
     this.value.set(value);
+    this.checkedChange.emit(value);
     this.propagateValueChange?.(value);
     this.propagateTouch?.();
   }

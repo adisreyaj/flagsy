@@ -70,6 +70,10 @@ export class DropdownComponent {
       this.toggleVisibility();
     }
   }
+
+  public close() {
+    this.isOpen.set(false);
+  }
 }
 
 @Directive({

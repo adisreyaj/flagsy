@@ -38,9 +38,11 @@ export interface TablePaginationState {
   limit: number;
 }
 
-export type TableDataFetcher<TableData> = (req: {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type TableDataFetcher<TableData = any, Triggers = any> = (req: {
   sort?: TableSortState;
   pagination?: TablePaginationState;
+  externalTriggers?: Triggers;
 }) => Observable<{
   data: TableData[];
   total: number;

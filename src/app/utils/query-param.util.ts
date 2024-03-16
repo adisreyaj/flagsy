@@ -1,4 +1,7 @@
 import { SortBy } from '@app/types/common.type';
+import { FlatFilter } from '@ui/types';
+import { isEmpty } from 'lodash-es';
+import qs from 'query-string';
 
 export abstract class QueryParamUtil {
   static buildSortParam = (sort?: SortBy): Record<string, string> => {
@@ -24,5 +27,18 @@ export abstract class QueryParamUtil {
     }
 
     return {};
+  };
+
+  static buildFilterParam = (filters?: FlatFilter): { filter?: string } => {
+    if (isEmpty(filters)) {
+      return {};
+    }
+    return {
+      filter: qs.stringify(filters, {
+        arrayFormat: 'separator',
+        encode: true,
+        arrayFormatSeparator: ':',
+      }),
+    };
   };
 }

@@ -20,3 +20,5 @@ export interface FilterValueGetArgs {
   sortOrder: string;
   limit: number;
 }
+
+export type FlatFilter = Record<string, string[]>;

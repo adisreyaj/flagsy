@@ -12,10 +12,7 @@ import { AngularRemixIconComponent } from 'angular-remix-icon';
 import { SelectOption } from '../../../../../../src/app/shared/components/select.type';
 import { SimpleChangesTyped } from '../../types/common';
 import { ButtonComponent } from '../button/button.component';
-import {
-  DropdownMenuComponent,
-  DropdownMenuOption,
-} from '../dropdown-menu/dropdown-menu.component';
+import { DropdownMenuComponent } from '../dropdown-menu/dropdown-menu.component';
 import { SelectComponent, SelectOptionComponent } from '../select';
 
 @Component({
@@ -38,27 +35,30 @@ import { SelectComponent, SelectOptionComponent } from '../select';
 
       <div>
         <div class="flex items-center gap-2">
-          <ui-select>
-            @for (
-              option of this.availablePageLimitsSelectOptions();
-              track option.value
-            ) {
-              <ui-select-option
-                [label]="option.label"
-                [value]="option.value"
-              ></ui-select-option>
-            }
-          </ui-select>
+          <div class="flex gap-2 items-center text-sm">
+            <p>Items per page:</p>
+            <ui-select>
+              @for (
+                option of this.availablePageLimitsSelectOptions();
+                track option.value
+              ) {
+                <ui-select-option
+                  [label]="option.label"
+                  [value]="option.value"
+                ></ui-select-option>
+              }
+            </ui-select>
+          </div>
           <ui-button
             [disabled]="this.activePageIndex() === 0"
-            (click)="this.updateActivePageIndex(this.activePageIndex() - 1)"
+            (click)="this.goToPrevPage()"
             variant="primary"
             prefixIcon="arrow-left-s-line"
           >
           </ui-button>
           <ui-button
             [disabled]="this.endPos() >= this.totalCount()"
-            (click)="this.updateActivePageIndex(this.activePageIndex() + 1)"
+            (click)="this.goToNextPage()"
             variant="primary"
             prefixIcon="arrow-right-s-line"
           >
@@ -112,19 +112,32 @@ export class PaginatorComponent implements OnChanges {
       Pick<this, 'initialPageIndex' | 'initialPageLimit'>
     >,
   ): void {
-    if (changes.initialPageIndex)
+    if (
+      changes.initialPageIndex &&
+      changes.initialPageIndex.currentValue !==
+        changes.initialPageIndex.previousValue
+    ) {
       this.activePageIndex.set(this.initialPageIndex());
-    if (changes.initialPageLimit)
+    }
+
+    if (
+      changes.initialPageLimit &&
+      changes.initialPageLimit.currentValue !==
+        changes.initialPageLimit.previousValue
+    ) {
       this.activePageLimit.set(this.initialPageLimit());
+    }
   }
 
-  protected updateActivePageLimit = (option: DropdownMenuOption<unknown>) => {
-    this.activePageLimit.set(
-      (option.value as number) ?? this.availablePageLimits()[0],
-    );
-    this.activePageIndex.set(0);
-    this.notifyPageChange();
-  };
+  public goToPrevPage(): void {
+    if (this.activePageIndex() > 0)
+      this.updateActivePageIndex(this.activePageIndex() - 1);
+  }
+
+  public goToNextPage(): void {
+    if (this.endPos() < this.totalCount())
+      this.updateActivePageIndex(this.activePageIndex() + 1);
+  }
 
   public updateActivePageIndex(number: number): void {
     this.activePageIndex.set(number);
@@ -133,6 +146,7 @@ export class PaginatorComponent implements OnChanges {
 
   private notifyPageChange(): void {
     this.pageChange.emit({
+      index: this.activePageIndex(),
       limit: this.activePageLimit(),
       offset: this.activePageIndex() * this.activePageLimit(),
     });
@@ -142,4 +156,5 @@ export class PaginatorComponent implements OnChanges {
 export interface PageChangeEvent {
   limit: number;
   offset: number;
+  index: number;
 }
