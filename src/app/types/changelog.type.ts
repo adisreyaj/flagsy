@@ -1,3 +1,4 @@
+import { DataWithTotal } from './common.type';
 import { Environment } from './environment.type';
 import { Feature } from './feature.type';
 import { UserMeta } from './user.type';
@@ -13,10 +14,7 @@ export enum FeatureChangeLogType {
   Delete = 'DELETE',
 }
 
-export interface FeatureChangelogResponse {
-  data: FeatureChangelog[];
-  total: number;
-}
+export type FeatureChangelogResponse = DataWithTotal<FeatureChangelog>;
 
 export interface FeatureChangelog {
   feature: Pick<Feature, 'key' | 'id'>;

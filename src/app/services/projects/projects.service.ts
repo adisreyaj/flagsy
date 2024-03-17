@@ -8,7 +8,7 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { isNotUndefined } from '@app/types/common.type';
+import { DataWithTotal, isNotUndefined } from '@app/types/common.type';
 import { Project, ProjectCreateInput } from '@app/types/project.type';
 import {
   BehaviorSubject,
@@ -55,14 +55,14 @@ export class ProjectsService {
   constructor() {
     this.getAllProjects()
       .pipe(
-        tap((projects) => {
-          this.projects.set(projects);
+        tap((res) => {
+          this.projects.set(res.data);
           const savedProjectId = this.#preferenceService.getActiveProjectId();
           const savedProject = this.projects().find(
             (proj) => proj.id === savedProjectId,
           );
           if (!this.#activeProjectSubject.value) {
-            this.setActiveProject(savedProject?.id ?? projects?.[0]?.id);
+            this.setActiveProject(savedProject?.id ?? res.data?.[0]?.id);
           }
         }),
       )
@@ -72,7 +72,7 @@ export class ProjectsService {
   getAllProjects = () => {
     return this.refresh$.pipe(
       switchMap(() =>
-        this.http.get<Project[]>(`${environment.api}/projects`, {
+        this.http.get<DataWithTotal<Project>>(`${environment.api}/projects`, {
           withCredentials: true,
         }),
       ),

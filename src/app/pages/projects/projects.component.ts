@@ -1,9 +1,18 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ProjectsService } from '@app/services/projects/projects.service';
-import { ButtonComponent, InputComponent, SheetService } from '@ui/components';
+import { Project } from '@app/types/project.type';
+import {
+  ButtonComponent,
+  InputComponent,
+  SheetService,
+  TableColumnConfig,
+  TableComponent,
+  TableDataFetcher,
+  TableDefaultCellType,
+} from '@ui/components';
 import { SheetSize } from '../../../../projects/ui/src/lib/components/sheet/sheet.type';
 import { EnvironmentSelectorComponent } from '../../shared/components/environment-selector/environment-selector.component';
 import { PageHeaderComponent } from '../../shared/components/header/page-header.component';
@@ -23,17 +32,12 @@ import { ProjectConfigSheetComponent } from '../../shared/components/project-con
         </div>
       </app-page-header>
       <section class="page-content">
-        <ul class="flex gap-4">
-          @for (project of this.projects | async; track project.id) {
-            <li
-              class="flex p-4 rounded-xl border border-gray-300 cursor-pointer"
-            >
-              <a>
-                {{ project.name }}
-              </a>
-            </li>
-          }
-        </ul>
+        <ui-table
+          class="h-full min-h-0 block"
+          [columns]="this.columns"
+          [data]="this.dataFetcher"
+          [pageable]="true"
+        ></ui-table>
       </section>
     </div>
   `,
@@ -46,17 +50,52 @@ import { ProjectConfigSheetComponent } from '../../shared/components/project-con
     InputComponent,
     AsyncPipe,
     EnvironmentSelectorComponent,
+    TableComponent,
   ],
 })
 export class ProjectsComponent {
-  protected readonly projects;
-  protected readonly searchText = signal('');
-
+  protected readonly columns: TableColumnConfig[] = [
+    {
+      id: 'name',
+      label: 'Project',
+      sortable: true,
+      type: TableDefaultCellType.TextWithCopy,
+    },
+    {
+      id: 'count.features',
+      label: 'Features #',
+      width: 15,
+      minWidthInPx: 150,
+      type: TableDefaultCellType.Text,
+    },
+    {
+      id: 'count.environments',
+      label: 'Environments #',
+      width: 15,
+      minWidthInPx: 150,
+      type: TableDefaultCellType.Text,
+    },
+    {
+      id: 'owner',
+      label: 'User',
+      width: 15,
+      minWidthInPx: 150,
+      type: TableDefaultCellType.User,
+    },
+    {
+      id: 'createdAt',
+      label: 'Date',
+      width: '200px',
+      sortable: true,
+      sortDirection: 'desc',
+      type: TableDefaultCellType.Date,
+    },
+  ];
   private readonly sheetService = inject(SheetService);
   private readonly projectsService = inject(ProjectsService);
-
+  protected readonly dataFetcher: TableDataFetcher<Project>;
   constructor() {
-    this.projects = this.projectsService.getAllProjects();
+    this.dataFetcher = () => this.projectsService.getAllProjects();
   }
 
   public openProjectConfigSheet(): void {

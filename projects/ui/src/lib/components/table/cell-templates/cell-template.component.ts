@@ -1,4 +1,5 @@
 import {
+  computed,
   Directive,
   inject,
   Injector,
@@ -7,6 +8,7 @@ import {
   TemplateRef,
   ViewContainerRef,
 } from '@angular/core';
+import { get } from 'lodash-es';
 import { TableColumnConfig, TableDefaultCellType } from '../table.types';
 import { ActionsCellTemplateComponent } from './actions-cell-template.component';
 import { CELL_CONTEXT, CELL_DATA, ROW_DATA } from './cell.type';
@@ -23,9 +25,12 @@ export class CellTemplateDirective implements OnInit {
   column = input.required<TableColumnConfig>({
     alias: 'uiCellTemplate',
   });
-  data = input.required<unknown>();
 
-  rowData = input.required<unknown>();
+  rowData = input.required<Record<string, unknown>>();
+
+  data = computed(() => {
+    return get(this.rowData(), this.column().id);
+  });
 
   #vcr = inject(ViewContainerRef);
 

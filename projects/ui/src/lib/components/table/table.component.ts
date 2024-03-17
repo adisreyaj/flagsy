@@ -120,7 +120,6 @@ export enum TableSortDirection {
               <cdk-cell class="flex" *cdkCellDef="let rowData">
                 <ng-container
                   [uiCellTemplate]="column"
-                  [data]="rowData[column.id]"
                   [rowData]="rowData"
                 ></ng-container>
               </cdk-cell>

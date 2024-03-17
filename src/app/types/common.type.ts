@@ -14,3 +14,8 @@ export interface Pagination {
   offset: number;
   limit: number;
 }
+
+export interface DataWithTotal<DataType = unknown> {
+  data: DataType[];
+  total: number;
+}
