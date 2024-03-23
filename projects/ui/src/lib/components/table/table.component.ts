@@ -25,11 +25,13 @@ import { AngularRemixIconComponent } from 'angular-remix-icon';
 import { isEmpty } from 'lodash-es';
 import {
   combineLatest,
+  debounceTime,
   filter,
   fromEvent,
+  map,
   Observable,
+  startWith,
   switchMap,
-  throttleTime,
 } from 'rxjs';
 import {
   PageChangeEvent,
@@ -54,9 +56,9 @@ export enum TableSortDirection {
 @Component({
   selector: 'ui-table',
   template: `
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-2 h-full">
       <div
-        class="relative border border-gray-200 rounded-xl overflow-hidden"
+        class="relative border border-gray-200 rounded-xl overflow-auto"
         [class.min-h-[200px]]="
           (!this.dataFetched() && (this.isLoading() || this.isEmpty())) ||
           (this.dataFetched() && this.isEmpty())
@@ -79,15 +81,15 @@ export enum TableSortDirection {
           </div>
         }
         <cdk-table
-          class="flex flex-col overflow-auto w-full"
+          class="flex flex-col w-full"
           [dataSource]="this.dataSource()"
           #table
         >
-          @for (column of this.columns(); track column.id) {
+          @for (column of this.columns(); track column.id; let last = $last) {
             <ng-container [cdkColumnDef]="column.id">
               <cdk-header-cell
                 *cdkHeaderCellDef
-                class="flex px-2 py-1 bg-gray-100 border-b border-gray-200 justify-between items-center group"
+                class="flex px-2 py-1 bg-gray-100 border-b border-gray-200 justify-between items-center group sticky top-0"
                 [class.cursor-pointer]="column.sortable"
                 (click)="column.sortable && this.sort(column)"
               >
@@ -117,7 +119,10 @@ export enum TableSortDirection {
                   ></rmx-icon>
                 </div>
               </cdk-header-cell>
-              <cdk-cell class="flex" *cdkCellDef="let rowData">
+              <cdk-cell
+                class="flex border-b border-gray-200"
+                *cdkCellDef="let rowData"
+              >
                 <ng-container
                   [uiCellTemplate]="column"
                   [rowData]="rowData"
@@ -132,7 +137,7 @@ export enum TableSortDirection {
             *cdkHeaderRowDef="this.displayedColumns()"
           ></cdk-header-row>
           <cdk-row
-            class="grid w-full  h-[44px] border-b last-of-type:border-b-0"
+            class="grid w-full  h-[44px]"
             [style.grid-template-columns]="this.rowGridStyles()"
             *cdkRowDef="let row; columns: this.displayedColumns()"
           ></cdk-row>
@@ -161,6 +166,14 @@ export enum TableSortDirection {
       cdk-cell {
         &:not(:last-child) {
           @apply border-r border-gray-200;
+        }
+      }
+
+      cdk-row {
+        &:last-of-type {
+          cdk-cell {
+            @apply border-b-0;
+          }
         }
       }
     `,
@@ -233,10 +246,9 @@ export class TableComponent implements OnInit {
   protected dataFetched = computed(() => this.dataSource().dataFetched());
 
   protected rowGridStyles = computed(() => {
-    this.#resizeEventSignal(); // Trigger resize event to recalculate grid styles
     return TableUtil.getGridTemplateColumns(
       this.columns(),
-      this.tableElement().offsetWidth,
+      this.#tableWidth() ?? 0,
     );
   });
 
@@ -245,15 +257,23 @@ export class TableComponent implements OnInit {
   protected totalCount = computed(() => this.dataSource().totalCount() ?? 0);
 
   private tableElementRef = viewChild('table', { read: ElementRef });
-  private readonly tableElement = computed<HTMLDivElement>(
-    () => this.tableElementRef()?.nativeElement,
-  );
+  private readonly tableElement = computed<HTMLDivElement>(() => {
+    return this.tableElementRef()?.nativeElement;
+  });
 
-  #resizeEvent$ = fromEvent(window, 'resize').pipe(throttleTime(10));
-  #resizeEventSignal = toSignal(this.#resizeEvent$);
-  #sortState$ = toObservable(this.sortState);
-  #paginationState$ = toObservable(this.paginationState);
-  #externalTriggers$ = toObservable(this.externalTriggers).pipe(
+  readonly #tableWidthAndChanges$ = combineLatest([
+    toObservable(this.tableElement),
+    fromEvent(window, 'resize').pipe(startWith(undefined)),
+  ]).pipe(
+    debounceTime(10),
+    map(([tableElement]) => {
+      return tableElement.offsetWidth;
+    }),
+  );
+  readonly #tableWidth = toSignal(this.#tableWidthAndChanges$);
+  readonly #sortState$ = toObservable(this.sortState);
+  readonly #paginationState$ = toObservable(this.paginationState);
+  readonly #externalTriggers$ = toObservable(this.externalTriggers).pipe(
     filter(
       (triggers): triggers is Record<string, Observable<unknown>> =>
         !isEmpty(triggers),

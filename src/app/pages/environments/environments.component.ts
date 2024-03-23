@@ -55,7 +55,6 @@ import { HasFFAccessPipe } from '../../shared/pipes/has-ff-access.pipe';
               class="w-full"
               prefixIcon="search-line"
               placeholder="Search"
-              [debounceTime]="400"
               [ngModel]="this.searchText()"
               (ngModelChange)="this.search($event)"
             ></ui-input>

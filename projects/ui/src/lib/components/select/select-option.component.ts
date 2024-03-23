@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 
 @Component({
   selector: 'ui-select-option',
@@ -6,12 +6,9 @@ import { Component, Input } from '@angular/core';
   standalone: true,
 })
 export class SelectOptionComponent<ValueType = unknown> {
-  @Input({ required: true })
-  public value!: ValueType;
+  public value = input.required<ValueType>();
 
-  @Input({ required: true })
-  public label!: string;
+  public label = input.required<string>();
 
-  @Input()
-  public disabled: boolean = false;
+  public disabled = input<boolean>(false);
 }

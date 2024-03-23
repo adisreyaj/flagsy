@@ -10,7 +10,9 @@ import {
   booleanAttribute,
   Component,
   contentChildren,
+  input,
   Input,
+  output,
   signal,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -29,12 +31,12 @@ import { SelectOptionComponent } from './select-option.component';
       (cdkMenuClosed)="this.isOpen.set(false)"
     >
       <div class="flex items-center gap-2">
-        @if (this.prefixIcon) {
+        @if (this.prefixIcon()) {
           <div>
-            <rmx-icon class="!w-5 !h-5" [name]="this.prefixIcon"></rmx-icon>
+            <rmx-icon class="!w-5 !h-5" [name]="this.prefixIcon()!"></rmx-icon>
           </div>
         }
-        <div>{{ this.selectedItemLabel() ?? this.placeholder }}</div>
+        <div>{{ this.selectedItemLabel() ?? this.placeholder() }}</div>
       </div>
       <div>
         <rmx-icon
@@ -55,15 +57,16 @@ import { SelectOptionComponent } from './select-option.component';
             <button
               class="flex w-full items-center gap-2 justify-between cursor-pointer  px-4 pr-2 py-2 hover:bg-gray-100 rounded-md focus:ring-2 focus:ring-primary-500"
               cdkMenuItemRadio
-              [class.bg-gray-100]="this.selectedItemValue() === item.value"
-              [cdkMenuItemChecked]="this.selectedItemValue() === item.value"
+              [class.bg-gray-100]="this.selectedItemValue() === item.value()"
+              [cdkMenuItemChecked]="this.selectedItemValue() === item.value()"
               (cdkMenuItemTriggered)="this.selectItem(item)"
-              [cdkMenuItemDisabled]="item.disabled"
+              [cdkMenuItemDisabled]="item.disabled()"
+              (click)="this.selectionChange.emit(item.value())"
             >
               <div>
-                {{ item.label }}
+                {{ item.label() }}
               </div>
-              @if (this.selectedItemValue() === item.value) {
+              @if (this.selectedItemValue() === item.value()) {
                 <div>
                   <rmx-icon
                     class="!w-5 !h-5 text-primary-500"
@@ -94,7 +97,8 @@ import { SelectOptionComponent } from './select-option.component';
     },
   ],
 })
-export class SelectComponent<Value = unknown>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export class SelectComponent<Value = any>
   implements ControlValueAccessor, AfterContentInit
 {
   protected options = contentChildren<SelectOptionComponent<Value>>(
@@ -106,11 +110,11 @@ export class SelectComponent<Value = unknown>
     this.isDisabled.set(isDisabled);
   }
 
-  @Input()
-  public placeholder: string = 'Select';
+  public placeholder = input<string>('Select');
 
-  @Input()
-  public prefixIcon?: IconName;
+  public prefixIcon = input<IconName | undefined>();
+
+  public readonly selectionChange = output<Value>();
 
   protected isDisabled = signal(false);
   protected isOpen = signal(false);
@@ -122,13 +126,14 @@ export class SelectComponent<Value = unknown>
 
   public ngAfterContentInit(): void {
     if (this.selectedItemValue() === undefined) {
-      this.selectedItemValue.set(this.options()?.[0]?.value);
-      this.selectedItemLabel.set(this.options()?.[0]?.label);
+      this.selectedItemValue.set(this.options()?.[0]?.value());
+      this.selectedItemLabel.set(this.options()?.[0]?.label());
     } else {
       if (this.selectedItemLabel() === undefined) {
         this.selectedItemLabel.set(
-          this.options()?.find((o) => o.value === this.selectedItemValue())
-            ?.label,
+          this.options()
+            ?.find((o) => o.value() === this.selectedItemValue())
+            ?.label(),
         );
       }
     }
@@ -138,7 +143,9 @@ export class SelectComponent<Value = unknown>
     this.selectedItemValue.set(value);
     if (this.options) {
       this.selectedItemLabel.set(
-        this.options().find((o) => o.value === value)?.label,
+        this.options()
+          .find((o) => o.value() === value)
+          ?.label(),
       );
     }
   }
@@ -156,9 +163,9 @@ export class SelectComponent<Value = unknown>
   }
 
   public selectItem(option: SelectOptionComponent<Value>): void {
-    this.selectedItemValue.set(option.value);
-    this.selectedItemLabel.set(option.label);
-    this.propagateChange?.(option.value);
+    this.selectedItemValue.set(option.value());
+    this.selectedItemLabel.set(option.label());
+    this.propagateChange?.(option.value());
     this.propagateTouch?.();
   }
 }

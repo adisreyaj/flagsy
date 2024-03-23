@@ -13,6 +13,7 @@ import {
   TableDataFetcher,
   TableDefaultCellType,
 } from '@ui/components';
+import { take } from 'rxjs';
 import { SheetSize } from '../../../../projects/ui/src/lib/components/sheet/sheet.type';
 import { EnvironmentSelectorComponent } from '../../shared/components/environment-selector/environment-selector.component';
 import { PageHeaderComponent } from '../../shared/components/header/page-header.component';
@@ -95,7 +96,8 @@ export class ProjectsComponent {
   private readonly projectsService = inject(ProjectsService);
   protected readonly dataFetcher: TableDataFetcher<Project>;
   constructor() {
-    this.dataFetcher = () => this.projectsService.getAllProjects();
+    this.dataFetcher = () =>
+      this.projectsService.getAllProjects().pipe(take(1));
   }
 
   public openProjectConfigSheet(): void {

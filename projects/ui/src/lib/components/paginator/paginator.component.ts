@@ -17,7 +17,7 @@ import { SelectComponent, SelectOptionComponent } from '../select';
 
 @Component({
   selector: 'ui-paginator',
-  template: ` @if (this.totalCount() > this.activePageLimit()) {
+  template: ` @if (this.totalCount() > this.availablePageLimits()[0]) {
     <div class="flex items-center justify-between">
       <div>
         <span class="text-sm text-gray-500">
@@ -37,7 +37,7 @@ import { SelectComponent, SelectOptionComponent } from '../select';
         <div class="flex items-center gap-2">
           <div class="flex gap-2 items-center text-sm">
             <p>Items per page:</p>
-            <ui-select>
+            <ui-select (selectionChange)="this.updateActivePageLimit($event)">
               @for (
                 option of this.availablePageLimitsSelectOptions();
                 track option.value
@@ -141,6 +141,11 @@ export class PaginatorComponent implements OnChanges {
 
   public updateActivePageIndex(number: number): void {
     this.activePageIndex.set(number);
+    this.notifyPageChange();
+  }
+
+  public updateActivePageLimit(value: number): void {
+    this.activePageLimit.set(value);
     this.notifyPageChange();
   }
 

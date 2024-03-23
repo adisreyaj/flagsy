@@ -19,7 +19,7 @@ import {
   ToggleComponent,
 } from '@ui/components';
 import { isEmpty } from 'lodash-es';
-import { BehaviorSubject, filter, map, switchMap } from 'rxjs';
+import { BehaviorSubject, filter, map, switchMap, take } from 'rxjs';
 import { SheetSize } from '../../../../projects/ui/src/lib/components/sheet/sheet.type';
 import { ActionCellTemplateContext } from '../../../../projects/ui/src/lib/components/table/cell-templates/actions-cell-template.component';
 import { TimeAgoPipe } from '../../../../projects/ui/src/lib/pipes';
@@ -39,7 +39,6 @@ import {
           class="w-96 block"
           prefixIcon="search-line"
           placeholder="Search by key"
-          debounceTime="700"
           (inputChange)="this.search($event)"
         ></ui-input>
       </header>
@@ -149,13 +148,15 @@ export class FeaturesListComponent {
 
   constructor() {
     this.dataFetcher = ({ sort, externalTriggers }) => {
-      return this.#featuresService.getFeatures({
-        sort: {
-          key: sort?.column?.id as FeatureSortBy,
-          direction: sort?.direction,
-        },
-        search: externalTriggers?.search,
-      });
+      return this.#featuresService
+        .getFeatures({
+          sort: {
+            key: sort?.column?.id as FeatureSortBy,
+            direction: sort?.direction,
+          },
+          search: externalTriggers?.search,
+        })
+        .pipe(take(1));
     };
   }
 

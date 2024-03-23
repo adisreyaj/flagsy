@@ -144,7 +144,9 @@ export class LoginComponent {
           },
           error: (err) => {
             const errorMessage =
-              err instanceof HttpErrorResponse ? err.statusText : err.message;
+              err instanceof HttpErrorResponse
+                ? err.error.message
+                : err.message;
             this.#toast.error(errorMessage);
           },
         });

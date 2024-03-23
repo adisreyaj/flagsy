@@ -4,7 +4,6 @@ import {
   inject,
   Input,
   input,
-  numberAttribute,
   output,
   signal,
 } from '@angular/core';
@@ -15,7 +14,6 @@ import {
 } from '@angular/forms';
 import { AngularRemixIconComponent } from 'angular-remix-icon';
 import { IconName } from 'angular-remix-icon/lib/icon-names';
-import { debounce } from 'lodash-es';
 import { FormFieldComponent } from '../form-field/form-field.component';
 
 @Component({
@@ -36,7 +34,7 @@ import { FormFieldComponent } from '../form-field/form-field.component';
       }
       <input
         class="absolute w-full py-2 px-4 block border border-gray-200 focus-visible-outline rounded-xl disabled:opacity-50 disabled:pointer-events-none transition-all duration-300"
-        [class.pl-10]="this.prefixIcon"
+        [class.pl-10]="this.prefixIcon() !== undefined"
         [class.form-field-input]="this.isWithinFormField"
         [class.error]="this.hasError"
         [type]="this.type()"
@@ -97,11 +95,7 @@ export class InputComponent implements ControlValueAccessor {
 
   public placeholder = input<string>('');
 
-  public prefixIcon = input<IconName | undefined>();
-
-  public debounceTime = input<number, string | number>(400, {
-    transform: numberAttribute,
-  });
+  public prefixIcon = input<IconName | undefined>(undefined);
 
   public inputChange = output<string>();
 
@@ -146,14 +140,12 @@ export class InputComponent implements ControlValueAccessor {
 
   public updateValue(value: string): void {
     this.value.set(value);
-    this.debouncedNotifyChange(value)();
+    this.notifyChange(value);
   }
 
-  private debouncedNotifyChange(value: string) {
-    return debounce(() => {
-      this.propagateValueChange?.(value);
-      this.propagateTouch?.();
-      this.inputChange.emit(value);
-    }, this.debounceTime());
+  private notifyChange(value: string) {
+    this.propagateValueChange?.(value);
+    this.propagateTouch?.();
+    this.inputChange.emit(value);
   }
 }

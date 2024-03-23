@@ -6,7 +6,7 @@ import { SidebarComponent } from './shared/components/sidebar/sidebar.component'
 @Component({
   selector: 'app-shell',
   template: `
-    <div class="shell flex bg-slate-100 min-h-screen">
+    <div class="shell flex bg-slate-100 h-screen">
       <aside class="aside p-2 pr-0">
         <app-sidebar
           [class.sidebar-open]="this.isSidebarOpen()"
