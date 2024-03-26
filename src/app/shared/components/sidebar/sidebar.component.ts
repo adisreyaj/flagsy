@@ -18,6 +18,7 @@ import {
   TooltipDirective,
 } from '@ui/components';
 import { AngularRemixIconComponent } from 'angular-remix-icon';
+import { isEmpty } from 'lodash-es';
 import { switchMap } from 'rxjs';
 import {
   NAVIGATION_DATA,
@@ -59,27 +60,6 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
       </header>
       <section class="p-4 flex-auto">
         <ul class="flex flex-col gap-4">
-          <li
-            [uiTooltip]="this.isSidebarOpen() ? undefined : 'Home'"
-            uiTooltipPosition="${PopoverPosition.RightCentered}"
-          >
-            <a
-              class="item focus-visible-outline"
-              [routerLink]="['/']"
-              routerLinkActive="active"
-              [routerLinkActiveOptions]="{ exact: true }"
-              ariaCurrentWhenActive="page"
-              #router="routerLinkActive"
-            >
-              <rmx-icon
-                class="icon"
-                [name]="router.isActive ? 'home-2-fill' : 'home-2-line'"
-              ></rmx-icon>
-              @if (this.isSidebarOpen()) {
-                <div @fadeSlideInOut>Home</div>
-              }
-            </a>
-          </li>
           @for (item of this.navigationEntriesEnriched; track item.path) {
             <li
               [uiTooltip]="this.isSidebarOpen() ? undefined : item.title"
@@ -89,7 +69,7 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
                 class="item focus-visible-outline"
                 routerLinkActive="active"
                 [routerLink]="item.route"
-                [routerLinkActiveOptions]="routerLinkActiveOptions"
+                [routerLinkActiveOptions]="item.routerLinkActiveOptions"
                 [attr.aria-label]="item.title"
                 ariaCurrentWhenActive="page"
                 #router="routerLinkActive"
@@ -228,8 +208,11 @@ export class SidebarComponent {
     this.navigationEntriesEnriched = NAVIGATION_DATA.map((item) => {
       return {
         ...item,
-        route: ['/', item.path],
+        route: ['/', ...(!isEmpty(item.path) ? [item.path] : [])],
         featureEnabled: this.#accessService.hasAccess(item.featureFlags),
+        routerLinkActiveOptions: {
+          exact: item.path === AppRoutes.Home,
+        },
       };
     }).filter((item) => item.featureEnabled);
   }
@@ -255,4 +238,5 @@ export class SidebarComponent {
 interface NavigationEntryEnriched extends NavigationEntry {
   featureEnabled: boolean;
   route: string[];
+  routerLinkActiveOptions: IsActiveMatchOptions | { exact: boolean };
 }

@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ProjectsService } from './services/projects/projects.service';
 import { SidebarService } from './services/sidebar/sidebar.service';
 import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
 
@@ -39,7 +40,12 @@ import { SidebarComponent } from './shared/components/sidebar/sidebar.component'
   imports: [RouterOutlet, SidebarComponent],
 })
 export class ShellComponent {
-  private readonly sidebarService = inject(SidebarService);
+  readonly #sidebarService = inject(SidebarService);
+  readonly #projectService = inject(ProjectsService);
 
-  protected readonly isSidebarOpen = this.sidebarService.isOpen;
+  protected readonly isSidebarOpen = this.#sidebarService.isOpen;
+
+  constructor() {
+    this.#projectService.init();
+  }
 }

@@ -15,9 +15,11 @@ import {
 } from '@ui/components';
 import { take } from 'rxjs';
 import { SheetSize } from '../../../../projects/ui/src/lib/components/sheet/sheet.type';
+import { Permissions } from '../../config/permission.config';
 import { EnvironmentSelectorComponent } from '../../shared/components/environment-selector/environment-selector.component';
 import { PageHeaderComponent } from '../../shared/components/header/page-header.component';
 import { ProjectConfigSheetComponent } from '../../shared/components/project-config-sheet/project-config-sheet.component';
+import { PermissionAccessDirective } from '../../shared/directives/persmission-access.directive';
 
 @Component({
   selector: 'app-projects',
@@ -26,6 +28,7 @@ import { ProjectConfigSheetComponent } from '../../shared/components/project-con
       <app-page-header>
         <div class="flex gap-2 items-center">
           <ui-button
+            *permissionAccess="this.projectsWriteScope"
             label="Create"
             trailingIcon="add-line"
             (click)="this.openProjectConfigSheet()"
@@ -52,6 +55,7 @@ import { ProjectConfigSheetComponent } from '../../shared/components/project-con
     AsyncPipe,
     EnvironmentSelectorComponent,
     TableComponent,
+    PermissionAccessDirective,
   ],
 })
 export class ProjectsComponent {
@@ -92,6 +96,9 @@ export class ProjectsComponent {
       type: TableDefaultCellType.Date,
     },
   ];
+
+  protected readonly projectsWriteScope: string[] = [Permissions.project.write];
+
   private readonly sheetService = inject(SheetService);
   private readonly projectsService = inject(ProjectsService);
   protected readonly dataFetcher: TableDataFetcher<Project>;

@@ -6,10 +6,8 @@ export abstract class TableUtil {
     columns: TableColumnConfig[],
     tableWidthInPx: number,
   ): string {
-    const widthsInPx: {
-      id: string;
-      widthInPx?: number;
-    }[] = [];
+    const widthsMap = new Map<string, string>();
+
     let availableTableWidthInPx = tableWidthInPx;
     const colWithDynamicWidth = columns.filter((col) => isNil(col.width));
 
@@ -17,38 +15,38 @@ export abstract class TableUtil {
       if (isString(col.width)) {
         const widthInPx = this.getNumberFromWidth(col.width);
         const widthOfCol = Math.max(widthInPx, col.minWidthInPx ?? 0);
-        widthsInPx.push({ widthInPx: widthOfCol, id: col.id });
+        widthsMap.set(col.id, col.width);
         availableTableWidthInPx -= widthOfCol;
       } else if (isNumber(col.width)) {
         const widthInPxForPercentage =
           (availableTableWidthInPx * col.width) / 100;
         const widthOfCol = Math.max(
           widthInPxForPercentage,
-          col.minWidthInPx ?? 0,
+          col.minWidthInPx ?? widthInPxForPercentage,
         );
-        widthsInPx.push({
-          widthInPx: widthOfCol,
-          id: col.id,
-        });
+        widthsMap.set(col.id, `${widthOfCol}px`);
         availableTableWidthInPx -= widthOfCol;
       } else {
-        widthsInPx.push({
-          id: col.id,
-        });
+        // Push the placeholder value to the map inorder to preserver the order of columns
+        widthsMap.set(col.id, 'auto');
       }
     });
 
+    // Preserve some space for scrollbar
+    const widthOfScrollbar = 16;
+    availableTableWidthInPx -= widthOfScrollbar;
+
     colWithDynamicWidth.forEach((col) => {
-      const minWidthInPx = col.minWidthInPx ?? 0;
       const resolvedWidth =
         availableTableWidthInPx / colWithDynamicWidth.length;
-      widthsInPx.find((colInPx) => colInPx.id === col.id)!.widthInPx = Math.max(
-        resolvedWidth,
-        minWidthInPx,
-      );
+      const minWidthLargest = Math.max(col.minWidthInPx ?? 0, resolvedWidth);
+
+      const minWidth = minWidthLargest > 0 ? `${minWidthLargest}px` : '0px';
+
+      widthsMap.set(col.id, `minmax(${minWidth}, auto)`);
     });
 
-    return widthsInPx.map((width) => `${width.widthInPx}px`).join(' ');
+    return Array.from(widthsMap.values()).join(' ');
   }
 
   private static getNumberFromWidth(px?: string | number): number {

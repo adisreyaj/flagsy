@@ -6,7 +6,7 @@ import { CELL_DATA } from './cell.type';
   selector: 'ui-date-cell-template',
   template: `
     <div class="flex items-center w-full h-full text-sm px-2">
-      <div class="line-clamp-1 min-w-0">
+      <div class="line-clamp-1 min-w-0 text-gray-700">
         {{ this.cellData | date: 'dd-MMM-yy hh:mm a' }}
       </div>
     </div>

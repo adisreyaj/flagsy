@@ -132,7 +132,7 @@ export enum TableSortDirection {
           }
 
           <cdk-header-row
-            class="grid text-sm font-semibold text-gray-500 h-10 w-full"
+            class="grid text-sm font-semibold text-gray-500 h-10 w-full sticky top-0"
             [style.grid-template-columns]="this.rowGridStyles()"
             *cdkHeaderRowDef="this.displayedColumns()"
           ></cdk-header-row>

@@ -4,11 +4,24 @@ import { AppRoutes } from './routes/app.routes';
 
 export const NAVIGATION_DATA: NavigationEntry[] = [
   {
+    path: AppRoutes.Home,
+    title: 'Home',
+    icon: 'home-2-line',
+    activeIcon: 'home-2-fill',
+  },
+  {
     path: AppRoutes.Orgs,
     title: 'Orgs',
     icon: 'building-2-line',
     activeIcon: 'building-2-fill',
     featureFlags: FeatureFlag.Orgs,
+  },
+  {
+    path: AppRoutes.Users,
+    title: 'Users',
+    icon: 'user-3-line',
+    activeIcon: 'user-3-fill',
+    featureFlags: FeatureFlag.Users,
   },
   {
     path: AppRoutes.Projects,
@@ -29,7 +42,7 @@ export const NAVIGATION_DATA: NavigationEntry[] = [
     activeIcon: 'flag-fill',
   },
   {
-    path: AppRoutes.ChangeLog,
+    path: AppRoutes.Changelog,
     title: 'Changelog',
     icon: 'lock-line',
     activeIcon: 'lock-fill',

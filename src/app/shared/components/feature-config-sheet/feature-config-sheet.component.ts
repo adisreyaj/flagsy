@@ -346,7 +346,6 @@ export class FeatureConfigSheetComponent implements OnDestroy {
 
       this.#environmentService.activeEnvironment$
         .pipe(
-          take(1),
           switchMap((environment) =>
             this.#featuresService.updateFeature(
               id,
@@ -358,6 +357,7 @@ export class FeatureConfigSheetComponent implements OnDestroy {
             success: () => 'Feature flag updated successfully!',
             error: () => 'Failed to update feature flag!',
           }),
+          take(1),
         )
         .subscribe({
           next: () => this.closeSheet(),

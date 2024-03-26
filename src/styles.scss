@@ -36,14 +36,16 @@ svg {
 
   input[type='number'] {
     -moz-appearance: textfield;
+    appearance: textfield;
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
       -webkit-appearance: none;
+      appearance: none;
       margin: 0;
     }
   }
   .page-content {
-    @apply p-4 overflow-y-auto min-h-0 flex-auto;
+    @apply p-4 min-h-0 flex-auto;
   }
 
 }

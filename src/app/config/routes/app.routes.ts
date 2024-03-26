@@ -21,12 +21,22 @@ export const APP_ROUTES: Routes = [
           import('../../shell.component').then((m) => m.ShellComponent),
         children: [
           {
+            path: AppRoutes.Home,
+            title: 'Home',
+            data: {
+              ...NAVIGATION_DATA_MAP.get(AppRoutes.Home),
+            },
+            loadComponent: () =>
+              import('../../pages/home/home.component').then(
+                (m) => m.HomeComponent,
+              ),
+          },
+          {
             path: AppRoutes.Profile,
             title: 'Profile',
             data: {
               ...NAVIGATION_DATA_MAP.get(AppRoutes.Profile),
             },
-            canMatch: [loggedInGuard],
             loadComponent: () =>
               import('../../pages/profile/profile.component').then(
                 (m) => m.ProfileComponent,
@@ -40,6 +50,15 @@ export const APP_ROUTES: Routes = [
             },
             loadChildren: () =>
               import('./org.routes').then((m) => m.ORG_ROUTES),
+          },
+          {
+            path: AppRoutes.Users,
+            title: 'Users',
+            data: {
+              ...NAVIGATION_DATA_MAP.get(AppRoutes.Users),
+            },
+            loadChildren: () =>
+              import('./user.routes').then((m) => m.USER_ROUTES),
           },
           {
             path: AppRoutes.Projects,
@@ -69,10 +88,10 @@ export const APP_ROUTES: Routes = [
               import('./feature.routes').then((m) => m.FEATURE_ROUTES),
           },
           {
-            path: AppRoutes.ChangeLog,
+            path: AppRoutes.Changelog,
             title: 'Changelog',
             data: {
-              ...NAVIGATION_DATA_MAP.get(AppRoutes.ChangeLog),
+              ...NAVIGATION_DATA_MAP.get(AppRoutes.Changelog),
             },
             loadChildren: () =>
               import('./changelog.routes').then((m) => m.CHANGELOG_ROUTES),
@@ -84,12 +103,14 @@ export const APP_ROUTES: Routes = [
 ];
 
 export const enum AppRoutes {
+  Home = '',
   Login = 'login',
   Register = 'register',
   Orgs = 'orgs',
+  Users = 'users',
   Projects = 'projects',
   Environments = 'environments',
   Features = 'features',
   Profile = 'profile',
-  ChangeLog = 'changelog',
+  Changelog = 'changelog',
 }

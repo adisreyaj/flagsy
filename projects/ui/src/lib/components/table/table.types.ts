@@ -42,7 +42,7 @@ export interface TablePaginationState {
 export type TableDataFetcher<TableData = any, Triggers = any> = (req: {
   sort?: TableSortState;
   pagination?: TablePaginationState;
-  externalTriggers?: Triggers;
+  externalTriggers: Triggers;
 }) => Observable<{
   data: TableData[];
   total: number;

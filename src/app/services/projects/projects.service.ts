@@ -7,7 +7,7 @@ import {
   Signal,
   WritableSignal,
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { DataWithTotal, isNotUndefined } from '@app/types/common.type';
 import { Project, ProjectCreateInput } from '@app/types/project.type';
 import {
@@ -52,7 +52,10 @@ export class ProjectsService {
 
   private readonly http = inject(HttpClient);
 
-  constructor() {
+  constructor() {}
+
+  // Will be called in the init service during app initialization
+  init() {
     this.getAllProjects()
       .pipe(
         tap((res) => {
@@ -65,6 +68,7 @@ export class ProjectsService {
             this.setActiveProject(savedProject?.id ?? res.data?.[0]?.id);
           }
         }),
+        takeUntilDestroyed(),
       )
       .subscribe();
   }

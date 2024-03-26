@@ -4,3 +4,8 @@ export interface UserMeta {
   lastName: string;
   email: string;
 }
+
+export interface UserWithRole extends UserMeta {
+  role: string;
+  scopes: string[];
+}

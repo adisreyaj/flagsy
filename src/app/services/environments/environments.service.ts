@@ -15,11 +15,12 @@ import {
   EnvironmentUpdateInput,
 } from '@app/types/environment.type';
 import { Project } from '@app/types/project.type';
-import { isEmpty } from 'lodash-es';
+import { isEmpty, isNil } from 'lodash-es';
 import {
   BehaviorSubject,
   filter,
   Observable,
+  of,
   startWith,
   Subject,
   switchMap,
@@ -68,16 +69,19 @@ export class EnvironmentsService {
         takeUntilDestroyed(),
       )
       .subscribe((environments) => {
-        this.environments.set(environments);
-        const savedEnvironmentId =
-          this.#preferenceService.getActiveEnvironmentId();
-        const savedEnvironment = this.environments().find(
-          (env) => env.id === savedEnvironmentId,
-        );
-        this.#activeEnvironmentSubject.next(
-          savedEnvironment ?? environments[0],
-        );
+        this.#updateEnvironments(environments);
       });
+  }
+
+  init(projectId?: string) {
+    if (!isNil(projectId)) {
+      return this.#getAllEnvironments(projectId).pipe(
+        tap((environments) => {
+          this.#updateEnvironments(environments);
+        }),
+      );
+    }
+    return of(undefined);
   }
 
   #getAllEnvironments = (projectId?: string) => {
@@ -160,4 +164,13 @@ export class EnvironmentsService {
       this.#preferenceService.saveActiveEnvironmentId(environmentId);
     }
   };
+
+  #updateEnvironments(environments: Environment[]): void {
+    this.environments.set(environments);
+    const savedEnvironmentId = this.#preferenceService.getActiveEnvironmentId();
+    const savedEnvironment = this.environments().find(
+      (env) => env.id === savedEnvironmentId,
+    );
+    this.#activeEnvironmentSubject.next(savedEnvironment ?? environments[0]);
+  }
 }

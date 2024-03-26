@@ -39,6 +39,7 @@ import {
   RiTerminalBoxLine,
   RiText,
   RiToggleLine,
+  RiUser3Fill,
   RiUser3Line,
 } from 'angular-remix-icon';
 
@@ -84,4 +85,5 @@ export const ICONS = {
   RiText,
   RiToggleLine,
   RiHashtag,
+  RiUser3Fill,
 };

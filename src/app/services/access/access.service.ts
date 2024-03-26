@@ -1,7 +1,8 @@
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
 import { Feature } from '@app/types/feature.type';
 import { map, tap } from 'rxjs';
 import { FeatureFlag } from '../../config/feature.config';
+import { AuthService } from '../auth/auth.service';
 import { FeatureService } from '../features/feature.service';
 
 @Injectable({
@@ -10,6 +11,15 @@ import { FeatureService } from '../features/feature.service';
 export class AccessService {
   readonly #featureService = inject(FeatureService);
   #features = new Map<string, Feature>();
+
+  readonly #authService = inject(AuthService);
+  readonly #scopesSet = computed(() => {
+    return new Set(this.#authService.account()?.scopes ?? []);
+  });
+
+  readonly #roles = computed(() => {
+    return this.#authService.account()?.role;
+  });
 
   constructor() {
     this.init();
@@ -40,5 +50,9 @@ export class AccessService {
     const featureData = this.#features.get(featureKey);
 
     return featureData?.value === true;
+  }
+
+  hasPermission(scopes: string[]): boolean {
+    return scopes.every((scope) => this.#scopesSet().has(scope));
   }
 }

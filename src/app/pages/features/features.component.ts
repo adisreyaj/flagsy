@@ -12,12 +12,14 @@ import {
   ToggleComponent,
 } from '@ui/components';
 import { SheetSize } from '../../../../projects/ui/src/lib/components/sheet/sheet.type';
+import { Permissions } from '../../config/permission.config';
 import {
   FeatureConfigSheetComponent,
   FeatureConfigSheetData,
   FeatureConfigSheetMode,
 } from '../../shared/components/feature-config-sheet/feature-config-sheet.component';
 import { PageHeaderComponent } from '../../shared/components/header/page-header.component';
+import { PermissionAccessDirective } from '../../shared/directives/persmission-access.directive';
 import { NonNullPipe } from '../../shared/pipes/non-null.pipe';
 import { FeaturesListComponent } from './features-list.component';
 
@@ -28,6 +30,7 @@ import { FeaturesListComponent } from './features-list.component';
       <app-page-header>
         <div class="flex gap-2 items-center">
           <ui-button
+            *permissionAccess="this.featuresWriteScope"
             label="Create Flag"
             trailingIcon="add-line"
             (click)="this.openCreateFeatureSheet()"
@@ -55,10 +58,12 @@ import { FeaturesListComponent } from './features-list.component';
     ReactiveFormsModule,
     FeaturesListComponent,
     NonNullPipe,
+    PermissionAccessDirective,
   ],
 })
 export class FeaturesComponent {
   readonly #sheetService = inject(SheetService);
+  public featuresWriteScope = Permissions.feature.write;
 
   public openCreateFeatureSheet(): void {
     this.#sheetService.open<FeatureConfigSheetData>(

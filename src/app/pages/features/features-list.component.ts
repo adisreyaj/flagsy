@@ -79,11 +79,13 @@ export class FeaturesListComponent {
       label: 'Feature',
       sortable: true,
       width: 15,
+      minWidthInPx: 100,
       type: TableDefaultCellType.TextWithCopy,
     },
     {
       id: 'description',
       label: 'Description',
+      minWidthInPx: 100,
     },
     {
       id: 'value',
@@ -144,12 +146,17 @@ export class FeaturesListComponent {
           : undefined;
       }),
     ),
+    refresh: this.#featuresService.refresh$,
+    projectId: this.#featuresService.currentProjectId$,
+    environmentId: this.#featuresService.currentEnvironmentId$,
   };
 
   constructor() {
     this.dataFetcher = ({ sort, externalTriggers }) => {
       return this.#featuresService
         .getFeatures({
+          projectId: externalTriggers.projectId,
+          environmentId: externalTriggers.environmentId,
           sort: {
             key: sort?.column?.id as FeatureSortBy,
             direction: sort?.direction,
@@ -203,4 +210,7 @@ export class FeaturesListComponent {
 
 interface FeatureTableExternalTriggers {
   search?: string;
+  refresh: void;
+  projectId: string;
+  environmentId: string;
 }

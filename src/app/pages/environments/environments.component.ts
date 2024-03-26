@@ -35,11 +35,13 @@ import { AngularRemixIconComponent } from 'angular-remix-icon';
 import { isNil, lowerCase } from 'lodash-es';
 import { SheetSize } from '../../../../projects/ui/src/lib/components/sheet/sheet.type';
 import { FeatureFlag } from '../../config/feature.config';
+import { Permissions } from '../../config/permission.config';
 import { AppRoutes } from '../../config/routes/app.routes';
 import { EnvironmentSectionRoute } from '../../config/routes/environment.routes';
 import { EnvironmentConfigSheetComponent } from '../../shared/components/environment-config-sheet/environment-config-sheet.component';
 import { PageHeaderComponent } from '../../shared/components/header/page-header.component';
 import { FfAccessDirective } from '../../shared/directives/ff-access.directive';
+import { PermissionAccessDirective } from '../../shared/directives/persmission-access.directive';
 import { HasFFAccessPipe } from '../../shared/pipes/has-ff-access.pipe';
 
 @Component({
@@ -95,7 +97,7 @@ import { HasFFAccessPipe } from '../../shared/pipes/has-ff-access.pipe';
               </li>
             }
           </ul>
-          <footer>
+          <footer *permissionAccess="this.environmentWriteScope">
             <ui-button
               size="sm"
               variant="primary"
@@ -124,7 +126,10 @@ import { HasFFAccessPipe } from '../../shared/pipes/has-ff-access.pipe';
                     <ui-textarea formControlName="description"></ui-textarea>
                   </ui-form-field>
 
-                  <footer class="flex justify-end">
+                  <footer
+                    class="flex justify-end"
+                    *permissionAccess="this.environmentWriteScope"
+                  >
                     <ui-button
                       label="Update"
                       (click)="
@@ -169,7 +174,7 @@ import { HasFFAccessPipe } from '../../shared/pipes/has-ff-access.pipe';
                     >
                       <div class="flex gap-2">
                         <ui-input class="flex-auto"></ui-input>
-                        <ui-button prefixIcon="clipboard-line"> </ui-button>
+                        <ui-button prefixIcon="clipboard-line"></ui-button>
                       </div>
                     </ui-form-field>
                     <div class="text-sm text-gray-500">
@@ -232,6 +237,7 @@ import { HasFFAccessPipe } from '../../shared/pipes/has-ff-access.pipe';
     HasFFAccessPipe,
     FfAccessDirective,
     CdkCopyToClipboard,
+    PermissionAccessDirective,
   ],
 })
 export class EnvironmentsComponent {
@@ -248,6 +254,9 @@ export class EnvironmentsComponent {
     this.activeSectionRoute.set(section ?? EnvironmentSectionRoute.General);
   }
 
+  protected readonly environmentWriteScope: string[] = [
+    Permissions.environment.write,
+  ];
   protected readonly environments: Signal<Environment[]>;
   protected readonly searchText = signal('');
   protected readonly selectedEnvironmentId = signal<string | undefined>(

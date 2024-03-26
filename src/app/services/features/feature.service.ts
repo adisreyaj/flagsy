@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { SortBy } from '@app/types/common.type';
+import { Pagination, SortBy } from '@app/types/common.type';
 import {
   Feature,
   FeatureCreateData,
@@ -10,7 +10,7 @@ import {
   FeatureValueType,
 } from '@app/types/feature.type';
 import { startCase } from 'lodash-es';
-import { combineLatest, Observable, Subject, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, finalize, map, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SelectOption } from '../../shared/components/select.type';
 import { QueryParamUtil } from '../../utils/query-param.util';
@@ -21,11 +21,26 @@ import { ProjectsService } from '../projects/projects.service';
   providedIn: 'root',
 })
 export class FeatureService {
-  #refreshSubject = new Subject<void>();
-  #http = inject(HttpClient);
-  #environmentService = inject(EnvironmentsService);
-  #projectsService = inject(ProjectsService);
+  readonly #refreshSubject = new BehaviorSubject<void>(undefined);
+  readonly refresh$ = this.#refreshSubject.asObservable();
 
+  readonly #http = inject(HttpClient);
+  readonly #environmentService = inject(EnvironmentsService);
+  readonly #projectsService = inject(ProjectsService);
+
+  get currentProjectId$() {
+    return this.#projectsService.activeProject$.pipe(
+      map((project) => project?.id),
+    );
+  }
+
+  get currentEnvironmentId$() {
+    return this.#environmentService.activeEnvironment$.pipe(
+      map((environment) => environment?.id),
+    );
+  }
+
+  // TODO: Use Public API
   getAllFeaturesForCurrentProjectAndEnvironment() {
     return this.#http.get<FeatureResponse>(`${environment.api}/features`, {
       params: {
@@ -36,26 +51,23 @@ export class FeatureService {
     });
   }
 
-  getFeatures(args?: {
+  getFeatures(args: {
+    projectId: string;
+    environmentId: string;
     sort?: SortBy<FeatureSortBy>;
     search?: string;
+    pagination?: Pagination;
   }): Observable<FeatureResponse> {
-    return combineLatest([
-      this.#projectsService.activeProject$,
-      this.#environmentService.activeEnvironment$,
-    ]).pipe(
-      switchMap(([activeProject, activeEnvironment]) =>
-        this.#http.get<FeatureResponse>(`${environment.api}/features`, {
-          params: {
-            projectId: activeProject.id,
-            environmentId: activeEnvironment.id,
-            ...QueryParamUtil.buildSortParam(args?.sort),
-            ...QueryParamUtil.buildSearchParam(args?.search),
-          },
-          withCredentials: true,
-        }),
-      ),
-    );
+    return this.#http.get<FeatureResponse>(`${environment.api}/features`, {
+      params: {
+        projectId: args.projectId,
+        environmentId: args.environmentId,
+        ...QueryParamUtil.buildSortParam(args?.sort),
+        ...QueryParamUtil.buildSearchParam(args?.search),
+        ...QueryParamUtil.buildPaginationParam(args?.pagination),
+      },
+      withCredentials: true,
+    });
   }
 
   getFeatureTypeSelectOptions(): SelectOption<FeatureValueType>[] {
@@ -83,7 +95,7 @@ export class FeatureService {
       .post<Feature>(`${environment.api}/features/${id}`, data, {
         withCredentials: true,
       })
-      .pipe(tap(() => this.#refreshSubject.next()));
+      .pipe(finalize(() => this.#refreshSubject.next()));
   }
 
   deleteFeature(id: string): Observable<void> {
