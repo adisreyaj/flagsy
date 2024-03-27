@@ -86,21 +86,21 @@ export class EnvironmentConfigSheetComponent {
   readonly #sheetRef = inject(SheetRef);
   readonly #fb: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  constructor() {
+  public constructor() {
     this.form = this.#buildForm();
   }
 
-  hasErrors(control: AbstractControl): boolean {
+  protected hasErrors(control: AbstractControl): boolean {
     return (
       this.submitted() && (control.touched || control.dirty) && control.invalid
     );
   }
 
-  closeSheet() {
+  protected closeSheet() {
     this.#sheetRef.close();
   }
 
-  saveEnvironment(): void {
+  protected saveEnvironment(): void {
     this.#projectsService.activeProject$
       .pipe(
         filter((project): project is Project => !isNil(project)),

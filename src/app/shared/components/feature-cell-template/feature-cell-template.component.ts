@@ -34,11 +34,11 @@ export class FeatureCellTemplateComponent {
   protected isValueBooleanPositive = this.rowData.value === true;
   protected isValueBooleanNegative = this.rowData.value === false;
 
-  constructor() {
-    this.iconName = this.getIconName(this.rowData.type);
+  public constructor() {
+    this.iconName = this.#getIconName(this.rowData.type);
   }
 
-  private getIconName(type: FeatureValueType): IconName {
+  #getIconName(type: FeatureValueType): IconName {
     switch (type) {
       case FeatureValueType.Boolean:
         return 'toggle-line';

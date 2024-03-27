@@ -1,9 +1,9 @@
 
 @mixin xs($withTrailingIcon: false) {
   @if $withTrailingIcon {
-    @apply py-1 px-1 pr-1;
+    @apply py-1 px-2 pr-1;
   } @else {
-    @apply py-1 px-1;
+    @apply py-1 px-2;
   }
 }
 
@@ -90,7 +90,7 @@
   }
 
   &.xs {
-    @apply text-sm;
+    @apply text-xs;
     &:not(.has-trailing-icon) {
       @include xs;
     }

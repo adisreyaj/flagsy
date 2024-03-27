@@ -31,7 +31,8 @@
       "files": [
         "*.html"
       ],
-      "rules": {}
+      "rules": {
+      }
     }
   ]
 }

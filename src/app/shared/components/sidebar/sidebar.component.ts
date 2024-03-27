@@ -183,7 +183,6 @@ export class SidebarComponent {
     queryParams: 'ignored',
     matrixParams: 'subset',
   };
-
   protected readonly menuOptions: DropdownMenuOption[] = [
     {
       label: 'My Profile',
@@ -196,15 +195,14 @@ export class SidebarComponent {
     },
   ];
 
-  private readonly sidebarService = inject(SidebarService);
   protected readonly currentLoggedInAccount = inject(AuthService).account;
-  protected isSidebarOpen: Signal<boolean> = this.sidebarService.isOpen;
-
+  readonly #sidebarService = inject(SidebarService);
+  protected isSidebarOpen: Signal<boolean> = this.#sidebarService.isOpen;
   readonly #router = inject(Router);
   readonly #authService = inject(AuthService);
   readonly #accessService = inject(AccessService);
 
-  constructor() {
+  public constructor() {
     this.navigationEntriesEnriched = NAVIGATION_DATA.map((item) => {
       return {
         ...item,
@@ -218,7 +216,7 @@ export class SidebarComponent {
   }
 
   protected toggleSidebar(): void {
-    this.sidebarService.toggleSidebar();
+    this.#sidebarService.toggleSidebar();
   }
 
   protected handleOptionClick(event: DropdownMenuOption) {

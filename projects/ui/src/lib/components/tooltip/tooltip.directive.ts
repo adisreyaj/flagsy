@@ -20,34 +20,34 @@ import { TooltipComponent } from './tooltip.component';
 
 @Directive({ selector: '[uiTooltip]', standalone: true })
 export class TooltipDirective {
-  text = input<string | undefined>('', {
+  public text = input<string | undefined>('', {
     alias: 'uiTooltip',
   });
 
-  position = input<string | undefined>(undefined, {
+  public position = input<string | undefined>(undefined, {
     alias: 'uiTooltipPosition',
   });
 
-  offsetX = input<number | undefined>(undefined, {
+  public offsetX = input<number | undefined>(undefined, {
     alias: 'uiTooltipOffsetX',
   });
 
-  offsetY = input<number | undefined>(undefined, {
+  public offsetY = input<number | undefined>(undefined, {
     alias: 'uiTooltipOffsetY',
   });
 
   #overlayRef?: OverlayRef;
   #tooltipRef?: ComponentRef<TooltipComponent>;
 
-  readonly mouseEnter$: Subject<void> = new Subject();
-  readonly mouseLeave$: Subject<void> = new Subject();
+  readonly #mouseEnter$: Subject<void> = new Subject();
+  readonly #mouseLeave$: Subject<void> = new Subject();
 
   readonly #overlay = inject(Overlay);
   readonly #overlayPositionBuilder = inject(OverlayPositionBuilder);
   readonly #elementRef = inject(ElementRef);
   readonly #positionStrategy: FlexibleConnectedPositionStrategy;
 
-  constructor() {
+  public constructor() {
     this.#positionStrategy = this.#overlayPositionBuilder
       .flexibleConnectedTo(this.#elementRef)
       .withPositions(
@@ -62,7 +62,7 @@ export class TooltipDirective {
           PopoverPosition.BelowRightAligned,
           PopoverPosition.OverLeftAligned,
           PopoverPosition.InsideTopLeft,
-        ].map((pos) => this.getPositionPairForLocation(pos)),
+        ].map((pos) => this.#getPositionPairForLocation(pos)),
       );
 
     this.#overlayRef = this.#overlay.create({
@@ -72,7 +72,7 @@ export class TooltipDirective {
     effect(() => {
       if (this.position() !== undefined) {
         this.#positionStrategy?.withPositions([
-          this.getPositionPairForLocation(
+          this.#getPositionPairForLocation(
             this.position() as PopoverPosition,
             this.offsetX(),
             this.offsetY(),
@@ -85,28 +85,28 @@ export class TooltipDirective {
   @HostListener('mouseenter')
   @HostListener('focusin')
   show() {
-    this.mouseEnter$
+    this.#mouseEnter$
       .pipe(
         delay(200),
-        takeUntil(this.mouseLeave$),
+        takeUntil(this.#mouseLeave$),
         tap({
-          complete: () => this.removeTooltip(),
+          complete: () => this.#removeTooltip(),
         }),
       )
       .subscribe(() => {
-        this.showTooltip();
+        this.#showTooltip();
       });
 
-    this.mouseEnter$.next();
+    this.#mouseEnter$.next();
   }
 
   @HostListener('mouseleave')
   @HostListener('focusout')
   hide() {
-    this.mouseLeave$.next();
+    this.#mouseLeave$.next();
   }
 
-  private getPositionPairForLocation(
+  #getPositionPairForLocation(
     location: PopoverPosition,
     offsetX: number | undefined = undefined,
     offsetY: number | undefined = undefined,
@@ -194,7 +194,7 @@ export class TooltipDirective {
     }
   }
 
-  private showTooltip(): void {
+  #showTooltip(): void {
     this.#overlayRef?.detach();
     this.#tooltipRef = this.#overlayRef?.attach(
       new ComponentPortal(TooltipComponent),
@@ -202,7 +202,7 @@ export class TooltipDirective {
     this.#tooltipRef?.instance.text.set(this.text());
   }
 
-  private removeTooltip(): void {
+  #removeTooltip(): void {
     this.#overlayRef?.detach();
     this.#tooltipRef?.destroy();
   }

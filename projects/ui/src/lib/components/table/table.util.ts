@@ -2,7 +2,7 @@ import { isNil, isNumber, isString } from 'lodash-es';
 import { TableColumnConfig } from './table.types';
 
 export abstract class TableUtil {
-  static getGridTemplateColumns(
+  public static getGridTemplateColumns(
     columns: TableColumnConfig[],
     tableWidthInPx: number,
   ): string {
@@ -13,7 +13,7 @@ export abstract class TableUtil {
 
     columns.forEach((col) => {
       if (isString(col.width)) {
-        const widthInPx = this.getNumberFromWidth(col.width);
+        const widthInPx = this.#getNumberFromWidth(col.width);
         const widthOfCol = Math.max(widthInPx, col.minWidthInPx ?? 0);
         widthsMap.set(col.id, col.width);
         availableTableWidthInPx -= widthOfCol;
@@ -49,11 +49,11 @@ export abstract class TableUtil {
     return Array.from(widthsMap.values()).join(' ');
   }
 
-  private static getNumberFromWidth(px?: string | number): number {
-    return !isNil(px)
-      ? isString(px)
-        ? parseInt(px.replace('px', ''))
-        : px
+  static #getNumberFromWidth(width?: string | number): number {
+    return !isNil(width)
+      ? isString(width)
+        ? parseInt(width.replace('px', ''))
+        : width
       : 0;
   }
 }

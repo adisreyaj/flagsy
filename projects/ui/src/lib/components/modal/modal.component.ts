@@ -62,11 +62,11 @@ export class ModalComponent {
   readonly #modalConfig = inject<ModalConfig>(DIALOG_CONFIG);
   readonly #modalRef = inject(ModalRef);
 
-  get title(): string | undefined {
+  protected get title(): string | undefined {
     return trim(this.#modalConfig?.title) ?? undefined;
   }
 
-  get modalIcon(): IconName | undefined {
+  protected get modalIcon(): IconName | undefined {
     switch (this.#modalConfig?.dataType) {
       case ModalDataType.Info:
         return 'information-line';
@@ -82,7 +82,7 @@ export class ModalComponent {
     }
   }
 
-  get modalIconColor(): string | undefined {
+  protected get modalIconColor(): string | undefined {
     switch (this.#modalConfig?.dataType) {
       case ModalDataType.Info:
         return 'text-blue-600';
@@ -98,7 +98,7 @@ export class ModalComponent {
     }
   }
 
-  get modalIconBgColor(): string | undefined {
+  protected get modalIconBgColor(): string | undefined {
     switch (this.#modalConfig?.dataType) {
       case ModalDataType.Info:
         return 'bg-blue-100';
@@ -114,7 +114,7 @@ export class ModalComponent {
     }
   }
 
-  public close(): void {
+  protected close(): void {
     this.#modalRef.close();
   }
 }

@@ -59,7 +59,7 @@ export class EnvironmentsService {
   readonly #projectService = inject(ProjectsService);
   readonly #preferenceService = inject(PreferenceService);
 
-  constructor() {
+  public constructor() {
     this.#projectService.activeProject$
       .pipe(
         filter(isNotUndefined),
@@ -73,7 +73,7 @@ export class EnvironmentsService {
       });
   }
 
-  init(projectId?: string) {
+  public init(projectId?: string) {
     if (!isNil(projectId)) {
       return this.#getAllEnvironments(projectId).pipe(
         tap((environments) => {
@@ -84,24 +84,7 @@ export class EnvironmentsService {
     return of(undefined);
   }
 
-  #getAllEnvironments = (projectId?: string) => {
-    return this.#refresh$.pipe(
-      switchMap(() =>
-        this.#http.get<Environment[]>(`${environment.api}/environments`, {
-          params: {
-            ...(!isEmpty(projectId)
-              ? {
-                  projectId,
-                }
-              : {}),
-          },
-          withCredentials: true,
-        }),
-      ),
-    );
-  };
-
-  createEnvironment(data: EnvironmentCreateInput): Observable<string> {
+  public createEnvironment(data: EnvironmentCreateInput): Observable<string> {
     return this.#http
       .post<string>(
         `${environment.api}/environments`,
@@ -121,7 +104,7 @@ export class EnvironmentsService {
       );
   }
 
-  updateEnvironment({
+  public updateEnvironment({
     id,
     ...data
   }: EnvironmentUpdateInput): Observable<string> {
@@ -144,7 +127,7 @@ export class EnvironmentsService {
       );
   }
 
-  getEnvironmentSelectOptions = (): Signal<SelectOption<string>[]> => {
+  public getEnvironmentSelectOptions = (): Signal<SelectOption<string>[]> => {
     return computed(() => {
       return this.environments().map((env) => ({
         label: env.name,
@@ -153,7 +136,7 @@ export class EnvironmentsService {
     });
   };
 
-  setActiveEnvironment = (environmentId: string) => {
+  public setActiveEnvironment = (environmentId: string) => {
     const environment = this.environments().find(
       (env) => env.id === environmentId,
     );
@@ -163,6 +146,23 @@ export class EnvironmentsService {
       );
       this.#preferenceService.saveActiveEnvironmentId(environmentId);
     }
+  };
+
+  #getAllEnvironments = (projectId?: string) => {
+    return this.#refresh$.pipe(
+      switchMap(() =>
+        this.#http.get<Environment[]>(`${environment.api}/environments`, {
+          params: {
+            ...(!isEmpty(projectId)
+              ? {
+                  projectId,
+                }
+              : {}),
+          },
+          withCredentials: true,
+        }),
+      ),
+    );
   };
 
   #updateEnvironments(environments: Environment[]): void {

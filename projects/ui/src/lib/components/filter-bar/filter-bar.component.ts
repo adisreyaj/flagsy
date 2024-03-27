@@ -5,10 +5,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  EventEmitter,
   input,
   isSignal,
-  Output,
+  output,
   signal,
   Signal,
 } from '@angular/core';
@@ -160,29 +159,51 @@ import { SelectComponent } from '../select';
   ],
 })
 export class FilterBarComponent {
-  filters = input.required<Filter[]>({});
-  filtersEnriched: Signal<FiltersEnriched[]>;
+  public filters = input.required<Filter[]>({});
+  public filterChange = output<FilterWithSelection[]>();
 
-  filtersApplied = signal<FiltersEnriched[]>([]);
+  protected filtersEnriched: Signal<FiltersEnriched[]> =
+    this.#getFiltersEnriched();
+  protected filtersApplied = signal<FiltersEnriched[]>([]);
 
-  @Output()
-  filterChange = new EventEmitter<FilterWithSelection[]>();
-
-  constructor() {
-    this.filtersEnriched = this.getFiltersEnriched();
-  }
-
-  public applyFilter(filter: FiltersEnriched): void {
+  protected applyFilter(filter: FiltersEnriched): void {
     filter.selectedValues = new Set(filter.tempSelectedValues);
     const filterNotApplied =
       this.filtersApplied().findIndex((f) => f.field === filter.field) === -1;
     if (filterNotApplied) {
       this.filtersApplied.set([...this.filtersApplied(), filter]);
     }
-    this.notifyFilterChange();
+    this.#notifyFilterChange();
   }
 
-  private getFiltersEnriched(): Signal<FiltersEnriched[]> {
+  protected updateSelectedValues(
+    filter: FiltersEnriched,
+    item: FilterValue<unknown>,
+    isSelected: boolean,
+  ): void {
+    if (isSelected) {
+      filter.tempSelectedValues.add(item);
+    } else {
+      filter.tempSelectedValues.delete(item);
+    }
+  }
+
+  protected valuesToString = (selectedValues: Set<FilterValue<unknown>>) => {
+    return selectedValues.size === 0
+      ? 'All'
+      : selectedValues.values().next().value.label;
+  };
+
+  protected clearSelection(filter: FiltersEnriched): void {
+    filter.tempSelectedValues.clear();
+    filter.selectedValues.clear();
+  }
+
+  protected selectAll(filter: FiltersEnriched): void {
+    filter.values().forEach((value) => filter.tempSelectedValues.add(value));
+  }
+
+  #getFiltersEnriched(): Signal<FiltersEnriched[]> {
     return computed(() => {
       return this.filters().map((filter) => {
         const getValue = (): Signal<FilterValue<unknown>[]> => {
@@ -210,25 +231,7 @@ export class FilterBarComponent {
     });
   }
 
-  public updateSelectedValues(
-    filter: FiltersEnriched,
-    item: FilterValue<unknown>,
-    isSelected: boolean,
-  ): void {
-    if (isSelected) {
-      filter.tempSelectedValues.add(item);
-    } else {
-      filter.tempSelectedValues.delete(item);
-    }
-  }
-
-  public valuesToString = (selectedValues: Set<FilterValue<unknown>>) => {
-    return selectedValues.size === 0
-      ? 'All'
-      : selectedValues.values().next().value.label;
-  };
-
-  private notifyFilterChange(): void {
+  #notifyFilterChange(): void {
     this.filterChange.emit(
       this.filtersApplied().map((filter) => {
         return {
@@ -239,15 +242,6 @@ export class FilterBarComponent {
         };
       }),
     );
-  }
-
-  public clearSelection(filter: FiltersEnriched): void {
-    filter.tempSelectedValues.clear();
-    filter.selectedValues.clear();
-  }
-
-  public selectAll(filter: FiltersEnriched): void {
-    filter.values().forEach((value) => filter.tempSelectedValues.add(value));
   }
 }
 

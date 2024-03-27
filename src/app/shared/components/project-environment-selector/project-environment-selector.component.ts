@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, inject, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { EnvironmentsService } from '@app/services/environments/environments.service';
 import { ProjectsService } from '@app/services/projects/projects.service';
@@ -61,34 +61,31 @@ import { AngularRemixIconComponent } from 'angular-remix-icon';
   ],
 })
 export class ProjectEnvironmentSelectorComponent {
-  @Output()
-  environmentSelect = new EventEmitter<string>();
+  public readonly environmentSelect = output<string>();
 
   protected readonly projectSelectOptions;
   protected readonly environmentSelectOptions;
-
   protected readonly activeEnvironment;
-
-  private readonly projectsService = inject(ProjectsService);
-  private readonly environmentsService = inject(EnvironmentsService);
-
   protected readonly activeProject;
 
-  constructor() {
-    this.activeProject = this.projectsService.activeProject;
-    this.projectSelectOptions = this.projectsService.getProjectSelectOptions();
+  readonly #projectsService = inject(ProjectsService);
+  readonly #environmentsService = inject(EnvironmentsService);
 
-    this.activeEnvironment = this.environmentsService.activeEnvironment;
+  public constructor() {
+    this.projectSelectOptions = this.#projectsService.getProjectSelectOptions();
     this.environmentSelectOptions =
-      this.environmentsService.getEnvironmentSelectOptions();
+      this.#environmentsService.getEnvironmentSelectOptions();
+
+    this.activeProject = this.#projectsService.activeProject;
+    this.activeEnvironment = this.#environmentsService.activeEnvironment;
   }
 
-  public updateActiveProject(projectId: string): void {
-    this.projectsService.setActiveProject(projectId);
+  protected updateActiveProject(projectId: string): void {
+    this.#projectsService.setActiveProject(projectId);
   }
 
-  public updateActiveEnvironment(environmentId: string): void {
-    this.environmentsService.setActiveEnvironment(environmentId);
+  protected updateActiveEnvironment(environmentId: string): void {
+    this.#environmentsService.setActiveEnvironment(environmentId);
     this.environmentSelect.emit(environmentId);
   }
 }

@@ -30,38 +30,36 @@ export class ProjectsService {
   readonly #activeProjectSubject = new BehaviorSubject<Project | undefined>(
     undefined,
   );
+  public readonly activeProject$: Observable<Project> =
+    this.#activeProjectSubject.asObservable().pipe(filter(isNotUndefined));
 
-  readonly #preferenceService = inject(PreferenceService);
-
-  readonly activeProject$: Observable<Project> = this.#activeProjectSubject
-    .asObservable()
-    .pipe(filter(isNotUndefined));
-
-  readonly activeProject: Signal<Project | undefined> = toSignal(
+  public readonly activeProject: Signal<Project | undefined> = toSignal(
     this.activeProject$,
     {
       initialValue: undefined,
     },
   );
 
-  private readonly projects: WritableSignal<Project[]> = signal([]);
-  private readonly refreshSubject = new Subject<void>();
-  private readonly refresh$: Observable<void> = this.refreshSubject
+  readonly #projects: WritableSignal<Project[]> = signal([]);
+
+  readonly #refreshSubject = new Subject<void>();
+  readonly #refresh$: Observable<void> = this.#refreshSubject
     .asObservable()
     .pipe(startWith(undefined));
 
-  private readonly http = inject(HttpClient);
+  readonly #http = inject(HttpClient);
+  readonly #preferenceService = inject(PreferenceService);
 
-  constructor() {}
+  public constructor() {}
 
   // Will be called in the init service during app initialization
-  init() {
+  public init() {
     this.getAllProjects()
       .pipe(
         tap((res) => {
-          this.projects.set(res.data);
+          this.#projects.set(res.data);
           const savedProjectId = this.#preferenceService.getActiveProjectId();
-          const savedProject = this.projects().find(
+          const savedProject = this.#projects().find(
             (proj) => proj.id === savedProjectId,
           );
           if (!this.#activeProjectSubject.value) {
@@ -73,18 +71,18 @@ export class ProjectsService {
       .subscribe();
   }
 
-  getAllProjects = () => {
-    return this.refresh$.pipe(
+  public getAllProjects = () => {
+    return this.#refresh$.pipe(
       switchMap(() =>
-        this.http.get<DataWithTotal<Project>>(`${environment.api}/projects`, {
+        this.#http.get<DataWithTotal<Project>>(`${environment.api}/projects`, {
           withCredentials: true,
         }),
       ),
     );
   };
 
-  createProject = (data: ProjectCreateInput): Observable<string> => {
-    return this.http
+  public createProject = (data: ProjectCreateInput): Observable<string> => {
+    return this.#http
       .post<string>(
         `${environment.api}/projects`,
         {
@@ -97,23 +95,23 @@ export class ProjectsService {
       .pipe(
         tap({
           next: () => {
-            this.refreshSubject.next();
+            this.#refreshSubject.next();
           },
         }),
       );
   };
 
-  getProjectSelectOptions = (): Signal<SelectOption<string>[]> => {
+  public getProjectSelectOptions = (): Signal<SelectOption<string>[]> => {
     return computed(() => {
-      return this.projects().map((project) => ({
+      return this.#projects().map((project) => ({
         label: project.name,
         value: project.id,
       }));
     });
   };
 
-  setActiveProject = (projectId: string) => {
-    const project = this.projects().find((p) => p.id === projectId);
+  public setActiveProject = (projectId: string) => {
+    const project = this.#projects().find((p) => p.id === projectId);
     if (project) {
       this.#activeProjectSubject.next(project);
       this.#preferenceService.saveActiveProjectId(projectId);

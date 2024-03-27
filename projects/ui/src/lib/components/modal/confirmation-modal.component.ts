@@ -41,43 +41,43 @@ export class ConfirmationModalComponent {
   readonly #modalData = inject<ConfirmationModalConfig>(DIALOG_DATA);
   readonly #modalRef = inject(ModalRef);
 
-  get title(): string {
+  protected get title(): string {
     return this.#modalData.title;
   }
 
-  get message(): string | undefined {
+  protected get message(): string | undefined {
     return typeof this.#modalData.content === 'string'
       ? this.#modalData.content
       : undefined;
   }
 
-  get template(): TemplateRef<unknown> | undefined {
+  protected get template(): TemplateRef<unknown> | undefined {
     return this.#modalData.content instanceof TemplateRef
       ? this.#modalData.content
       : undefined;
   }
 
-  get templateContext(): unknown {
+  protected get templateContext(): unknown {
     return this.#modalData?.context;
   }
 
-  get confirmButtonText(): string {
+  protected get confirmButtonText(): string {
     return this.#modalData?.confirmButtonText ?? 'Confirm';
   }
 
-  get confirmButtonVariant(): ButtonVariant {
+  protected get confirmButtonVariant(): ButtonVariant {
     return this.#modalData?.confirmButtonVariant ?? 'primary';
   }
 
-  get cancelButtonText(): string {
+  protected get cancelButtonText(): string {
     return this.#modalData?.cancelButtonText ?? 'Cancel';
   }
 
-  public onConfirm = (): void => {
+  protected onConfirm = (): void => {
     this.#modalRef.close(true);
   };
 
-  public onCancel = (): void => {
+  protected onCancel = (): void => {
     this.#modalRef.close(false);
   };
 }

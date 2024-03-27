@@ -1,10 +1,9 @@
 import {
   Component,
   computed,
-  EventEmitter,
   input,
   OnChanges,
-  Output,
+  output,
   signal,
   Signal,
 } from '@angular/core';
@@ -77,16 +76,15 @@ import { SelectComponent, SelectOptionComponent } from '../select';
   ],
 })
 export class PaginatorComponent implements OnChanges {
-  initialPageIndex = input<number>(0);
-  initialPageLimit = input<number>(10);
-  availablePageLimits = input<number[]>([10, 25, 50, 100]);
-  totalCount = input<number>(0);
+  public initialPageIndex = input<number>(0);
+  public initialPageLimit = input<number>(10);
+  public availablePageLimits = input<number[]>([10, 25, 50, 100]);
+  public totalCount = input<number>(0);
 
-  activePageIndex = signal<number>(0);
-  activePageLimit = signal<number>(this.availablePageLimits()[0]);
+  public readonly pageChange = output<PageChangeEvent>();
 
-  @Output()
-  readonly pageChange = new EventEmitter<PageChangeEvent>();
+  protected activePageIndex = signal<number>(0);
+  protected activePageLimit = signal<number>(this.availablePageLimits()[0]);
 
   protected availablePageLimitsSelectOptions: Signal<SelectOption<number>[]> =
     computed(() => {
@@ -129,27 +127,27 @@ export class PaginatorComponent implements OnChanges {
     }
   }
 
-  public goToPrevPage(): void {
+  protected goToPrevPage(): void {
     if (this.activePageIndex() > 0)
       this.updateActivePageIndex(this.activePageIndex() - 1);
   }
 
-  public goToNextPage(): void {
+  protected goToNextPage(): void {
     if (this.endPos() < this.totalCount())
       this.updateActivePageIndex(this.activePageIndex() + 1);
   }
 
-  public updateActivePageIndex(number: number): void {
+  protected updateActivePageIndex(number: number): void {
     this.activePageIndex.set(number);
-    this.notifyPageChange();
+    this.#notifyPageChange();
   }
 
-  public updateActivePageLimit(value: number): void {
+  protected updateActivePageLimit(value: number): void {
     this.activePageLimit.set(value);
-    this.notifyPageChange();
+    this.#notifyPageChange();
   }
 
-  private notifyPageChange(): void {
+  #notifyPageChange(): void {
     this.pageChange.emit({
       index: this.activePageIndex(),
       limit: this.activePageLimit(),

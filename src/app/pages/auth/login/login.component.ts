@@ -105,33 +105,34 @@ import { FormUtil } from '../../../utils/form.util';
 export class LoginComponent {
   protected readonly inProgress = signal(false);
   protected readonly submitted = signal(false);
+
   protected readonly form: FormGroup<LoginFormType>;
 
-  private readonly fb = inject(FormBuilder).nonNullable;
-  private readonly authService = inject(AuthService);
-  protected readonly router = inject(Router);
+  readonly #fb = inject(FormBuilder).nonNullable;
+  readonly #authService = inject(AuthService);
+  readonly #router = inject(Router);
   readonly #toast = inject(HotToastService);
 
-  constructor() {
-    this.form = this.fb.group<LoginFormType>({
-      email: this.fb.control('hi@adi.so', [
+  public constructor() {
+    this.form = this.#fb.group<LoginFormType>({
+      email: this.#fb.control('hi@adi.so', [
         Validators.required,
         Validators.email,
       ]),
-      password: this.fb.control('password', [Validators.required]),
+      password: this.#fb.control('password', [Validators.required]),
     });
   }
 
-  hasErrors(control: AbstractControl): boolean {
+  protected hasErrors(control: AbstractControl): boolean {
     return FormUtil.hasErrors(control, this.submitted());
   }
 
-  login(): void {
+  protected login(): void {
     this.submitted.set(true);
     if (this.form.valid) {
       const { email, password } = this.form.getRawValue();
       this.inProgress.set(true);
-      this.authService
+      this.#authService
         .login(email, password)
         .pipe(
           finalize(() => {
@@ -140,7 +141,7 @@ export class LoginComponent {
         )
         .subscribe({
           next: () => {
-            this.router.navigate(['/']);
+            this.#router.navigate(['/']);
           },
           error: (err) => {
             const errorMessage =

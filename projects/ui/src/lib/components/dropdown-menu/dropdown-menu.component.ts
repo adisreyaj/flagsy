@@ -1,6 +1,6 @@
 import { A11yModule } from '@angular/cdk/a11y';
 import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
-import { Component, EventEmitter, input, Output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { FocusableDirective } from '@ui/a11y';
 import { IconName } from 'angular-remix-icon/lib/icon-names';
 import { ButtonComponent, ButtonVariant } from '../button/button.component';
@@ -51,15 +51,9 @@ import { ButtonComponent, ButtonVariant } from '../button/button.component';
 export class DropdownMenuComponent<ValueType = unknown> {
   public options = input.required<DropdownMenuOption<ValueType>[]>();
 
-  @Output()
-  public optionClick: EventEmitter<DropdownMenuOption<ValueType>> =
-    new EventEmitter();
-
-  @Output()
-  public dropdownOpen = new EventEmitter<void>();
-
-  @Output()
-  public dropdownClose = new EventEmitter<void>();
+  public optionClick = output<DropdownMenuOption<ValueType>>();
+  public dropdownOpen = output<void>();
+  public dropdownClose = output<void>();
 }
 
 export interface DropdownMenuOption<ValueType = unknown> {

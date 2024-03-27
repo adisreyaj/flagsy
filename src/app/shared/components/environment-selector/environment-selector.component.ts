@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, inject, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { EnvironmentsService } from '@app/services/environments/environments.service';
 import {
@@ -37,26 +37,26 @@ import { map, Observable } from 'rxjs';
   ],
 })
 export class EnvironmentSelectorComponent {
-  @Output()
-  environmentSelect = new EventEmitter<string>();
+  public readonly environmentSelect = output<string>();
 
   protected readonly environmentSelectOptions;
-  private readonly environmentsService = inject(EnvironmentsService);
 
   protected readonly activeEnvironmentId$: Observable<string | undefined>;
 
-  constructor() {
+  readonly #environmentsService = inject(EnvironmentsService);
+
+  public constructor() {
     this.activeEnvironmentId$ =
-      this.environmentsService.activeEnvironment$.pipe(
+      this.#environmentsService.activeEnvironment$.pipe(
         map((environment) => environment?.id),
       );
 
     this.environmentSelectOptions =
-      this.environmentsService.getEnvironmentSelectOptions();
+      this.#environmentsService.getEnvironmentSelectOptions();
   }
 
-  public updateActiveEnvironment(environmentId: string): void {
-    this.environmentsService.setActiveEnvironment(environmentId);
+  protected updateActiveEnvironment(environmentId: string): void {
+    this.#environmentsService.setActiveEnvironment(environmentId);
     this.environmentSelect.emit(environmentId);
   }
 }

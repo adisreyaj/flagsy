@@ -1,5 +1,5 @@
 import { FocusableOption } from '@angular/cdk/a11y';
-import { Directive, ElementRef, HostBinding, Input } from '@angular/core';
+import { Directive, ElementRef, HostBinding, input } from '@angular/core';
 
 @Directive({
   // eslint-disable-next-line @angular-eslint/directive-selector
@@ -7,14 +7,8 @@ import { Directive, ElementRef, HostBinding, Input } from '@angular/core';
   standalone: true,
 })
 export class FocusableDirective implements FocusableOption {
-  @Input()
-  public label?: string;
-
-  @Input()
-  public disabled?: boolean;
-
-  @Input()
-  public customTabIndex: number = -1;
+  public label = input<string>('');
+  public customTabIndex = input<number>(-1);
 
   /**
    * We don't want individual list items to be navigable by tabbing, Instead

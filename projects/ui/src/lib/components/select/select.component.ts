@@ -7,11 +7,10 @@ import {
 } from '@angular/cdk/menu';
 import {
   AfterContentInit,
-  booleanAttribute,
   Component,
   contentChildren,
   input,
-  Input,
+  model,
   output,
   signal,
 } from '@angular/core';
@@ -26,7 +25,7 @@ import { SelectOptionComponent } from './select-option.component';
     <button
       class="py-2 px-4 pr-2 flex gap-4 text-sm justify-between items-center w-full border border-gray-200 rounded-xl focus:ring-1 focus:border-primary-500 focus:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none transition-all duration-300"
       [cdkMenuTriggerFor]="menu"
-      [disabled]="this.isDisabled()"
+      [disabled]="this.disabled()"
       (cdkMenuOpened)="this.isOpen.set(true)"
       (cdkMenuClosed)="this.isOpen.set(false)"
     >
@@ -101,28 +100,23 @@ import { SelectOptionComponent } from './select-option.component';
 export class SelectComponent<Value = any>
   implements ControlValueAccessor, AfterContentInit
 {
+  public placeholder = input<string>('Select');
+  public prefixIcon = input<IconName | undefined>();
+
+  protected disabled = model(false);
+  protected isOpen = model(false);
+
+  public readonly selectionChange = output<Value>();
+
   protected options = contentChildren<SelectOptionComponent<Value>>(
     SelectOptionComponent,
   );
 
-  @Input({ transform: booleanAttribute })
-  public set disabled(isDisabled: boolean) {
-    this.isDisabled.set(isDisabled);
-  }
-
-  public placeholder = input<string>('Select');
-
-  public prefixIcon = input<IconName | undefined>();
-
-  public readonly selectionChange = output<Value>();
-
-  protected isDisabled = signal(false);
-  protected isOpen = signal(false);
   protected selectedItemValue = signal<Value | undefined>(undefined);
   protected selectedItemLabel = signal<string | undefined>(undefined);
 
-  private propagateChange?: (value: Value) => void;
-  private propagateTouch?: () => void;
+  #propagateChange?: (value: Value) => void;
+  #propagateTouch?: () => void;
 
   public ngAfterContentInit(): void {
     if (this.selectedItemValue() === undefined) {
@@ -139,7 +133,7 @@ export class SelectComponent<Value = any>
     }
   }
 
-  writeValue(value: Value): void {
+  public writeValue(value: Value): void {
     this.selectedItemValue.set(value);
     if (this.options) {
       this.selectedItemLabel.set(
@@ -150,22 +144,22 @@ export class SelectComponent<Value = any>
     }
   }
 
-  registerOnChange(fn: (value: Value) => void): void {
-    this.propagateChange = fn;
+  public registerOnChange(fn: (value: Value) => void): void {
+    this.#propagateChange = fn;
   }
 
-  registerOnTouched(fn: () => void): void {
-    this.propagateTouch = fn;
+  public registerOnTouched(fn: () => void): void {
+    this.#propagateTouch = fn;
   }
 
-  setDisabledState(isDisabled: boolean): void {
-    this.isDisabled.set(isDisabled);
+  public setDisabledState(isDisabled: boolean): void {
+    this.disabled.set(isDisabled);
   }
 
-  public selectItem(option: SelectOptionComponent<Value>): void {
+  protected selectItem(option: SelectOptionComponent<Value>): void {
     this.selectedItemValue.set(option.value());
     this.selectedItemLabel.set(option.label());
-    this.propagateChange?.(option.value());
-    this.propagateTouch?.();
+    this.#propagateChange?.(option.value());
+    this.#propagateTouch?.();
   }
 }

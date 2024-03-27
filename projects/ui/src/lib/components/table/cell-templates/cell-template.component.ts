@@ -22,33 +22,32 @@ import { UserCellTemplateComponent } from './user-cell-template.component';
   standalone: true,
 })
 export class CellTemplateDirective implements OnInit {
-  column = input.required<TableColumnConfig>({
+  public column = input.required<TableColumnConfig>({
     alias: 'uiCellTemplate',
   });
+  public rowData = input.required<Record<string, unknown>>();
 
-  rowData = input.required<Record<string, unknown>>();
-
-  data = computed(() => {
+  readonly #data = computed(() => {
     return get(this.rowData(), this.column().id);
   });
 
-  #vcr = inject(ViewContainerRef);
+  readonly #vcr = inject(ViewContainerRef);
 
-  ngOnInit() {
+  public ngOnInit() {
     this.#vcr.clear();
     if (!this.column()) return;
 
-    const componentOrTemplateRef = this.getColumnComponent(this.column());
+    const componentOrTemplateRef = this.#getColumnComponent(this.column());
     if (componentOrTemplateRef instanceof TemplateRef) {
       this.#vcr.createEmbeddedView(componentOrTemplateRef);
     } else if (componentOrTemplateRef) {
       this.#vcr.createComponent(componentOrTemplateRef, {
-        injector: this.getInjector(),
+        injector: this.#getInjector(),
       });
     }
   }
 
-  private getColumnComponent(columnConfig: TableColumnConfig) {
+  #getColumnComponent(columnConfig: TableColumnConfig) {
     if (columnConfig.content) {
       return columnConfig.content;
     }
@@ -70,12 +69,12 @@ export class CellTemplateDirective implements OnInit {
     }
   }
 
-  private getInjector() {
+  #getInjector() {
     return Injector.create({
       providers: [
         {
           provide: CELL_DATA,
-          useValue: this.data(),
+          useValue: this.#data(),
         },
         {
           provide: ROW_DATA,

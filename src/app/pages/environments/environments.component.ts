@@ -151,7 +151,7 @@ import { HasFFAccessPipe } from '../../shared/pipes/has-ff-access.pipe';
                         <ui-input
                           class="flex-auto"
                           [ngModel]="this.selectedEnvironmentId()"
-                          disabled
+                          [disabled]="true"
                         ></ui-input>
                         <ui-button
                           prefixIcon="clipboard-line"
@@ -241,16 +241,16 @@ import { HasFFAccessPipe } from '../../shared/pipes/has-ff-access.pipe';
   ],
 })
 export class EnvironmentsComponent {
-  environmentListItems: Signal<ReadonlyArray<FocusableDirective>> =
+  protected environmentListItems: Signal<ReadonlyArray<FocusableDirective>> =
     viewChildren(FocusableDirective);
 
   @Input()
-  set environmentId(environmentId: string) {
+  public set environmentId(environmentId: string) {
     this.selectedEnvironmentId.set(environmentId);
   }
 
   @Input()
-  set section(section: EnvironmentSectionRoute) {
+  public set section(section: EnvironmentSectionRoute) {
     this.activeSectionRoute.set(section ?? EnvironmentSectionRoute.General);
   }
 
@@ -281,7 +281,7 @@ export class EnvironmentsComponent {
 
   protected readonly detailForm;
 
-  keyManager = computed(() => {
+  protected readonly keyManager = computed(() => {
     return new FocusKeyManager(
       this.environmentListItems() as FocusableDirective[],
     ).withWrap(true);
@@ -292,7 +292,7 @@ export class EnvironmentsComponent {
   readonly #router = inject(Router);
   readonly #fb = inject(NonNullableFormBuilder);
 
-  constructor() {
+  public constructor() {
     this.environments = computed(() => {
       return this.#environmentsService
         .environments()
@@ -333,18 +333,18 @@ export class EnvironmentsComponent {
     );
   }
 
-  public search(searchText: string): void {
+  protected search(searchText: string): void {
     this.searchText.set(searchText);
   }
 
-  public openEnvironmentSheet(): void {
+  protected openEnvironmentSheet(): void {
     this.#sheetService.open(EnvironmentConfigSheetComponent, {
       title: 'Create Environment',
       size: SheetSize.Medium,
     });
   }
 
-  public selectEnvironment(environment: Environment) {
+  protected selectEnvironment(environment: Environment) {
     if (!isNil(environment)) {
       this.selectedEnvironmentId.set(environment.id);
       return this.#router.navigate([
@@ -357,7 +357,7 @@ export class EnvironmentsComponent {
     return;
   }
 
-  public updateSelectedTab(event: TabChangeEvent): void {
+  protected updateSelectedTab(event: TabChangeEvent): void {
     const indexToRoutesMap: Record<number, string> = {
       0: EnvironmentSectionRoute.General,
       1: EnvironmentSectionRoute.AccessKeys,
@@ -371,11 +371,11 @@ export class EnvironmentsComponent {
     ]);
   }
 
-  onKeydown(event: KeyboardEvent) {
+  protected onKeydown(event: KeyboardEvent) {
     this.keyManager()?.onKeydown(event);
   }
 
-  public updateEnvironment(id?: string): void {
+  protected updateEnvironment(id?: string): void {
     if (!isNil(id)) {
       this.#environmentsService
         .updateEnvironment({

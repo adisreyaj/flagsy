@@ -98,17 +98,18 @@ export class ProjectsComponent {
   ];
 
   protected readonly projectsWriteScope: string[] = [Permissions.project.write];
-
-  private readonly sheetService = inject(SheetService);
-  private readonly projectsService = inject(ProjectsService);
   protected readonly dataFetcher: TableDataFetcher<Project>;
-  constructor() {
+
+  readonly #sheetService = inject(SheetService);
+  readonly #projectsService = inject(ProjectsService);
+
+  public constructor() {
     this.dataFetcher = () =>
-      this.projectsService.getAllProjects().pipe(take(1));
+      this.#projectsService.getAllProjects().pipe(take(1));
   }
 
-  public openProjectConfigSheet(): void {
-    this.sheetService.open(ProjectConfigSheetComponent, {
+  protected openProjectConfigSheet(): void {
+    this.#sheetService.open(ProjectConfigSheetComponent, {
       title: 'Create Project',
       size: SheetSize.Medium,
     });

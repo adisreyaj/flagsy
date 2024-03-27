@@ -26,7 +26,7 @@ import { FeaturesListComponent } from '../features/features-list.component';
 
     <section class="grid grid-cols-[5fr_7fr] min-h-0 p-4 gap-4">
       <div
-        class="border border-gray-200 rounded-xl p-4 flex flex-col gap-4 shadow-sm"
+        class="border border-gray-200 rounded-xl p-4 pt-2 flex flex-col gap-2 shadow-sm"
       >
         <header class="flex justify-between items-center">
           <h2 class="font-semibold text-sm text-gray-700">Latest Flags</h2>
@@ -48,7 +48,7 @@ import { FeaturesListComponent } from '../features/features-list.component';
         </div>
       </div>
       <div
-        class="border border-gray-200 rounded-xl p-4 flex flex-col gap-4 shadow-sm"
+        class="border border-gray-200 rounded-xl p-4 pt-2 flex flex-col gap-2 shadow-sm"
       >
         <header class="flex justify-between items-center">
           <h2 class="font-semibold text-sm text-gray-700">Recent Changelog</h2>

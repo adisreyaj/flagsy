@@ -13,10 +13,10 @@ import { SHEET_DATA, SheetConfig, SheetSize } from './sheet.type';
   providedIn: 'root',
 })
 export class SheetService {
-  private readonly overlay = inject(Overlay);
-  private readonly parentInjector = inject(Injector);
+  readonly #overlay = inject(Overlay);
+  readonly #parentInjector = inject(Injector);
 
-  open<DataType = unknown>(
+  public open<DataType = unknown>(
     component: Type<unknown>,
     config?: SheetConfig<DataType>,
   ) {
@@ -41,33 +41,33 @@ export class SheetService {
           useValue: sheetRef,
         },
       ],
-      parent: this.parentInjector,
+      parent: this.#parentInjector,
     });
     const componentPortal = new ComponentPortal(
       SheetComponent,
       undefined,
       injector,
     );
-    const positionStrategy = this.overlay
+    const positionStrategy = this.#overlay
       .position()
       .global()
       .top('0')
       .right('0');
 
     const overlayConfig: OverlayConfig = {
-      ...this.getSheetDimensions(config?.size),
+      ...this.#getSheetDimensions(config?.size),
       hasBackdrop: true,
       backdropClass: 'overlay-backdrop',
       panelClass: 'sheet',
       disposeOnNavigation: true,
       positionStrategy: positionStrategy,
     };
-    const ref = this.overlay.create(overlayConfig);
+    const ref = this.#overlay.create(overlayConfig);
     sheetRef.setRef(ref);
     return ref.attach(componentPortal);
   }
 
-  private getSheetDimensions(
+  #getSheetDimensions(
     size?: SheetSize,
   ): Pick<OverlayConfig, 'maxWidth' | 'height' | 'width'> {
     switch (size) {

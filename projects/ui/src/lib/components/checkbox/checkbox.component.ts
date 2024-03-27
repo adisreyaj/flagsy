@@ -1,12 +1,10 @@
 import {
-  booleanAttribute,
   Component,
   ElementRef,
-  EventEmitter,
   HostBinding,
-  Input,
-  Output,
-  signal,
+  input,
+  model,
+  output,
   viewChild,
 } from '@angular/core';
 import {
@@ -19,17 +17,18 @@ import {
 @Component({
   selector: 'ui-checkbox',
   template: ` <div class="text-sm font-normal">
-    <label [for]="this.label" class="flex items-center gap-2 cursor-pointer">
+    <label [for]="this.label()" class="flex items-center gap-2 cursor-pointer">
       <input
         #input
-        [id]="this.label"
         type="checkbox"
         class="h-5 w-5 cursor-pointer"
-        [ngModel]="this.value()"
+        [id]="this.label()"
+        [disabled]="this.disabled()"
+        [ngModel]="this.checked()"
         (ngModelChange)="this.updateValue($event)"
       />
       <div>
-        {{ this.label }}
+        {{ this.label() }}
       </div>
     </label>
   </div>`,
@@ -44,55 +43,42 @@ import {
   imports: [ReactiveFormsModule, FormsModule],
 })
 export class CheckboxComponent implements ControlValueAccessor {
-  @Input()
-  label: string = '';
+  public label = input<string>('');
+  public checked = model<boolean>(false);
+  public disabled = model<boolean>(false);
 
-  @Input({ transform: booleanAttribute })
-  public set checked(isChecked: boolean) {
-    this.value.set(isChecked);
-  }
+  public readonly checkedChange = output<boolean>();
 
-  @Output()
-  public readonly checkedChange = new EventEmitter<boolean>();
-
-  @Input({ transform: booleanAttribute })
-  public set disabled(isDisabled: boolean) {
-    this.isDisabled.set(isDisabled);
-  }
-
-  public inputTpl = viewChild('input', { read: ElementRef });
+  #inputTpl = viewChild('input', { read: ElementRef });
 
   @HostBinding('focus')
   public focusCheckBox = () => {
-    this.inputTpl()?.nativeElement.focus();
+    this.#inputTpl()?.nativeElement.focus();
   };
 
-  protected readonly value = signal(false);
-  protected readonly isDisabled = signal(false);
+  #propagateValueChange?: (checked: boolean) => void;
+  #propagateTouch?: () => void;
 
-  private propagateValueChange?: (checked: boolean) => void;
-  private propagateTouch?: () => void;
-
-  writeValue(value?: boolean): void {
-    this.value.set(value ?? false);
+  public writeValue(value?: boolean): void {
+    this.checked.set(value ?? false);
   }
 
-  registerOnChange(fn: (value: boolean) => void): void {
-    this.propagateValueChange = fn;
+  public registerOnChange(fn: (value: boolean) => void): void {
+    this.#propagateValueChange = fn;
   }
 
-  registerOnTouched(fn: () => void): void {
-    this.propagateTouch = fn;
+  public registerOnTouched(fn: () => void): void {
+    this.#propagateTouch = fn;
   }
 
-  setDisabledState(isDisabled: boolean): void {
-    this.isDisabled.set(isDisabled);
+  public setDisabledState(isDisabled: boolean): void {
+    this.disabled.set(isDisabled);
   }
 
-  updateValue(value: boolean): void {
-    this.value.set(value);
+  protected updateValue(value: boolean): void {
+    this.checked.set(value);
     this.checkedChange.emit(value);
-    this.propagateValueChange?.(value);
-    this.propagateTouch?.();
+    this.#propagateValueChange?.(value);
+    this.#propagateTouch?.();
   }
 }

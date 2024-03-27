@@ -22,26 +22,26 @@ import { ProjectsService } from '../projects/projects.service';
 })
 export class FeatureService {
   readonly #refreshSubject = new BehaviorSubject<void>(undefined);
-  readonly refresh$ = this.#refreshSubject.asObservable();
+  public readonly refresh$ = this.#refreshSubject.asObservable();
 
   readonly #http = inject(HttpClient);
   readonly #environmentService = inject(EnvironmentsService);
   readonly #projectsService = inject(ProjectsService);
 
-  get currentProjectId$() {
+  public get currentProjectId$() {
     return this.#projectsService.activeProject$.pipe(
       map((project) => project?.id),
     );
   }
 
-  get currentEnvironmentId$() {
+  public get currentEnvironmentId$() {
     return this.#environmentService.activeEnvironment$.pipe(
       map((environment) => environment?.id),
     );
   }
 
   // TODO: Use Public API
-  getAllFeaturesForCurrentProjectAndEnvironment() {
+  public getAllFeaturesForCurrentProjectAndEnvironment() {
     return this.#http.get<FeatureResponse>(`${environment.api}/features`, {
       params: {
         projectId: environment.projectId,
@@ -51,7 +51,7 @@ export class FeatureService {
     });
   }
 
-  getFeatures(args: {
+  public getFeatures(args: {
     projectId: string;
     environmentId: string;
     sort?: SortBy<FeatureSortBy>;
@@ -70,7 +70,7 @@ export class FeatureService {
     });
   }
 
-  getFeatureTypeSelectOptions(): SelectOption<FeatureValueType>[] {
+  public getFeatureTypeSelectOptions(): SelectOption<FeatureValueType>[] {
     return Object.values(FeatureValueType).map((feature) => {
       return {
         label: startCase(feature),
@@ -79,7 +79,7 @@ export class FeatureService {
     });
   }
 
-  createFeature(data: FeatureCreateData): Observable<Feature> {
+  public createFeature(data: FeatureCreateData): Observable<Feature> {
     return this.#http
       .post<Feature>(`${environment.api}/features`, data, {
         withCredentials: true,
@@ -87,7 +87,7 @@ export class FeatureService {
       .pipe(tap(() => this.#refreshSubject.next()));
   }
 
-  updateFeature(
+  public updateFeature(
     id: string,
     data: Partial<FeatureUpdateData>,
   ): Observable<Feature> {
@@ -98,7 +98,7 @@ export class FeatureService {
       .pipe(finalize(() => this.#refreshSubject.next()));
   }
 
-  deleteFeature(id: string): Observable<void> {
+  public deleteFeature(id: string): Observable<void> {
     return this.#http
       .delete<void>(`${environment.api}/features/${id}`, {
         withCredentials: true,

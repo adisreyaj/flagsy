@@ -32,5 +32,3 @@ export const Permissions = Object.values(Scope).reduce(
   },
   {} as Record<Scope, Record<PermissionType, string>>,
 );
-
-console.log(Permissions);

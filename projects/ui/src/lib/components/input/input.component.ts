@@ -1,12 +1,4 @@
-import {
-  booleanAttribute,
-  Component,
-  inject,
-  Input,
-  input,
-  output,
-  signal,
-} from '@angular/core';
+import { Component, inject, input, model, output } from '@angular/core';
 import {
   ControlValueAccessor,
   FormsModule,
@@ -21,7 +13,7 @@ import { FormFieldComponent } from '../form-field/form-field.component';
   template: `
     <div
       class="flex gap-2 items-center relative group h-[42px]"
-      [class.disabled]="this.isDisabled()"
+      [class.disabled]="this.disabled()"
     >
       @if (this.prefixIcon(); as prefixIcon) {
         <div class="absolute h-full top-0 left-3 flex items-center z-10">
@@ -38,7 +30,7 @@ import { FormFieldComponent } from '../form-field/form-field.component';
         [class.form-field-input]="this.isWithinFormField"
         [class.error]="this.hasError"
         [type]="this.type()"
-        [disabled]="this.isDisabled()"
+        [disabled]="this.disabled()"
         [placeholder]="this.placeholder()"
         [ngModel]="this.value()"
         (ngModelChange)="this.updateValue($event)"
@@ -92,60 +84,53 @@ import { FormFieldComponent } from '../form-field/form-field.component';
 })
 export class InputComponent implements ControlValueAccessor {
   public type = input<string>('text');
-
   public placeholder = input<string>('');
-
   public prefixIcon = input<IconName | undefined>(undefined);
+
+  public value = model<string>('');
+  public disabled = model<boolean>(false);
 
   public inputChange = output<string>();
 
-  @Input({ transform: booleanAttribute })
-  public set disabled(isDisabled: boolean) {
-    this.isDisabled.set(isDisabled);
-  }
-
-  protected readonly value = signal('');
-  protected readonly isDisabled = signal(false);
-
-  protected readonly formField? = inject(FormFieldComponent, {
+  readonly #formField? = inject(FormFieldComponent, {
     optional: true,
   });
 
-  private propagateValueChange?: (value: string) => void;
-  private propagateTouch?: () => void;
+  #propagateValueChange?: (value: string) => void;
+  #propagateTouch?: () => void;
 
-  get isWithinFormField(): boolean {
-    return this.formField !== undefined;
+  protected get isWithinFormField(): boolean {
+    return this.#formField !== undefined;
   }
 
-  get hasError(): boolean {
-    return this.formField?.showError ?? false;
+  protected get hasError(): boolean {
+    return this.#formField?.showError() ?? false;
   }
 
-  writeValue(value?: string): void {
+  public writeValue(value?: string): void {
     this.value.set(value ?? '');
   }
 
-  registerOnChange(fn: (value: string) => void): void {
-    this.propagateValueChange = fn;
+  public registerOnChange(fn: (value: string) => void): void {
+    this.#propagateValueChange = fn;
   }
 
-  registerOnTouched(fn: () => void): void {
-    this.propagateTouch = fn;
+  public registerOnTouched(fn: () => void): void {
+    this.#propagateTouch = fn;
   }
 
-  setDisabledState(isDisabled: boolean): void {
-    this.isDisabled.set(isDisabled);
+  public setDisabledState(isDisabled: boolean): void {
+    this.disabled.set(isDisabled);
   }
 
-  public updateValue(value: string): void {
+  protected updateValue(value: string): void {
     this.value.set(value);
-    this.notifyChange(value);
+    this.#notifyChange(value);
   }
 
-  private notifyChange(value: string) {
-    this.propagateValueChange?.(value);
-    this.propagateTouch?.();
+  #notifyChange(value: string) {
+    this.#propagateValueChange?.(value);
+    this.#propagateTouch?.();
     this.inputChange.emit(value);
   }
 }

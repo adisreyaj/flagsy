@@ -20,14 +20,14 @@ import {
 export class ModalService {
   readonly #dialog = inject(Dialog);
 
-  open<DataType = unknown, ReturnType = unknown>(
+  public open<DataType = unknown, ReturnType = unknown>(
     component: Type<unknown>,
     config?: ModalConfig & { data?: DataType },
   ): DialogRef<ReturnType, ModalComponent> {
     return this.#dialog.open<ReturnType, DataType, ModalComponent>(
       ModalComponent,
       {
-        ...this.getModalDimensions(config?.size),
+        ...this.#getModalDimensions(config?.size),
         panelClass: 'modal',
         backdropClass: 'overlay-backdrop',
         providers: [
@@ -49,7 +49,7 @@ export class ModalService {
     );
   }
 
-  openConfirmation<TemplateContextData = unknown>(
+  public openConfirmation<TemplateContextData = unknown>(
     config: ConfirmationModalConfig<TemplateContextData>,
   ): Observable<boolean | undefined> {
     const ref: DialogRef<boolean, ModalComponent> = this.open<
@@ -65,7 +65,7 @@ export class ModalService {
     return ref.closed;
   }
 
-  private getModalDimensions(
+  #getModalDimensions(
     size?: ModalSize,
   ): Pick<DialogConfig, 'maxWidth' | 'width'> {
     switch (size) {

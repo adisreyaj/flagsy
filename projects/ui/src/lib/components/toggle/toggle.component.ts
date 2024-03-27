@@ -1,4 +1,4 @@
-import { booleanAttribute, Component, Input, signal } from '@angular/core';
+import { Component, model } from '@angular/core';
 import {
   ControlValueAccessor,
   FormsModule,
@@ -9,14 +9,14 @@ import {
   selector: 'ui-toggle',
   template: `
     <label
-      [class.disabled]="this.isDisabled()"
+      [class.disabled]="this.disabled()"
       class="toggle rounded-full relative block h-6 w-11 cursor-pointer [-webkit-tap-highlight-color:_transparent]"
     >
       <input
         type="checkbox"
         class="peer sr-only"
-        [disabled]="this.isDisabled()"
-        [ngModel]="this.isChecked()"
+        [disabled]="this.disabled()"
+        [ngModel]="this.checked()"
         (ngModelChange)="updateChecked($event)"
       />
 
@@ -55,41 +55,31 @@ import {
   ],
 })
 export class ToggleComponent implements ControlValueAccessor {
-  @Input({ transform: booleanAttribute })
-  public set checked(isEnabled: boolean) {
-    this.isChecked.set(isEnabled);
+  public disabled = model(false);
+  public checked = model(false);
+
+  #propagateValueChange?: (value: boolean) => void;
+  #propagateTouch?: () => void;
+
+  public writeValue(isEnabled: boolean): void {
+    this.checked.set(isEnabled);
   }
 
-  @Input({ transform: booleanAttribute })
-  public set disabled(isDisabled: boolean) {
-    this.isDisabled.set(isDisabled);
+  public registerOnChange(fn: (value: boolean) => void): void {
+    this.#propagateValueChange = fn;
   }
 
-  protected isDisabled = signal(false);
-  protected readonly isChecked = signal(false);
-
-  private propagateValueChange?: (value: boolean) => void;
-  private propagateTouch?: () => void;
-
-  writeValue(isEnabled: boolean): void {
-    this.isChecked.set(isEnabled);
+  public registerOnTouched(fn: () => void): void {
+    this.#propagateTouch = fn;
   }
 
-  registerOnChange(fn: (value: boolean) => void): void {
-    this.propagateValueChange = fn;
+  public setDisabledState(isDisabled: boolean): void {
+    this.disabled.set(isDisabled);
   }
 
-  registerOnTouched(fn: () => void): void {
-    this.propagateTouch = fn;
-  }
-
-  setDisabledState(isDisabled: boolean): void {
-    this.isDisabled.set(isDisabled);
-  }
-
-  public updateChecked(isChecked: boolean): void {
-    this.isChecked.set(isChecked);
-    this.propagateValueChange?.(isChecked);
-    this.propagateTouch?.();
+  protected updateChecked(isChecked: boolean): void {
+    this.checked.set(isChecked);
+    this.#propagateValueChange?.(isChecked);
+    this.#propagateTouch?.();
   }
 }

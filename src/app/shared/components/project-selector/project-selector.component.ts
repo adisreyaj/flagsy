@@ -31,16 +31,16 @@ import {
 })
 export class ProjectSelectorComponent {
   protected readonly projectSelectOptions;
-  private readonly projectsService = inject(ProjectsService);
-
   protected readonly activeProject;
 
-  constructor() {
-    this.activeProject = this.projectsService.activeProject;
-    this.projectSelectOptions = this.projectsService.getProjectSelectOptions();
+  readonly #projectsService = inject(ProjectsService);
+
+  public constructor() {
+    this.projectSelectOptions = this.#projectsService.getProjectSelectOptions();
+    this.activeProject = this.#projectsService.activeProject;
   }
 
   public updateActiveProject(projectId: string): void {
-    this.projectsService.setActiveProject(projectId);
+    this.#projectsService.setActiveProject(projectId);
   }
 }

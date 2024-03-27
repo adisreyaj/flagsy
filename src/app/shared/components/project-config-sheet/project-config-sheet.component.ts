@@ -69,15 +69,15 @@ export class ProjectConfigSheetComponent {
   protected readonly form: FormGroup<ProjectFormType>;
   protected readonly submitted = signal(false);
 
-  private readonly sheetRef = inject(SheetRef);
-  private readonly projectsService = inject(ProjectsService);
-  private readonly fb: NonNullableFormBuilder = inject(FormBuilder).nonNullable;
+  readonly #sheetRef = inject(SheetRef);
+  readonly #projectsService = inject(ProjectsService);
+  readonly #fb: NonNullableFormBuilder = inject(FormBuilder).nonNullable;
 
-  constructor() {
+  public constructor() {
     this.form = this.#buildForm();
   }
 
-  hasErrors(control: AbstractControl): boolean {
+  protected hasErrors(control: AbstractControl): boolean {
     if (this.submitted()) {
       return control.invalid;
     }
@@ -85,14 +85,14 @@ export class ProjectConfigSheetComponent {
     return (control.touched || control.dirty) && control.invalid;
   }
 
-  closeSheet() {
-    this.sheetRef.close();
+  protected closeSheet() {
+    this.#sheetRef.close();
   }
 
-  saveProject(): void {
+  protected saveProject(): void {
     this.submitted.set(true);
     if (this.form.valid) {
-      this.projectsService
+      this.#projectsService
         .createProject({
           name: this.form.controls.name.value,
           key: this.form.controls.key.value,
@@ -106,9 +106,9 @@ export class ProjectConfigSheetComponent {
   }
 
   #buildForm(): FormGroup<ProjectFormType> {
-    const form = this.fb.group<ProjectFormType>({
-      name: this.fb.control('', Validators.required),
-      key: this.fb.control('', [
+    const form = this.#fb.group<ProjectFormType>({
+      name: this.#fb.control('', Validators.required),
+      key: this.#fb.control('', [
         Validators.required,
         Validators.minLength(3),
         Validators.pattern(ValidatorsUtil.ALPHANUMERIC_WITH_DASHES),

@@ -23,16 +23,7 @@ import {
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { AngularRemixIconComponent } from 'angular-remix-icon';
 import { isEmpty } from 'lodash-es';
-import {
-  combineLatest,
-  debounceTime,
-  filter,
-  fromEvent,
-  map,
-  Observable,
-  startWith,
-  switchMap,
-} from 'rxjs';
+import { combineLatest, filter, fromEvent, Observable, switchMap } from 'rxjs';
 import {
   PageChangeEvent,
   PaginatorComponent,
@@ -81,9 +72,9 @@ export enum TableSortDirection {
           </div>
         }
         <cdk-table
+          #table
           class="flex flex-col w-full"
           [dataSource]="this.dataSource()"
-          #table
         >
           @for (column of this.columns(); track column.id; let last = $last) {
             <ng-container [cdkColumnDef]="column.id">
@@ -198,31 +189,37 @@ export enum TableSortDirection {
   ],
 })
 export class TableComponent implements OnInit {
-  columns = input.required<TableColumnConfig[]>();
-  data = input.required<TableDataFetcher>();
+  public columns = input.required<TableColumnConfig[]>();
+  public data = input.required<TableDataFetcher>();
 
   // Pagination
-  pageable = input<boolean>(false);
-  initialPageIndex = input<number>(0);
-  initialPageLimit = input<number>(10);
-  availablePageLimits = input<number[]>([10, 25, 50, 100]);
+  public pageable = input<boolean>(false);
+  public initialPageIndex = input<number>(0);
+  public initialPageLimit = input<number>(10);
+  public availablePageLimits = input<number[]>([10, 25, 50, 100]);
 
   // External Triggers
-  externalTriggers = input<Record<string, Observable<unknown>> | undefined>(
-    undefined,
-  );
+  public externalTriggers = input<
+    Record<string, Observable<unknown>> | undefined
+  >(undefined);
+
+  protected tableElementRef = viewChild('table', {
+    read: ElementRef<HTMLDivElement>,
+  });
 
   // Pagination state is managed by the table itself
-  activePageIndex = signal<number>(0);
-  activePageLimit = signal<number>(this.availablePageLimits()[0]);
+  protected readonly activePageIndex = signal<number>(0);
+  protected readonly activePageLimit = signal<number>(
+    this.availablePageLimits()[0],
+  );
 
-  protected sortState = signal<TableSortState | undefined>(undefined);
-  protected paginationState = signal<TablePaginationState>({
+  readonly #sortState = signal<TableSortState | undefined>(undefined);
+  readonly #paginationState = signal<TablePaginationState>({
     limit: this.initialPageLimit(),
     offset: this.initialPageIndex(),
   });
 
-  protected dataSource = computed(() => {
+  protected readonly dataSource = computed(() => {
     const hasSortableColumn = this.columns().some((col) => col.sortable);
     return new TableDataSource(
       this.data(),
@@ -231,8 +228,7 @@ export class TableComponent implements OnInit {
       !isEmpty(this.externalTriggers()) ? this.#externalTriggers$ : undefined,
     );
   });
-
-  protected displayedColumns = computed(() =>
+  protected readonly displayedColumns = computed(() =>
     this.columns().reduce((acc, col) => {
       if (col.visible ?? true) {
         return [...acc, col.id];
@@ -241,38 +237,38 @@ export class TableComponent implements OnInit {
     }, [] as string[]),
   );
 
-  protected isLoading = computed(() => this.dataSource().isLoading());
-  protected isEmpty = computed(() => this.dataSource().isEmpty());
-  protected dataFetched = computed(() => this.dataSource().dataFetched());
+  protected readonly isLoading = computed(() => this.dataSource().isLoading());
+  protected readonly isEmpty = computed(() => this.dataSource().isEmpty());
+  protected readonly dataFetched = computed(() =>
+    this.dataSource().dataFetched(),
+  );
 
-  protected rowGridStyles = computed(() => {
+  protected readonly activeSortColumn = computed(
+    () => this.#sortState()?.column?.id,
+  );
+  protected readonly activeSortDirection = computed(
+    () => this.#sortState()?.direction,
+  );
+  protected readonly totalCount = computed(
+    () => this.dataSource().totalCount() ?? 0,
+  );
+
+  protected readonly rowGridStyles = computed(() => {
     return TableUtil.getGridTemplateColumns(
       this.columns(),
       this.#tableWidth() ?? 0,
     );
   });
 
-  protected activeSortColumn = computed(() => this.sortState()?.column?.id);
-  protected activeSortDirection = computed(() => this.sortState()?.direction);
-  protected totalCount = computed(() => this.dataSource().totalCount() ?? 0);
-
-  private tableElementRef = viewChild('table', { read: ElementRef });
-  private readonly tableElement = computed<HTMLDivElement>(() => {
-    return this.tableElementRef()?.nativeElement;
+  readonly #windowResize = toSignal(fromEvent(window, 'resize'), {
+    initialValue: undefined,
   });
-
-  readonly #tableWidthAndChanges$ = combineLatest([
-    toObservable(this.tableElement),
-    fromEvent(window, 'resize').pipe(startWith(undefined)),
-  ]).pipe(
-    debounceTime(10),
-    map(([tableElement]) => {
-      return tableElement.offsetWidth;
-    }),
-  );
-  readonly #tableWidth = toSignal(this.#tableWidthAndChanges$);
-  readonly #sortState$ = toObservable(this.sortState);
-  readonly #paginationState$ = toObservable(this.paginationState);
+  readonly #tableWidth = computed(() => {
+    this.#windowResize();
+    return this.tableElementRef()?.nativeElement.offsetWidth;
+  });
+  readonly #sortState$ = toObservable(this.#sortState);
+  readonly #paginationState$ = toObservable(this.#paginationState);
   readonly #externalTriggers$ = toObservable(this.externalTriggers).pipe(
     filter(
       (triggers): triggers is Record<string, Observable<unknown>> =>
@@ -281,13 +277,13 @@ export class TableComponent implements OnInit {
     switchMap((triggers) => combineLatest(triggers)),
   );
 
-  ngOnInit() {
+  public ngOnInit() {
     const colWithDefaultSortApplied = this.columns().find(
       (col) => col.sortable && col.sortDirection !== undefined,
     );
 
     if (colWithDefaultSortApplied) {
-      this.sortState.set({
+      this.#sortState.set({
         column: colWithDefaultSortApplied,
         direction:
           colWithDefaultSortApplied.sortDirection! as TableSortDirection,
@@ -295,19 +291,19 @@ export class TableComponent implements OnInit {
     }
   }
 
-  public sort(column: TableColumnConfig): void {
-    const nextSortDirection = this.getNextSortDirection(
-      this.sortState()?.direction,
+  protected sort(column: TableColumnConfig): void {
+    const nextSortDirection = this.#getNextSortDirection(
+      this.#sortState()?.direction,
     );
 
-    this.sortState.set({
+    this.#sortState.set({
       column: nextSortDirection === undefined ? undefined : column,
-      direction: this.getNextSortDirection(this.sortState()?.direction),
+      direction: this.#getNextSortDirection(this.#sortState()?.direction),
     });
   }
 
-  public pageChange(event: PageChangeEvent): void {
-    this.paginationState.set({
+  protected pageChange(event: PageChangeEvent): void {
+    this.#paginationState.set({
       offset: event.offset,
       limit: event.limit,
     });
@@ -315,7 +311,7 @@ export class TableComponent implements OnInit {
     this.activePageLimit.set(event.limit);
   }
 
-  private getNextSortDirection(
+  #getNextSortDirection(
     direction?: TableSortDirection,
   ): TableSortDirection | undefined {
     switch (direction) {
