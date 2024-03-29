@@ -5,9 +5,8 @@ import {
   Component,
   computed,
   contentChildren,
-  EventEmitter,
-  Input,
-  Output,
+  model,
+  output,
   Signal,
   signal,
   viewChildren,
@@ -30,9 +29,9 @@ import { TabComponent } from './tab.component';
           class="flex item flex-1 cursor-pointer relative transition-colors duration-300"
           focusable
           [disabled]="tab.disabled"
-          [tabindex]="this.selectedTabIndex() === i ? 0 : -1"
-          [attr.aria-selected]="this.selectedTabIndex() === i"
-          [class.active]="this.selectedTabIndex() === i"
+          [tabindex]="this.tabIndex() === i ? 0 : -1"
+          [attr.aria-selected]="this.tabIndex() === i"
+          [class.active]="this.tabIndex() === i"
           [class.disabled]="tab.disabled"
           (click)="!tab.disabled && this.selectTab(i)"
           (keydown.enter)="!tab.disabled && this.selectTab(i)"
@@ -94,32 +93,27 @@ import { TabComponent } from './tab.component';
   imports: [NgTemplateOutlet, AngularRemixIconComponent, FocusableDirective],
 })
 export class TabsComponent {
-  readonly tabs = contentChildren(TabComponent);
-  readonly tabListItemsSignal = viewChildren(FocusableDirective);
+  protected readonly tabIndex = model<number>(0);
 
-  readonly keyManager: Signal<FocusKeyManager<unknown> | undefined> = signal<
+  public readonly tabChange = output<TabChangeEvent>();
+
+  protected readonly tabs = contentChildren(TabComponent);
+  protected readonly tabListItemsSignal = viewChildren(FocusableDirective);
+
+  readonly #keyManager: Signal<FocusKeyManager<unknown> | undefined> = signal<
     FocusKeyManager<unknown> | undefined
   >(undefined);
 
-  @Input()
-  set tabIndex(selectedTabIndex: number) {
-    this.selectedTabIndex.set(selectedTabIndex);
-  }
-
-  @Output()
-  readonly tabChange: EventEmitter<TabChangeEvent> =
-    new EventEmitter<TabChangeEvent>();
-
-  readonly selectedTabIndex = signal<number>(0);
-
-  readonly selectedTab: Signal<TabComponent | undefined> = computed(() => {
-    const tabs = this.tabs();
-    const selectedTabIndex = this.selectedTabIndex();
-    return tabs?.[selectedTabIndex];
-  });
+  protected readonly selectedTab: Signal<TabComponent | undefined> = computed(
+    () => {
+      const tabs = this.tabs();
+      const selectedTabIndex = this.tabIndex();
+      return tabs?.[selectedTabIndex];
+    },
+  );
 
   public constructor() {
-    this.keyManager = computed(() => {
+    this.#keyManager = computed(() => {
       return new FocusKeyManager(
         this.tabListItemsSignal() as FocusableDirective[],
       )
@@ -129,17 +123,17 @@ export class TabsComponent {
   }
 
   public selectTab(i: number): void {
-    const prevIndex = this.selectedTabIndex();
-    this.selectedTabIndex.set(i);
+    const prevIndex = this.tabIndex();
+    this.tabIndex.set(i);
     this.tabChange.emit({ prevIndex, currIndex: i });
   }
 
-  onKeydown(event: KeyboardEvent) {
-    this.keyManager()?.onKeydown(event);
+  protected onKeydown(event: KeyboardEvent) {
+    this.#keyManager()?.onKeydown(event);
   }
 
   public setFocusedAsActiveInKeyManager(i: number): void {
-    this.keyManager()?.updateActiveItem(i);
+    this.#keyManager()?.updateActiveItem(i);
   }
 }
 

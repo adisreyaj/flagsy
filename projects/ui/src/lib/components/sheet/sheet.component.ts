@@ -61,19 +61,19 @@ export class SheetComponent<T> {
   readonly #sheetConfig = inject(SHEET_COMPONENT_ARGS);
   readonly #sheetRef: SheetRef = inject(SheetRef);
 
-  get content(): Type<T> {
+  protected get content(): Type<T> {
     return this.#sheetConfig.content as Type<T>;
   }
 
-  get title(): string | undefined {
+  protected get title(): string | undefined {
     return trim(this.#sheetConfig.title) ?? undefined;
   }
 
-  get showCloseButton(): boolean {
+  protected get showCloseButton(): boolean {
     return this.#sheetConfig.showCloseButton ?? true;
   }
 
-  close() {
+  protected close() {
     this.#sheetRef.close();
   }
 }

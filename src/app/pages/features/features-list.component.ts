@@ -151,7 +151,7 @@ export class FeaturesListComponent {
     environmentId: this.#featuresService.currentEnvironmentId$,
   };
 
-  constructor() {
+  public constructor() {
     this.dataFetcher = ({ sort, externalTriggers }) => {
       return this.#featuresService
         .getFeatures({

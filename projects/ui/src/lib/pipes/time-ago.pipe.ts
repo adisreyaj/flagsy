@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
   standalone: true,
 })
 export class TimeAgoPipe implements PipeTransform {
-  transform(value?: Date): string {
+  public transform(value?: Date): string {
     if (value) {
       const seconds = Math.floor((+new Date() - +new Date(value)) / 1000);
       if (seconds < 29)

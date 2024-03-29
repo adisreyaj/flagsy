@@ -32,7 +32,7 @@ import { FormUtil } from '../../../utils/form.util';
     <section class="flex items-center justify-center">
       <div class="flex flex-col">
         <header class="flex flex-col gap-6 items-center justify-center">
-          <img src="/assets/images/logo-full.svg" class="h-10" />
+          <img src="/assets/images/logo-full.svg" alt="Flagsy" class="h-10" />
           <div class="flex flex-col items-center gap-2">
             <h2 class="font-bold text-3xl">Welcome Back!</h2>
             <p>Please login to continue</p>

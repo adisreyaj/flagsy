@@ -16,7 +16,8 @@ export class PermissionAccessDirective {
   readonly #viewContainer = inject(ViewContainerRef);
   readonly #accessService = inject(AccessService);
 
-  @Input() set permissionAccess(scopes: string[] | string) {
+  @Input()
+  public set permissionAccess(scopes: string[] | string) {
     if (
       this.#accessService.hasPermission(
         Array.isArray(scopes) ? scopes : [scopes],

@@ -4,7 +4,7 @@ import { isEmpty } from 'lodash-es';
 import qs from 'query-string';
 
 export abstract class QueryParamUtil {
-  static buildSortParam = (sort?: SortBy): Record<string, string> => {
+  public static buildSortParam = (sort?: SortBy): Record<string, string> => {
     if (sort?.key && sort?.direction) {
       return {
         sortBy: sort.key,
@@ -15,7 +15,9 @@ export abstract class QueryParamUtil {
     return {};
   };
 
-  static buildSearchParam = (search?: string): Record<string, string> => {
+  public static buildSearchParam = (
+    search?: string,
+  ): Record<string, string> => {
     if (search) {
       return {
         search,
@@ -25,7 +27,7 @@ export abstract class QueryParamUtil {
     return {};
   };
 
-  static buildPaginationParam = (pagination?: {
+  public static buildPaginationParam = (pagination?: {
     offset: number;
     limit: number;
   }): Record<string, string> => {
@@ -39,7 +41,9 @@ export abstract class QueryParamUtil {
     return {};
   };
 
-  static buildFilterParam = (filters?: FlatFilter): { filter?: string } => {
+  public static buildFilterParam = (
+    filters?: FlatFilter,
+  ): { filter?: string } => {
     if (isEmpty(filters)) {
       return {};
     }

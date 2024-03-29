@@ -3,7 +3,7 @@ import { FlatFilter } from '@ui/types';
 import { toLower } from 'lodash-es';
 
 export class FilterUtil {
-  static convertToFlatFilter = (
+  public static convertToFlatFilter = (
     filters?: FilterWithSelection[],
   ): FlatFilter => {
     return (filters ?? []).reduce((acc, filter) => {

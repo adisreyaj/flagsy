@@ -47,31 +47,31 @@ import {
   ],
 })
 export class DropdownComponent {
-  isOpen = signal(false);
+  public isOpen = signal(false);
 
-  content = contentChild(DropdownContentDirective);
+  protected content = contentChild(DropdownContentDirective);
 
-  contentTemplate: Signal<TemplateRef<unknown> | null> = computed(
+  protected contentTemplate: Signal<TemplateRef<unknown> | null> = computed(
     () => this.content()?.template ?? null,
   );
 
-  public toggleVisibility(): void {
+  protected toggleVisibility(): void {
     if (!this.isOpen()) this.isOpen.set(!this.isOpen());
   }
 
-  public closeOnEscape(event: KeyboardEvent): void {
+  protected closeOnEscape(event: KeyboardEvent): void {
     if (event.key === 'Escape') {
       this.isOpen.set(false);
     }
   }
 
-  public toggleVisibilityOnKeyDown(event: KeyboardEvent): void {
+  protected toggleVisibilityOnKeyDown(event: KeyboardEvent): void {
     if (['Enter', 'Space', 'ArrowDown', 'ArrowUp'].includes(event.key)) {
       this.toggleVisibility();
     }
   }
 
-  public close() {
+  protected close() {
     this.isOpen.set(false);
   }
 }
@@ -81,5 +81,5 @@ export class DropdownComponent {
   standalone: true,
 })
 export class DropdownContentDirective {
-  constructor(public template?: TemplateRef<unknown>) {}
+  public constructor(public template?: TemplateRef<unknown>) {}
 }

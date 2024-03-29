@@ -16,7 +16,8 @@ export class FfAccessDirective {
   readonly #viewContainer = inject(ViewContainerRef);
   readonly #accessService = inject(AccessService);
 
-  @Input() set ffAccess(featureFlag: string) {
+  @Input()
+  public set ffAccess(featureFlag: string) {
     if (this.#accessService.hasAccess(featureFlag)) {
       this.#viewContainer.createEmbeddedView(this.#templateRef);
     } else {

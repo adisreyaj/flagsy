@@ -7,7 +7,7 @@ import { isNil } from 'lodash-es';
   pure: true,
 })
 export class NonNullPipe implements PipeTransform {
-  transform<T = unknown>(value: T | null): T | undefined {
+  public transform<T = unknown>(value: T | null): T | undefined {
     return isNil(value) ? undefined : (value as T);
   }
 }

@@ -21,7 +21,7 @@ export class AccessService {
     return this.#authService.account()?.role;
   });
 
-  constructor() {
+  public constructor() {
     this.init();
   }
 
@@ -36,7 +36,7 @@ export class AccessService {
       );
   }
 
-  hasAccess(
+  public hasAccess(
     featureKey?: FeatureFlag | string | FeatureFlag[] | string[],
   ): boolean {
     if (!featureKey) {
@@ -52,7 +52,7 @@ export class AccessService {
     return featureData?.value === true;
   }
 
-  hasPermission(scopes: string[]): boolean {
+  public hasPermission(scopes: string[]): boolean {
     return scopes.every((scope) => this.#scopesSet().has(scope));
   }
 }

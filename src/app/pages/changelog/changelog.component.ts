@@ -110,7 +110,8 @@ export class ChangelogComponent {
 
   readonly #environmentService = inject(EnvironmentsService);
   readonly #changelogService = inject(ChangelogService);
-  constructor() {
+
+  public constructor() {
     this.filters = [
       {
         field: 'environment',

@@ -9,7 +9,7 @@ import { AccessService } from '@app/services/access/access.service';
 export class HasFFAccessPipe implements PipeTransform {
   #accessService = inject(AccessService);
 
-  transform(value: string) {
+  public transform(value: string) {
     return this.#accessService.hasAccess(value);
   }
 }

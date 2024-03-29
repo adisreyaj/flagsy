@@ -36,6 +36,7 @@ import { ProjectSelectorComponent } from '../project-selector/project-selector.c
         class="transform-gpu transition-all duration-300 group-hover:opacity-100 focus-visible:opacity-100 flex top-6 bg-primary-500 opacity-0 absolute -right-3 cursor-pointer rounded-full w-6 h-6 shadow-md hover:bg-primary-600 items-center justify-center text-white focus-visible-outline"
         (click)="this.toggleSidebar()"
         [class.rotate-180]="this.isSidebarOpen()"
+        aria-label="Toggle Sidebar"
       >
         <rmx-icon class="!w-4 !h-4" name="arrow-right-s-line"></rmx-icon>
       </button>

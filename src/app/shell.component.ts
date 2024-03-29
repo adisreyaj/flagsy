@@ -45,7 +45,7 @@ export class ShellComponent {
 
   protected readonly isSidebarOpen = this.#sidebarService.isOpen;
 
-  constructor() {
+  public constructor() {
     this.#projectService.init();
   }
 }

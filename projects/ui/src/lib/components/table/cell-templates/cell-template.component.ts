@@ -11,7 +11,12 @@ import {
 import { get } from 'lodash-es';
 import { TableColumnConfig, TableDefaultCellType } from '../table.types';
 import { ActionsCellTemplateComponent } from './actions-cell-template.component';
-import { CELL_CONTEXT, CELL_DATA, ROW_DATA } from './cell.type';
+import {
+  CELL_CONTEXT,
+  CELL_DATA,
+  DATA_TRANSFORMER,
+  ROW_DATA,
+} from './cell.type';
 import { DateCellTemplateComponent } from './date-cell-template.component';
 import { TextCellTemplateComponent } from './text-cell-template.component';
 import { TextWithCopyCellTemplateComponent } from './text-with-copy-cell-template.component';
@@ -83,6 +88,10 @@ export class CellTemplateDirective implements OnInit {
         {
           provide: CELL_CONTEXT,
           useValue: this.column().context,
+        },
+        {
+          provide: DATA_TRANSFORMER,
+          useValue: this.column().transform,
         },
       ],
     });

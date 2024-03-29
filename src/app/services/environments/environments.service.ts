@@ -8,19 +8,18 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { isNotUndefined } from '@app/types/common.type';
+import { DataWithTotal, isNotUndefined } from '@app/types/common.type';
 import {
   Environment,
   EnvironmentCreateInput,
   EnvironmentUpdateInput,
 } from '@app/types/environment.type';
 import { Project } from '@app/types/project.type';
-import { isEmpty, isNil } from 'lodash-es';
+import { isEmpty } from 'lodash-es';
 import {
   BehaviorSubject,
   filter,
   Observable,
-  of,
   startWith,
   Subject,
   switchMap,
@@ -35,15 +34,16 @@ import { ProjectsService } from '../projects/projects.service';
   providedIn: 'root',
 })
 export class EnvironmentsService {
-  readonly environments: WritableSignal<Environment[]> = signal([]);
+  readonly #environments: WritableSignal<Environment[]> = signal([]);
+  public readonly environments = this.#environments.asReadonly();
 
   readonly #activeEnvironmentSubject = new BehaviorSubject<
     Environment | undefined
   >(undefined);
-  readonly activeEnvironment$: Observable<Environment> =
+  public readonly activeEnvironment$: Observable<Environment> =
     this.#activeEnvironmentSubject.asObservable().pipe(filter(isNotUndefined));
 
-  readonly activeEnvironment: Signal<Environment | undefined> = toSignal(
+  public readonly activeEnvironment: Signal<Environment | undefined> = toSignal(
     this.activeEnvironment$,
     {
       initialValue: undefined,
@@ -69,19 +69,8 @@ export class EnvironmentsService {
         takeUntilDestroyed(),
       )
       .subscribe((environments) => {
-        this.#updateEnvironments(environments);
+        this.#updateEnvironments(environments.data);
       });
-  }
-
-  public init(projectId?: string) {
-    if (!isNil(projectId)) {
-      return this.#getAllEnvironments(projectId).pipe(
-        tap((environments) => {
-          this.#updateEnvironments(environments);
-        }),
-      );
-    }
-    return of(undefined);
   }
 
   public createEnvironment(data: EnvironmentCreateInput): Observable<string> {
@@ -151,26 +140,32 @@ export class EnvironmentsService {
   #getAllEnvironments = (projectId?: string) => {
     return this.#refresh$.pipe(
       switchMap(() =>
-        this.#http.get<Environment[]>(`${environment.api}/environments`, {
-          params: {
-            ...(!isEmpty(projectId)
-              ? {
-                  projectId,
-                }
-              : {}),
+        this.#http.get<DataWithTotal<Environment>>(
+          `${environment.api}/environments`,
+          {
+            params: {
+              ...(!isEmpty(projectId)
+                ? {
+                    projectId,
+                  }
+                : {}),
+            },
+            withCredentials: true,
           },
-          withCredentials: true,
-        }),
+        ),
       ),
     );
   };
 
   #updateEnvironments(environments: Environment[]): void {
-    this.environments.set(environments);
-    const savedEnvironmentId = this.#preferenceService.getActiveEnvironmentId();
-    const savedEnvironment = this.environments().find(
-      (env) => env.id === savedEnvironmentId,
-    );
-    this.#activeEnvironmentSubject.next(savedEnvironment ?? environments[0]);
+    if (!isEmpty(environments)) {
+      this.#environments.set(environments);
+      const savedEnvironmentId =
+        this.#preferenceService.getActiveEnvironmentId();
+      const savedEnvironment = this.environments().find(
+        (env) => env.id === savedEnvironmentId,
+      );
+      this.#activeEnvironmentSubject.next(savedEnvironment ?? environments[0]);
+    }
   }
 }

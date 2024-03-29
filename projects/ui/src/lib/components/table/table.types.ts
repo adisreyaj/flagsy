@@ -1,3 +1,5 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+
 import { TemplateRef, Type } from '@angular/core';
 import { Observable } from 'rxjs';
 import { TableSortDirection } from './table.component';
@@ -13,12 +15,15 @@ export type TableColumnConfig = {
   content?: Type<unknown> | TemplateRef<unknown>;
   context?: unknown;
   type?: TableDefaultCellType;
+  transform?: (cellData: any) => any;
 } & (
   | {
       content: Type<unknown> | TemplateRef<unknown>;
     }
   | { type?: TableDefaultCellType }
 );
+
+export type RowData = Record<string, any>;
 
 export enum TableDefaultCellType {
   Text = 'text',

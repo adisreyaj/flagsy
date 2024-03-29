@@ -235,7 +235,7 @@ export class FeatureConfigSheetComponent implements OnDestroy {
   readonly #environmentService = inject(EnvironmentsService);
   readonly #destroyed = new Subject<void>();
 
-  constructor() {
+  public constructor() {
     this.activeEnvironment = this.#environmentService.activeEnvironment;
     this.featureTypeSelectOptions =
       this.#featuresService.getFeatureTypeSelectOptions();

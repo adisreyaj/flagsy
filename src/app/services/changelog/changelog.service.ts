@@ -16,7 +16,7 @@ import { QueryParamUtil } from '../../utils/query-param.util';
 export class ChangelogService {
   #http = inject(HttpClient);
 
-  getChangelogs(args?: {
+  public getChangelogs(args?: {
     sort?: SortBy<FeatureChangelogSortKey>;
     pagination?: Pagination;
     filters?: FlatFilter;

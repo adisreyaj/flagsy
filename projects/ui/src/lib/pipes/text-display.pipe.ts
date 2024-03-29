@@ -3,7 +3,7 @@ import { isBoolean, isEmpty, isNumber, isString } from 'lodash-es';
 
 @Pipe({ name: 'textDisplay', standalone: true })
 export class TextDisplayPipe implements PipeTransform {
-  transform(value?: string | number | boolean): string {
+  public transform(value?: string | number | boolean): string {
     if (isNumber(value)) return value?.toString() ?? '-';
     if (isBoolean(value)) return value ? 'true' : 'false';
     if (isString(value)) {

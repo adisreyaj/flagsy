@@ -29,5 +29,5 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
   ],
 })
 export class TooltipComponent {
-  text = signal<string | undefined>(undefined);
+  protected text = signal<string | undefined>(undefined);
 }

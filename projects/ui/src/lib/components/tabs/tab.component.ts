@@ -1,9 +1,9 @@
 import {
   booleanAttribute,
   Component,
-  Input,
+  input,
   TemplateRef,
-  ViewChild,
+  viewChild,
 } from '@angular/core';
 import { IconName } from 'angular-remix-icon/lib/icon-names';
 
@@ -15,15 +15,13 @@ import { IconName } from 'angular-remix-icon/lib/icon-names';
   standalone: true,
 })
 export class TabComponent {
-  @ViewChild('content', { static: true, read: TemplateRef })
-  public content!: TemplateRef<unknown>;
+  public content = viewChild<TemplateRef<unknown>>('content');
 
-  @Input()
-  title?: string;
+  public title = input<string>('');
 
-  @Input()
-  icon?: IconName;
+  public icon = input<IconName>();
 
-  @Input({ transform: booleanAttribute })
-  disabled?: boolean;
+  public disabled = input<boolean | string, boolean>(false, {
+    transform: booleanAttribute,
+  });
 }

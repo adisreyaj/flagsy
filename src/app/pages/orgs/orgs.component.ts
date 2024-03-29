@@ -67,7 +67,7 @@ export class OrgsComponent {
 
   readonly #orgsService = inject(OrgsService);
 
-  constructor() {
+  public constructor() {
     this.dataFetcher = () => this.#orgsService.getAll();
   }
 }

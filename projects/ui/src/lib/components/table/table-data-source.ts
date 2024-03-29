@@ -24,20 +24,20 @@ export class TableDataSource<DataType = unknown> extends DataSource<DataType> {
   protected externalTriggers$;
 
   readonly #isLoadingSignal = signal<boolean>(false);
-  readonly isLoading = this.#isLoadingSignal.asReadonly();
+  public readonly isLoading = this.#isLoadingSignal.asReadonly();
 
   readonly #isEmptySignal = signal<boolean>(false);
-  readonly isEmpty = this.#isEmptySignal.asReadonly();
+  public readonly isEmpty = this.#isEmptySignal.asReadonly();
 
   readonly #totalCountSignal = signal<number>(0);
-  readonly totalCount = this.#totalCountSignal.asReadonly();
+  public readonly totalCount = this.#totalCountSignal.asReadonly();
 
   readonly #dataFetchedSignal = signal<boolean>(false);
-  readonly dataFetched = this.#dataFetchedSignal.asReadonly();
+  public readonly dataFetched = this.#dataFetchedSignal.asReadonly();
 
   readonly #subs = new Subscription();
 
-  constructor(
+  public constructor(
     dataFetcher: TableDataFetcher<DataType>,
     sortChange?: Observable<TableSortState | undefined>,
     pageChange?: Observable<TablePaginationState | undefined>,
@@ -50,7 +50,7 @@ export class TableDataSource<DataType = unknown> extends DataSource<DataType> {
     this.externalTriggers$ = externalTriggers ?? of(undefined);
   }
 
-  connect() {
+  public connect() {
     return combineLatest([
       this.sortChange$,
       this.pageChange$,
@@ -82,7 +82,7 @@ export class TableDataSource<DataType = unknown> extends DataSource<DataType> {
     );
   }
 
-  disconnect() {
+  public disconnect() {
     this.#subs.unsubscribe();
   }
 }

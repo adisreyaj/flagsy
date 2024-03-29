@@ -9,20 +9,20 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root',
 })
 export class AuthService {
-  readonly account: Signal<UserWithRole | undefined>;
-  readonly isLoggedIn: Signal<boolean>;
+  public readonly account: Signal<UserWithRole | undefined>;
+  public readonly isLoggedIn: Signal<boolean>;
 
   readonly #account = signal<UserWithRole | undefined>(undefined);
   readonly #http: HttpClient = inject(HttpClient);
 
-  constructor() {
+  public constructor() {
     this.account = this.#account.asReadonly();
     this.isLoggedIn = computed(() => {
       return !isNil(this.#account());
     });
   }
 
-  fetchUserDetails(): Observable<UserWithRole | undefined> {
+  public fetchUserDetails(): Observable<UserWithRole | undefined> {
     return this.#http
       .get<UserWithRole>(`${environment.api}/auth/me`, {
         withCredentials: true,
@@ -40,7 +40,7 @@ export class AuthService {
       );
   }
 
-  login(email: string, password: string) {
+  public login(email: string, password: string) {
     return this.#http
       .post<UserWithRole>(
         `${environment.api}/auth/login`,
@@ -56,7 +56,7 @@ export class AuthService {
       );
   }
 
-  logout() {
+  public logout() {
     return this.#http
       .get(`${environment.api}/auth/logout`, { withCredentials: true })
       .pipe(

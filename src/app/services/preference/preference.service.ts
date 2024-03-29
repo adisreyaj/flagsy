@@ -5,19 +5,19 @@ import { Injectable } from '@angular/core';
 })
 // TODO: Use facade for local storage
 export class PreferenceService {
-  saveActiveProjectId(projectId: string) {
+  public saveActiveProjectId(projectId: string) {
     localStorage.setItem(PreferenceKey.ActiveProject, projectId);
   }
 
-  getActiveProjectId() {
+  public getActiveProjectId() {
     return localStorage.getItem(PreferenceKey.ActiveProject) ?? undefined;
   }
 
-  saveActiveEnvironmentId(environmentId: string) {
+  public saveActiveEnvironmentId(environmentId: string) {
     localStorage.setItem(PreferenceKey.ActiveEnvironment, environmentId);
   }
 
-  getActiveEnvironmentId() {
+  public getActiveEnvironmentId() {
     return localStorage.getItem(PreferenceKey.ActiveEnvironment) ?? undefined;
   }
 }

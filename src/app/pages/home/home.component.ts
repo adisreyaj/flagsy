@@ -31,7 +31,7 @@ import { FeaturesListComponent } from '../features/features-list.component';
         <header class="flex justify-between items-center">
           <h2 class="font-semibold text-sm text-gray-700">Latest Flags</h2>
           <ui-button
-            size="sm"
+            size="xs"
             variant="icon"
             label="View All"
             trailingIcon="arrow-right-line"
@@ -53,7 +53,7 @@ import { FeaturesListComponent } from '../features/features-list.component';
         <header class="flex justify-between items-center">
           <h2 class="font-semibold text-sm text-gray-700">Recent Changelog</h2>
           <ui-button
-            size="sm"
+            size="xs"
             variant="icon"
             label="View All"
             trailingIcon="arrow-right-line"
@@ -131,7 +131,7 @@ export class HomeComponent {
   readonly #changelogService = inject(ChangelogService);
   readonly #router = inject(Router);
 
-  constructor() {
+  public constructor() {
     this.featureTableDataFetcher = () => {
       return combineLatest([
         this.#featuresService.currentProjectId$,

@@ -8,7 +8,7 @@ import { RouterStateSnapshot, TitleStrategy } from '@angular/router';
 export class FlagsyTitleStrategy extends TitleStrategy {
   #title = inject(Title);
 
-  override updateTitle(routerState: RouterStateSnapshot) {
+  public override updateTitle(routerState: RouterStateSnapshot) {
     const title = this.buildTitle(routerState);
     this.#title.setTitle(
       title

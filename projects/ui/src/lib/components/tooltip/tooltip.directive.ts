@@ -84,7 +84,7 @@ export class TooltipDirective {
 
   @HostListener('mouseenter')
   @HostListener('focusin')
-  show() {
+  public show() {
     this.#mouseEnter$
       .pipe(
         delay(200),
@@ -102,7 +102,7 @@ export class TooltipDirective {
 
   @HostListener('mouseleave')
   @HostListener('focusout')
-  hide() {
+  public hide() {
     this.#mouseLeave$.next();
   }
 

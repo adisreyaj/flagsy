@@ -7,11 +7,11 @@ import { environment } from '../../../environments/environment';
 @Injectable({
   providedIn: 'root',
 })
-export class OrgsService {
+export class UsersService {
   #http = inject(HttpClient);
 
   public getAll() {
-    return this.#http.get<DataWithTotal<Org>>(`${environment.api}/orgs`, {
+    return this.#http.get<DataWithTotal<Org>>(`${environment.api}/users`, {
       withCredentials: true,
     });
   }
