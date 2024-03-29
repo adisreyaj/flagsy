@@ -1,27 +1,73 @@
-# Flagsy
+<!-- PROJECT LOGO -->
+<br />
+<p align="center">
+  <a href="https://github.com/adi.sreyaj/flagsy">
+    <img src="assets/logo-full.svg" alt="Logo" width="333" height="100">
+  </a>
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.0.
+<h3 align="center">Flagsy -  Control your flags ✔️</h3>
 
-## Development server
+  <p align="center">
+    A simple and user friendly feature flag management application
+    <br />
+    <br />
+    <a href="https://flagsy.adi.so">View Demo</a>
+    ·
+    <a href="https://github.com/adisreyaj/flagsy/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/adisreyaj/flagsy/issues">Request Feature</a>
+    ·
+  </p>
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+  <p align="center">
+   <img src="https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white">
+   <img src="https://img.shields.io/badge/angular-%23DD0031.svg?style=for-the-badge&logo=angular&logoColor=white">
+   <img src="https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white">
+   <img src="https://img.shields.io/badge/fastify-%23E0234E.svg?style=for-the-badge&logo=fastify&logoColor=white">
+   <img src="https://img.shields.io/badge/prisma-%231a202c.svg?style=for-the-badge&logo=prisma&logoColor=white">
+   <img src="https://img.shields.io/badge/mysql-%23316192.svg?style=for-the-badge&logo=mysql&logoColor=white">
+  </p>
+</p>
 
-## Code scaffolding
+##
+A simple application build for managing feature flags in your application. This is the UI repo for the project.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
-## Build
+Back-end Repo: https://github.com/adisreyaj/flagsy-api
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+---
+## Login
 
-## Running unit tests
+![Flagsy login page](assets/login.png 'Login')
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Home
 
-## Running end-to-end tests
+![Flagsy home page](assets/home.png 'home')
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
 
-## Further help
+## Users
+![Flagsy users page](assets/users.png 'users')
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## Projects
+![Flagsy projects page](assets/projects.png 'projects')
+
+## Environments
+![Flagsy environments page](assets/environments.png 'environments')
+
+## Features
+![Flagsy features page](assets/features.png 'features')
+
+## Changelog
+![Flagsy changelog](assets/changelog.png 'Changelog')
+
+## Roadmap
+
+See the [open issues](https://github.com/adisreyaj/flagsy/issues) for a list of proposed features (and known issues).
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## Show your support
+
+Please ⭐️ this repository if this project helped you!
