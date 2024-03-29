@@ -1,5 +1,6 @@
 import { A11yModule } from '@angular/cdk/a11y';
 import { AsyncPipe, JsonPipe, TitleCasePipe } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, OnDestroy, signal } from '@angular/core';
 import {
   AbstractControl,
@@ -355,7 +356,9 @@ export class FeatureConfigSheetComponent implements OnDestroy {
           this.#toast.observe({
             loading: 'Updating...',
             success: () => 'Feature flag updated successfully!',
-            error: () => 'Failed to update feature flag!',
+            error: (err: HttpErrorResponse) => {
+              return err.error?.message ?? 'Failed to update feature flag!';
+            },
           }),
           take(1),
         )

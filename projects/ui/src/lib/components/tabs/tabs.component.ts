@@ -28,36 +28,34 @@ import { TabComponent } from './tab.component';
           role="tab"
           class="flex item flex-1 cursor-pointer relative transition-colors duration-300"
           focusable
-          [disabled]="tab.disabled"
+          [disabled]="tab.disabled()"
           [tabindex]="this.tabIndex() === i ? 0 : -1"
           [attr.aria-selected]="this.tabIndex() === i"
           [class.active]="this.tabIndex() === i"
-          [class.disabled]="tab.disabled"
-          (click)="!tab.disabled && this.selectTab(i)"
-          (keydown.enter)="!tab.disabled && this.selectTab(i)"
-          (keydown.space)="!tab.disabled && this.selectTab(i)"
+          [class.disabled]="tab.disabled()"
+          (click)="!tab.disabled() && this.selectTab(i)"
+          (keydown.enter)="!tab.disabled() && this.selectTab(i)"
+          (keydown.space)="!tab.disabled() && this.selectTab(i)"
           (focus)="this.setFocusedAsActiveInKeyManager(i)"
         >
           <div
             class="relative flex items-center justify-center gap-2 px-1 py-3 w-full"
           >
-            @if (tab.icon) {
+            @if (tab.icon(); as iconName) {
               <div>
-                <rmx-icon [name]="tab.icon" class="!w-5 !h-5"></rmx-icon>
+                <rmx-icon [name]="iconName" class="!w-5 !h-5"></rmx-icon>
               </div>
             }
             <div>
-              {{ tab.title }}
+              {{ tab.title() }}
             </div>
           </div>
         </button>
       }
     </div>
     <div>
-      @if (this.selectedTab()?.content) {
-        <ng-container
-          *ngTemplateOutlet="this.selectedTab()!.content"
-        ></ng-container>
+      @if (this.selectedTab()?.content(); as content) {
+        <ng-container *ngTemplateOutlet="content"></ng-container>
       }
     </div>
   </div>`,
@@ -93,7 +91,7 @@ import { TabComponent } from './tab.component';
   imports: [NgTemplateOutlet, AngularRemixIconComponent, FocusableDirective],
 })
 export class TabsComponent {
-  protected readonly tabIndex = model<number>(0);
+  public readonly tabIndex = model<number>(0);
 
   public readonly tabChange = output<TabChangeEvent>();
 

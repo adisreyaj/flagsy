@@ -115,7 +115,7 @@ export class LoginComponent {
 
   public constructor() {
     this.form = this.#fb.group<LoginFormType>({
-      email: this.#fb.control('hi@adi.so', [
+      email: this.#fb.control('maicy@adi.so', [
         Validators.required,
         Validators.email,
       ]),

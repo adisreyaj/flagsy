@@ -71,7 +71,7 @@ export class DropdownComponent {
     }
   }
 
-  protected close() {
+  public close() {
     this.isOpen.set(false);
   }
 }

@@ -21,10 +21,6 @@ export class AccessService {
     return this.#authService.account()?.role;
   });
 
-  public constructor() {
-    this.init();
-  }
-
   public init() {
     return this.#featureService
       .getAllFeaturesForCurrentProjectAndEnvironment()
