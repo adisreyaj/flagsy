@@ -27,7 +27,7 @@ import { ValidatorsUtil } from '../../../utils/validators.util';
 
 @Component({
   selector: 'app-environment-config-sheet',
-  template: ` <div class="flex flex-col h-full" cdkFocusRegionStart>
+  template: ` <div class="flex flex-col h-full">
     <form
       [formGroup]="form"
       class="flex flex-col gap-4 p-6 min-h-0 overflow-y-auto flex-auto max-w-lg"

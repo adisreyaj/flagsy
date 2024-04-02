@@ -6,6 +6,13 @@ export interface UserMeta {
 }
 
 export interface UserWithRole extends UserMeta {
-  role: string;
+  role: UserRole;
   scopes: string[];
+}
+
+export type UserInviteData = Omit<UserWithRole, 'id' | 'scopes'>;
+
+export enum UserRole {
+  Admin = 'ADMIN',
+  User = 'USER',
 }

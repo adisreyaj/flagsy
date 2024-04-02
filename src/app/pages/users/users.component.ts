@@ -2,14 +2,17 @@ import { Component, inject } from '@angular/core';
 import { UsersService } from '@app/services/users/users.service';
 import {
   ButtonComponent,
+  SheetService,
   TableColumnConfig,
   TableComponent,
   TableDataFetcher,
   TableDefaultCellType,
 } from '@ui/components';
 import { capitalize } from 'lodash-es';
+import { SheetSize } from '../../../../projects/ui/src/lib/components/sheet/sheet.type';
 import { Permissions } from '../../config/permission.config';
 import { PageHeaderComponent } from '../../shared/components/header/page-header.component';
+import { UserInviteSheetComponent } from '../../shared/components/user-invite-sheet/user-invite-sheet.component';
 import { PermissionAccessDirective } from '../../shared/directives/persmission-access.directive';
 
 @Component({
@@ -20,7 +23,11 @@ import { PermissionAccessDirective } from '../../shared/directives/persmission-a
         class="flex gap-2 items-center"
         *permissionAccess="this.inviteUserScope"
       >
-        <ui-button label="Invite User" trailingIcon="add-line"></ui-button>
+        <ui-button
+          label="Invite User"
+          trailingIcon="add-line"
+          (click)="this.openInviteUserSheet()"
+        />
       </div>
     </app-page-header>
 
@@ -74,8 +81,16 @@ export class UsersComponent {
   protected readonly dataFetcher: TableDataFetcher;
 
   readonly #usersService = inject(UsersService);
+  readonly #sheetService = inject(SheetService);
 
   public constructor() {
     this.dataFetcher = () => this.#usersService.getAll();
+  }
+
+  protected openInviteUserSheet(): void {
+    this.#sheetService.open(UserInviteSheetComponent, {
+      title: 'Invite User',
+      size: SheetSize.Medium,
+    });
   }
 }
