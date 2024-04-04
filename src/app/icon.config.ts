@@ -8,6 +8,7 @@ import {
   RiArrowLeftSLine,
   RiArrowRightLine,
   RiArrowRightSLine,
+  RiArrowRightUpLine,
   RiBriefcaseFill,
   RiBriefcaseLine,
   RiBuilding2Fill,
@@ -86,4 +87,5 @@ export const ICONS = {
   RiToggleLine,
   RiHashtag,
   RiUser3Fill,
+  RiArrowRightUpLine,
 };

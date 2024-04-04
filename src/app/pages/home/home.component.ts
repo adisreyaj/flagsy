@@ -14,6 +14,7 @@ import {
 } from '@ui/components';
 import { combineLatest, map, switchMap, take } from 'rxjs';
 import { AppRoutes } from '../../config/routes/app.routes';
+import { FlagsyCommandPaletteComponent } from '../../shared/components/command-palette/command-palette.component';
 import { FeatureChangeCellTemplateComponent } from '../../shared/components/feature-change-cell-template/feature-change-cell-template.component';
 import { PageHeaderComponent } from '../../shared/components/header/page-header.component';
 import { FeatureChangelogTableData } from '../changelog/changelog.component';
@@ -69,6 +70,8 @@ import { FeaturesListComponent } from '../features/features-list.component';
           ></ui-table>
         </div>
       </div>
+
+      <app-cmd-palette></app-cmd-palette>
     </section>
   </div>`,
   standalone: true,
@@ -79,6 +82,7 @@ import { FeaturesListComponent } from '../features/features-list.component';
     TableComponent,
     ButtonComponent,
     RouterLink,
+    FlagsyCommandPaletteComponent,
   ],
 })
 export class HomeComponent {

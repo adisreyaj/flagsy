@@ -22,3 +22,5 @@ export * from './tooltip';
 export * from './filter-bar/filter-bar.component';
 
 export * from './table';
+
+export * from './command-palette';

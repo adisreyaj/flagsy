@@ -50,6 +50,23 @@ svg {
 
 }
 
+
+@layer utilities {
+  .col {
+    @apply flex flex-col;
+  }
+
+  .icon-xs {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .icon-sm {
+    width: 18px !important;
+    height: 18px !important;
+  }
+}
+
 .sheet {
   @apply bg-white rounded-tl-xl rounded-bl-xl border-l border-gray-200;
   box-shadow: -9px 0px 32px -6px rgba(0, 0, 0, 0.1);
