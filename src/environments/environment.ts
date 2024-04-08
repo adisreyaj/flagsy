@@ -1,5 +1,5 @@
 export const environment = {
-  api: 'https://flagsy-api.adi.so',
-  projectId: 'cltivjtyu00023rxcfu7r9gwv',
-  environmentId: 'cltkcuqjw0003nw9obs2v9x67',
+  api: 'https://flagsy.api.adi.so',
+  projectId: 'clur2xfvq0002tgxc297400gg',
+  environmentId: 'clur2xg0x0003tgxc8xk6bzfu',
 };
